@@ -1,9 +1,9 @@
-import { PrismaCliente } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
 class UserService {
     constructor() {
-        this.prisma = new PrismaCliente();
+        this.prisma = new PrismaClient();
     }
 
     addUser = async(user) => {

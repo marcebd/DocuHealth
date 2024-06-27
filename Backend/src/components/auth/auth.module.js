@@ -1,8 +1,7 @@
-import AuthController from "./auth.controller";
-import AuthService from "./auth.service";
-import AuthRouter from "./auth.router";
-import AuthRouter from "./auth.router";
-import UserService from "../User/user.service";
+import AuthController from "./auth.controller.js";
+import AuthService from "./auth.service.js";
+import AuthRouter from "./auth.router.js";
+import UserService from "../user/user.service.js";
 
 const userService = new UserService();
 const authService = new AuthService();
