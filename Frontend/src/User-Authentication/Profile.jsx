@@ -52,21 +52,61 @@ function Profile() {
                     type="idNumber"
                     name="idNumber"
                     placeholder="ID Number"
-                    aria-label="idNumber"
+                    aria-label="ID Number"
                     className="profile-input"
                 />
             </label>
             <h2>Date of Birth</h2>
-
+            <label>
+                <input
+                    type="dateBirth"
+                    name="dateBirth"
+                    placeholder="mm/dd/year"
+                    aria-label="Date of Birth"
+                    className="profile-input"
+                />
+            </label>
             <h2>Gender</h2>
-
-            <h2>Language</h2>
-
+            <select>
+                <option value="">Select an option</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Non-binary">Non-binary</option>
+                <option value="DeclineToState">Prefer not to say</option>
+                <option value="Other">Other</option>
+            </select>
+            <h2>Language(s)</h2>
+            <label>
+                <input
+                    type="Language"
+                    name="Language"
+                    placeholder="Language(s)"
+                    aria-label="Language"
+                    className="profile-input"
+                />
+            </label>
             <h2>Location(s)</h2>
-
+            <label>
+                <input
+                    type="Location"
+                    name="Location"
+                    placeholder="Location(s)"
+                    aria-label="Location"
+                    className="profile-input"
+                />
+            </label>
             <h2>Education</h2>
-
+            <label>
+                <input
+                    type="Education"
+                    name="Education"
+                    placeholder="Education"
+                    aria-label="Education"
+                    className="profile-input"
+                />
+            </label>
             <h2>Tell us more about yourself...</h2>
+            <textarea placeholder="Tell us about yourself..." />
         </div>
     );
 }
