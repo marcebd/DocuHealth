@@ -58,11 +58,11 @@ app.get("/logout", (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  let { name, email, password, password2 } = req.body;
-  console.log("Received data:", { name, email, password, password2 });
+  let { email, password, password2 } = req.body;
+  console.log("Received data:", {email, password, password2 });
   let errors = [];
 
-  if (!name || !email || !password || !password2) {
+  if (!email || !password || !password2) {
     errors.push({ message: "Please enter all fields" });
   }
 
@@ -80,10 +80,10 @@ app.post("/register", async (req, res) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const result = await pool.query(
-        `INSERT INTO users (name, email, password)
-         VALUES ($1, $2, $3)
+        `INSERT INTO users (email, password)
+         VALUES ($1, $2)
          RETURNING id, password`,
-        [name, email, hashedPassword]
+        [email, hashedPassword]
       );
       res.status(201).json({ message: "User registered successfully", userId: result.rows[0].id });
     } catch (err) {

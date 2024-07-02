@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 
 function Register() {
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
     password: '',
     password2: '',
@@ -37,7 +36,7 @@ function Register() {
         const data = await response.json();
         console.log('Registration successful', data);
         // Optionally redirect or update UI upon successful registration
-        window.location.href = '/login'; // Redirect to login on successful registration
+        window.location.href = '/profile'; // Redirect to login on successful registration
       }
     } catch (error) {
       setError('Network error or registration failed');
@@ -50,20 +49,7 @@ function Register() {
   return (
     <div className="register-container">
       <form onSubmit={handleSubmit} aria-live="polite" className="register-form">
-        <h2>Register</h2>
-        <label>
-          Name:
-          <input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            placeholder="Name"
-            required
-            aria-label="Name"
-            className="register-input"
-          />
-        </label>
+        <h2>Create an Account</h2>
         <label>
           Email:
           <input
@@ -104,7 +90,7 @@ function Register() {
           />
         </label>
         <button type="submit" disabled={isLoading} className="register-button">
-          {isLoading ? 'Registering...' : 'Register'}
+          {isLoading ? 'Creating...' : 'Create account'}
         </button>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <p>

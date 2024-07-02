@@ -15,7 +15,43 @@ datasource db {
 
 model users {
   id       BigInt   @id @default(autoincrement()) @db.BigInt
-  name     String   @db.VarChar(200)
   email    String   @unique @db.VarChar(200)
   password String   @db.VarChar(200)
+  userData user_data?
+}
+
+enum Gender {
+  Female
+  Male
+  Nonbinary
+  DeclineToState
+  Other
+}
+
+model user_data {
+  id       BigInt   @id @default(autoincrement()) @db.BigInt
+  first_name String
+  middle_name String?
+  last_name String
+  phone_number String?
+  specialty String[]
+  id_number String
+  date_of_birth DateTime
+  gender Gender
+  languages String[]
+  location String[]
+  education Education[]
+  biography String
+  profile_picture String?
+  user_id BigInt @unique
+  user users @relation(fields: [user_id], references: [id])
+}
+
+model Education {
+  id           BigInt @id @default(autoincrement()) @db.BigInt
+  institution  String
+  degree       String
+  graduation   DateTime
+  user_data_id BigInt
+  userData     user_data @relation(fields: [user_data_id], references: [id])
 }
