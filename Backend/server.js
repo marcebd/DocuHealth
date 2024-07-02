@@ -32,6 +32,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });
 
+/*************** GET ******************/
 app.get("/register", checkAuthenticated, (req, res) => {
   res.json({ message: "Registration page" });
 });
@@ -57,6 +58,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
+/*************** POST ******************/
 app.post("/register", async (req, res) => {
   let { email, password, password2 } = req.body;
   console.log("Received data:", {email, password, password2 });
@@ -103,6 +105,8 @@ app.post(
   })
 );
 
+
+//Helper Functions
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return res.redirect("/dashboard");
