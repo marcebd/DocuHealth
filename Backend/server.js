@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const session = require("express-session");
 const cors = require("cors");
+const flash = require("connect-flash");
 require("dotenv").config();
 const app = express();
 
@@ -15,7 +16,7 @@ initializePassport(passport);
 // Middleware
 app.use(cors({
     origin: 'http://localhost:5174',
-    credentials: true, 
+    credentials: true,
 }));
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
@@ -23,6 +24,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+app.use(flash());  // Use connect-flash middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -30,15 +32,15 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });
 
-app.get("/users/register", checkAuthenticated, (req, res) => {
+app.get("/register", checkAuthenticated, (req, res) => {
   res.json({ message: "Registration page" });
 });
 
-app.get("/users/login", checkAuthenticated, (req, res) => {
+app.get("/login", checkAuthenticated, (req, res) => {
   res.json({ message: "Login page" });
 });
 
-app.get("/users/dashboard", checkNotAuthenticated, (req, res) => {
+app.get("/dashboard", checkNotAuthenticated, (req, res) => {
   if (req.user) {
     res.json({ user: req.user.name });
   } else {
@@ -46,7 +48,7 @@ app.get("/users/dashboard", checkNotAuthenticated, (req, res) => {
   }
 });
 
-app.get("/users/logout", (req, res) => {
+app.get("/logout", (req, res) => {
   req.logout(function(err) {
     if (err) {
       return next(err);
@@ -55,9 +57,9 @@ app.get("/users/logout", (req, res) => {
   });
 });
 
-app.post("/users/register", async (req, res) => {
+app.post("/register", async (req, res) => {
   let { name, email, password, password2 } = req.body;
-  console.log("Received data:", { name, email, password, password2 }); // Log received data
+  console.log("Received data:", { name, email, password, password2 });
   let errors = [];
 
   if (!name || !email || !password || !password2) {
@@ -92,17 +94,18 @@ app.post("/users/register", async (req, res) => {
 });
 
 app.post(
-  "/users/login",
+  "/login",
   passport.authenticate("local", {
-    successRedirect: "/users/dashboard",
-    failureRedirect: "/users/login",
-    failureFlash: true
+    successRedirect: "/dashboard",
+    failureRedirect: "/login",
+    failureFlash: true,
+    successFlash: "Welcome to the dashboard!"
   })
 );
 
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
-    return res.redirect("/users/dashboard");
+    return res.redirect("/dashboard");
   }
   next();
 }
@@ -111,7 +114,7 @@ function checkNotAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("/users/login");
+  res.redirect("/login");
 }
 
 app.listen(PORT, () => {
