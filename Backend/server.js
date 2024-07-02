@@ -9,7 +9,8 @@ require("dotenv").config();
 const app = express();
 
 const PORT = process.env.PORT || 3000;
-
+const minPasswordLenght = 6;
+const noErrors = 0;
 const initializePassport = require("./passportConfig");
 initializePassport(passport);
 
@@ -68,7 +69,7 @@ app.post("/register", async (req, res) => {
     errors.push({ message: "Please enter all fields" });
   }
 
-  if (password.length < 6) {
+  if (password.length < minPasswordLenght) {
     errors.push({ message: "Password must be at least 6 characters long" });
   }
 
@@ -76,7 +77,7 @@ app.post("/register", async (req, res) => {
     errors.push({ message: "Passwords do not match" });
   }
 
-  if (errors.length > 0) {
+  if (errors.length > noErrors) {
     res.status(400).json({ errors });
   } else {
     try {
