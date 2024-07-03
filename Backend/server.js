@@ -110,37 +110,42 @@ app.post(
   })
 );
 
-app.post("/profile", upload.single('profilePicture'), async (req, res) => {
-  try {
-    // Parse JSON strings into objects
-    const languages = req.body.languages ? JSON.parse(req.body.languages) : [];
-    const location = req.body.locations ? JSON.parse(req.body.locations) : [];
-    const education = req.body.education ? JSON.parse(req.body.education) : [];
-
-    const newProfile = await prisma.user_data.create({
-      data: {
-        first_name: req.body.firstName, // Make sure this matches the client's data key
-        middle_name: req.body.middleName,
-        last_name: req.body.lastName,
-        phone_number: req.body.contactNumber,
-        specialty: { set: req.body.specialty.split(',') },
-        id_number: req.body.idNumber,
-        date_of_birth: new Date(req.body.dateBirth),
-        gender: req.body.gender,
-        languages: { set: languages },
-        location: { set: location },
-        education: { create: education },
-        biography: req.body.biography,
-        profile_picture: req.file ? req.file.buffer : null,
-        user: req.body.user,
-        user_id: req.body.userID
-      }
-    });
-    res.status(201).json(newProfile);
-  } catch (error) {
-    console.error('Error creating profile:', error);
-    res.status(500).json({ message: "Failed to create profile", error: error.message });
+function replacer(key, value) {
+  if (typeof value === 'bigint') {
+      return value.toString(); // Convert BigInt to string
+  } else {
+      return value; // Return other values unchanged
   }
+}
+app.post("/profile", upload.single('profilePicture'), async (req, res) => {
+try {
+  const userId = req.body.userId; // Extract user ID from the request
+  const newProfile = await prisma.user_data.create({
+    data: {
+      user_id: parseInt(userId),
+      first_name: req.body.firstName,
+      middle_name: req.body.middleName,
+      last_name: req.body.lastName,
+      phone_number: req.body.contactNumber,
+      specialty: { set: req.body.specialty.split(',') },
+      id_number: req.body.idNumber,
+      date_of_birth: new Date(req.body.dateBirth),
+      gender: req.body.gender,
+      languages: { set: JSON.parse(req.body.languages) },
+      location: { set: JSON.parse(req.body.locations) },
+      education: { create: JSON.parse(req.body.education) },
+      biography: req.body.biography,
+      profile_picture: req.file ? req.file.buffer : null,
+    }
+  });
+  // Serialize the newProfile object with the custom replacer to handle BigInt
+  const serializedProfile = JSON.stringify(newProfile, replacer);
+  res.setHeader('Content-Type', 'application/json');
+  res.status(201).send(serializedProfile);
+} catch (error) {
+  console.error('Error creating profile:', error);
+  res.status(500).json({ message: "Failed to create profile", error: error.message });
+}
 });
 
 //Helper Functions

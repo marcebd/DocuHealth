@@ -1,8 +1,7 @@
-import './Register.css'
+import './Register.css';
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
-
 function Register() {
   const [formData, setFormData] = useState({
     email: '',
@@ -16,12 +15,10 @@ function Register() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
       const response = await fetch('http://localhost:3000/register', {
         method: 'POST',
@@ -30,7 +27,6 @@ function Register() {
         },
         body: new URLSearchParams(formData)
       });
-
       if (!response.ok) {
         const errorData = await response.json();
         setError(errorData.message || 'Registration failed');
@@ -38,7 +34,8 @@ function Register() {
       } else {
         const data = await response.json();
         console.log('Registration successful', data);
-        navigate('/profile'); // Redirect to login on successful registration
+        setUser({ id: data.userId}); // Update user context
+        navigate('/profile'); // Navigate to the profile page
       }
     } catch (error) {
       setError('Network error or registration failed');

@@ -136,10 +136,14 @@ function Profile() {
                 formData.append(key, profileData[key]);
             }
         });
-        formData.append('user', user);
+
+        // Convert BigInt user ID to string and append to FormData
+        if (user && user.id) {
+            formData.append('userId', user.id.toString()); // Ensure user ID is a string
+        }
 
         for (let [key, value] of formData.entries()) {
-            console.log(key, value);
+            console.log(`${key}: ${value}`);
         }
 
         // Send the data to the server
@@ -188,7 +192,7 @@ function Profile() {
                     <option value="">Select an option</option>
                     <option value="Female">Female</option>
                     <option value="Male">Male</option>
-                    <option value="Non-binary">Non-binary</option>
+                    <option value="Nonbinary">Non-binary</option>
                     <option value="DeclineToState">Prefer not to say</option>
                     <option value="Other">Other</option>
                 </select>
