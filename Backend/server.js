@@ -62,7 +62,6 @@ app.get("/logout", (req, res) => {
 /*************** POST ******************/
 app.post("/register", async (req, res) => {
   let { email, password, password2 } = req.body;
-  console.log("Received data:", {email, password, password2 });
   let errors = [];
 
   if (!email || !password || !password2) {
@@ -105,6 +104,13 @@ app.post(
     successFlash: "Welcome to the dashboard!"
   })
 );
+
+app.post("/profile", async (req, res) => {
+  let {first_name, middle_name, last_name, phone_number, specialty, id_number, date_of_birth, gender,
+    languages, location, education, biography, profile_picture} = req.body;
+
+    
+})
 
 
 //Helper Functions

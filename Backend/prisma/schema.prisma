@@ -42,7 +42,7 @@ model user_data {
   location String[]
   education Education[]
   biography String
-  profile_picture String?
+  profile_picture Bytes?
   user_id BigInt @unique
   user users @relation(fields: [user_id], references: [id])
 }
