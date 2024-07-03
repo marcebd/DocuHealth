@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
+import { useUser } from '../UserContext';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const { setUser } = useUser();
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
@@ -21,13 +22,13 @@ function Login() {
           email: email,
           password: password
         }),
-        credentials: 'include', // Necessary for cookies to be sent and received
+        credentials: 'include',
       });
-
-      if (response.ok && response.redirected) {
-        window.location.href = '/dashboard'; // Redirect to dashboard page
+      const data = await response.json();
+      if (response.ok && data.success) {
+        setUser(data.user); // Set user data in context
+        Navigate('/dashboard'); // Redirect to dashboard using React Router
       } else {
-        const data = await response.json();
         setError(data.message || 'Failed to login');
       }
     } catch (error) {

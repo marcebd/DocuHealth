@@ -4,9 +4,11 @@ import Home from './User-Authentication/Home';
 import Login from './User-Authentication/Login';
 import Register from './User-Authentication/Register';
 import Profile from './User-Authentication/Profile';
+import { UserProvider } from './UserContext';
 
 function App() {
   return (
+    <UserProvider>
     <Router>
       <div>
         <Routes>
@@ -18,6 +20,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </UserProvider>
   );
 }
 

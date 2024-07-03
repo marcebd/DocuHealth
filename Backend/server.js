@@ -1,5 +1,8 @@
 const express = require("express");
 const { pool } = require("./dbConfig");
+const multer = require('multer');
+const storage = multer.memoryStorage(); // Storing files in memory
+const upload = multer({ storage: storage });
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const session = require("express-session");
@@ -7,7 +10,8 @@ const cors = require("cors");
 const flash = require("connect-flash");
 require("dotenv").config();
 const app = express();
-
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 const minPasswordLenght = 6;
 const noErrors = 0;
@@ -15,6 +19,7 @@ const initializePassport = require("./passportConfig");
 initializePassport(passport);
 
 // Middleware
+app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:5174',
     credentials: true,
@@ -105,13 +110,38 @@ app.post(
   })
 );
 
-app.post("/profile", async (req, res) => {
-  let {first_name, middle_name, last_name, phone_number, specialty, id_number, date_of_birth, gender,
-    languages, location, education, biography, profile_picture} = req.body;
+app.post("/profile", upload.single('profilePicture'), async (req, res) => {
+  try {
+    // Parse JSON strings into objects
+    const languages = req.body.languages ? JSON.parse(req.body.languages) : [];
+    const location = req.body.locations ? JSON.parse(req.body.locations) : [];
+    const education = req.body.education ? JSON.parse(req.body.education) : [];
 
-    
-})
-
+    const newProfile = await prisma.user_data.create({
+      data: {
+        first_name: req.body.firstName, // Make sure this matches the client's data key
+        middle_name: req.body.middleName,
+        last_name: req.body.lastName,
+        phone_number: req.body.contactNumber,
+        specialty: { set: req.body.specialty.split(',') },
+        id_number: req.body.idNumber,
+        date_of_birth: new Date(req.body.dateBirth),
+        gender: req.body.gender,
+        languages: { set: languages },
+        location: { set: location },
+        education: { create: education },
+        biography: req.body.biography,
+        profile_picture: req.file ? req.file.buffer : null,
+        user: req.body.user,
+        user_id: req.body.userID
+      }
+    });
+    res.status(201).json(newProfile);
+  } catch (error) {
+    console.error('Error creating profile:', error);
+    res.status(500).json({ message: "Failed to create profile", error: error.message });
+  }
+});
 
 //Helper Functions
 function checkAuthenticated(req, res, next) {

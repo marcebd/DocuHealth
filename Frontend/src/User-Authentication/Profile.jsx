@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useUser } from '../UserContext';
 
 function Profile() {
+    const {user} = useUser();
     const [profileData, setProfileData] = useState({
         firstName: '',
         middleName: '',
@@ -112,13 +114,52 @@ function Profile() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        const isValid = validateForm();
-        if (!isValid) {
+        console.log("Profile Data Frontend", profileData);
+
+        // Validate the form
+        if (!validateForm()) {
             console.log('Validation errors:', errors);
             return;
         }
-        console.log('Submitting profile data:', profileData);
-        // Submit logic here
+
+        // Prepare FormData for submission
+        const formData = new FormData();
+        Object.keys(profileData).forEach(key => {
+            if (key === 'education' || key === 'languages' || key === 'locations') {
+                // Stringify array or object data
+                formData.append(key, JSON.stringify(profileData[key]));
+            } else if (key === 'profilePicture' && profileData[key]) {
+                // Append file data
+                formData.append(key, profileData[key], profileData[key].name);
+            } else {
+                // Append other data
+                formData.append(key, profileData[key]);
+            }
+        });
+        formData.append('user', user);
+
+        for (let [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
+
+        // Send the data to the server
+        try {
+            const response = await fetch('http://localhost:3000/profile', {
+                method: 'POST',
+                body: formData, // FormData will be sent as multipart/form-data
+            });
+            const responseData = await response.json();
+            if (response.ok) {
+                console.log('Profile submitted successfully:', responseData);
+                // Handle successful submission here, e.g., redirect or clear form
+            } else {
+                console.error('Failed to submit profile:', responseData);
+                // Handle errors, e.g., show error message to user
+            }
+        } catch (error) {
+            console.error('Network or other error:', error);
+            // Handle network or unexpected errors
+        }
     };
 
     return (

@@ -51,7 +51,7 @@ model Education {
   id           BigInt @id @default(autoincrement()) @db.BigInt
   institution  String
   degree       String
-  graduation   DateTime
+  graduation   String
   user_data_id BigInt
   userData     user_data @relation(fields: [user_data_id], references: [id])
 }

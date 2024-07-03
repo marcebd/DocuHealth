@@ -1,5 +1,7 @@
 import './Register.css'
 import React, { useState } from 'react';
+import { useUser } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -9,7 +11,8 @@ function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
+  const { setUser } = useUser();
+  const navigate = useNavigate();
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -35,8 +38,7 @@ function Register() {
       } else {
         const data = await response.json();
         console.log('Registration successful', data);
-        // Optionally redirect or update UI upon successful registration
-        window.location.href = '/profile'; // Redirect to login on successful registration
+        navigate('/profile'); // Redirect to login on successful registration
       }
     } catch (error) {
       setError('Network error or registration failed');
