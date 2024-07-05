@@ -22,7 +22,8 @@
     "react-helmet": "^6.1.0",
     "react-helmet-async": "^2.0.5",
     "react-router-dom": "^6.24.0",
-    "styled-components": "^6.1.11"
+    "styled-components": "^6.1.11",
+    "validator": "^13.12.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.9",

@@ -3,10 +3,8 @@ const { pool } = require("./dbConfig");
 const bcrypt = require("bcrypt");
 
 function initialize(passport) {
-  console.log("Initialized");
 
   const authenticateUser = (email, password, done) => {
-    console.log(email, password);
     pool.query(
       `SELECT * FROM users WHERE email = $1`,
       [email],
@@ -15,7 +13,6 @@ function initialize(passport) {
           console.error("Database error during authentication:", err);
           return done(err);
         }
-        console.log(results.rows);
 
         if (results.rows.length > 0) {
           const user = results.rows[0];
@@ -55,7 +52,6 @@ function initialize(passport) {
         console.error("Error during deserialization:", err);
         return done(err);
       }
-      console.log(`ID is ${results.rows[0].id}`);
       return done(null, results.rows[0]);
     });
   });

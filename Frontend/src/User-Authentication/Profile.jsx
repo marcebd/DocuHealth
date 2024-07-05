@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
+import { isMobilePhone } from 'validator';
+import { useNavigate } from 'react-router-dom';
+
 
 function Profile() {
     const {user} = useUser();
+    const navigate = useNavigate();
     const [profileData, setProfileData] = useState({
         firstName: '',
         middleName: '',
@@ -106,7 +110,12 @@ function Profile() {
         if (profileData.locations.some(loc => !loc)) newErrors.locations = 'All location fields must be filled';
         if (profileData.education.some(edu => !edu.institution || !edu.degree || !edu.graduation)) {
             newErrors.education = 'All fields in education must be filled';
+
+        //Validate real phone number
+        if(!isMobilePhone(profileData.contactNumber, 'en-US', {allow_international: true})){
+            newErrors.contactNumber = 'Invalid phone number';
         }
+    }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -114,11 +123,10 @@ function Profile() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        console.log("Profile Data Frontend", profileData);
 
         // Validate the form
         if (!validateForm()) {
-            console.log('Validation errors:', errors);
+            console.error('Validation errors:', errors);
             return;
         }
 
@@ -142,10 +150,6 @@ function Profile() {
             formData.append('userId', user.id.toString()); // Ensure user ID is a string
         }
 
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
         // Send the data to the server
         try {
             const response = await fetch('http://localhost:3000/profile', {
@@ -153,16 +157,14 @@ function Profile() {
                 body: formData, // FormData will be sent as multipart/form-data
             });
             const responseData = await response.json();
-            if (response.ok) {
-                console.log('Profile submitted successfully:', responseData);
-                // Handle successful submission here, e.g., redirect or clear form
-            } else {
+            if (!response.ok) {
                 console.error('Failed to submit profile:', responseData);
-                // Handle errors, e.g., show error message to user
+            } else {
+                user({ id: user.id}); // Update user context
+                navigate('/dashboard'); // Navigate to the profile page
             }
         } catch (error) {
             console.error('Network or other error:', error);
-            // Handle network or unexpected errors
         }
     };
 

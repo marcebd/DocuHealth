@@ -29,7 +29,6 @@ class Dashboard extends React.Component {
 
   render() {
     const { user, isLoading, error } = this.state;
-    console.log(user);
     // Handle loading state
     if (isLoading) {
       return <p>Loading...</p>;

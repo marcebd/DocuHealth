@@ -13,7 +13,7 @@ const app = express();
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
-const minPasswordLenght = 6;
+const minPasswordLength = 6;
 const noErrors = 0;
 const initializePassport = require("./passportConfig");
 initializePassport(passport);
@@ -73,7 +73,7 @@ app.post("/register", async (req, res) => {
     errors.push({ message: "Please enter all fields" });
   }
 
-  if (password.length < minPasswordLenght) {
+  if (password.length < minPasswordLength) {
     errors.push({ message: "Password must be at least 6 characters long" });
   }
 
@@ -119,7 +119,7 @@ function replacer(key, value) {
 }
 app.post("/profile", upload.single('profilePicture'), async (req, res) => {
 try {
-  const userId = req.body.userId; // Extract user ID from the request
+  const userId = req.body.userId;
   const newProfile = await prisma.user_data.create({
     data: {
       user_id: parseInt(userId),
@@ -148,7 +148,46 @@ try {
 }
 });
 
-//Helper Functions
+/********* Delete **********/
+app.delete('/users/:userId', async (req, res) => {
+  const userId = parseInt(req.params.userId); // Convert the userId to an integer
+
+  try {
+    // Check if the user has associated user_data
+    const userData = await prisma.user_data.findMany({
+      where: { user_id: userId },
+    });
+
+    if (userData.length > 0) {
+      // If the user has associated user_data, delete their education first
+      for (const data of userData) {
+        await prisma.education.deleteMany({
+          where: { user_data_id: data.id },
+        });
+      }
+
+      // Then delete the user_data
+      await prisma.user_data.deleteMany({
+        where: { user_id: userId },
+      });
+    }
+
+    // Finally, delete the user
+    await prisma.users.delete({
+      where: { id: userId },
+    });
+
+    res.status(200).json({ message: 'User and associated data deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    // Handle specific errors if needed (e.g., user not found)
+    if (error.code === 'P2025') {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.status(500).json({ message: 'Failed to delete user', error: error.message });
+  }
+});
+/*********  Helper Functions *********/
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return res.redirect("/dashboard");

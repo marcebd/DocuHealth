@@ -33,7 +33,6 @@ function Register() {
         console.error('Registration failed:', errorData);
       } else {
         const data = await response.json();
-        console.log('Registration successful', data);
         setUser({ id: data.userId}); // Update user context
         navigate('/profile'); // Navigate to the profile page
       }
