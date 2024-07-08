@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const NewPatientModal = ({ onHide }) => {
+const NewPatientModal = ({ onHide, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -28,8 +28,12 @@ const NewPatientModal = ({ onHide }) => {
       body: JSON.stringify(patientData)
     })
     .then(response => response.json())
-    .then(data => console.log(data))
+    .then(data => {
+      onCreate(firstName + " " + lastName);
+    })
     .catch(error => console.error("Error:", error));
+
+    onHide();
   };
 
   return (
