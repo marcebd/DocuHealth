@@ -13,19 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model users {
+model User {
   id       BigInt   @id @default(autoincrement()) @db.BigInt
-  email    String   @unique @db.VarChar(200)
-  password String   @db.VarChar(200)
+  email    String   @unique
+  password String
   userData user_data?
-}
-
-enum Gender {
-  Female
-  Male
-  Nonbinary
-  DeclineToState
-  Other
+  patients Patient[]
 }
 
 model user_data {
@@ -44,14 +37,54 @@ model user_data {
   biography String
   profile_picture Bytes?
   user_id BigInt @unique
-  user users @relation(fields: [user_id], references: [id])
+  user User @relation(fields: [user_id], references: [id])
 }
 
 model Education {
-  id           BigInt @id @default(autoincrement()) @db.BigInt
+  id           BigInt   @id @default(autoincrement()) @db.BigInt
   institution  String
   degree       String
   graduation   String
   user_data_id BigInt
   userData     user_data @relation(fields: [user_data_id], references: [id])
+}
+
+model Patient {
+  id       BigInt   @id  @unique
+  firstName String
+  middleName String?
+  lastName String
+  idNumber String
+  birthDate DateTime
+  visitNotes VisitNote[]
+  prescriptions Prescription[]
+  conditions Condition[]
+  userId BigInt @unique
+  user User @relation(fields: [userId], references: [id])
+}
+
+model VisitNote {
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  date      DateTime
+  notes     String
+  patientId BigInt @unique
+  patient   Patient  @relation(fields: [patientId], references: [id])
+}
+
+model Prescription {
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  name      String
+  dose      String
+  instructions String?
+  date      DateTime
+  patientId BigInt @unique
+  patient   Patient  @relation(fields: [patientId], references: [id])
+}
+
+model Condition {
+  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  name      String
+  date      DateTime
+  patientId BigInt @unique
+  patient   Patient  @relation(fields: [patientId], references: [id])
 }

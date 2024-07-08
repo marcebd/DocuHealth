@@ -2,7 +2,10 @@ import React from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
-
+import SearchBar from './SearchBar';
+import Notepad from './Notepad';
+import PastVisitNotes from './PastVisitNotes';
+import Prescriptions from './Prescriptions';
 // Reusable Helmet component for setting head elements
 const CustomHelmet = () => (
   <Helmet>
@@ -32,9 +35,13 @@ function Dashboard() {
       <HelmetProvider>
         <CustomHelmet />
       </HelmetProvider>
-      <h1>Dashboard</h1>
+      <h1>Hello, {user ? `${user.profileData.firstName}` : 'Guest'}</h1>
+      <img src={user.profileData.profilePicture} />
       <button onClick={handleLogout} aria-label="Logout from Dashboard">Logout</button>
-      <h4>Hello, {user ? `${user.profileData.firstName} (ID: ${user.id})` : 'Guest'}</h4>
+      <div>
+        <SearchBar />
+        <Notepad />
+      </div>
     </div>
   );
 }
