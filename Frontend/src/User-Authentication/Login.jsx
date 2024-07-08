@@ -26,13 +26,13 @@ function Login() {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        setUser(data.user); // Set user data in context
-        Navigate('/dashboard'); // Redirect to dashboard using React Router
+        setUser(data.user);
+        Navigate('/dashboard');
       } else {
         setError(data.message || 'Failed to login');
       }
     } catch (error) {
-      setError('Network error');
+      setError('Network error')
     } finally {
       setIsLoading(false);
     }

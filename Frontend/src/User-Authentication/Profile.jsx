@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 
 function Profile() {
-    const {user} = useUser();
+    const { user, setUser } = useUser();
+    console.log(user);
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState({
         firstName: '',
@@ -22,6 +23,7 @@ function Profile() {
         biography: '',
         profilePicture: ''
     });
+
 
     const handleChange = (event) => {
         const { name, type, value, files } = event.target;
@@ -145,11 +147,11 @@ function Profile() {
             }
         });
 
-        // Convert BigInt user ID to string and append to FormData
+         // Convert BigInt user ID to string and append to FormData
         if (user && user.id) {
             formData.append('userId', user.id.toString()); // Ensure user ID is a string
         }
-
+        user.profileData = profileData;
         // Send the data to the server
         try {
             const response = await fetch('http://localhost:3000/profile', {
@@ -157,10 +159,10 @@ function Profile() {
                 body: formData, // FormData will be sent as multipart/form-data
             });
             const responseData = await response.json();
+            console.log(formData.entries);
             if (!response.ok) {
                 console.error('Failed to submit profile:', responseData);
             } else {
-                user({ id: user.id}); // Update user context
                 navigate('/dashboard'); // Navigate to the profile page
             }
         } catch (error) {

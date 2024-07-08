@@ -1,6 +1,7 @@
 import React from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import PropTypes from 'prop-types'; // Import PropTypes for type checking
+import { useUser } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
 
 // Reusable Helmet component for setting head elements
 const CustomHelmet = () => (
@@ -13,50 +14,29 @@ const CustomHelmet = () => (
   </Helmet>
 );
 
-class Dashboard extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      user: '',
-      isLoading: false,
-      error: ''
-    };
-  }
+function Dashboard() {
+  const { user } = useUser();
+  console.log("User information dahsboard", user);
+  const navigate = useNavigate();
 
-  componentDidMount() {
-    // Code with side effects
-  }
+  // Function to handle logout
+  const handleLogout = () => {
+    // Implement logout functionality here
+    // For example, clearing user context and redirecting
+    // setUser(null); // Uncomment if setUser is correctly destructured from useUser
+    navigate('/login');
+  };
 
-  render() {
-    const { user, isLoading, error } = this.state;
-    // Handle loading state
-    if (isLoading) {
-      return <p>Loading...</p>;
-    }
-
-    // Handle error state
-    if (error) {
-      return <p>Error loading the dashboard: {error}</p>;
-    }
-
-    return (
-      <div>
-        <HelmetProvider>
-          <CustomHelmet />
-        </HelmetProvider>
-        <h1>Dashboard</h1>
-        <a href="/logout" aria-label="Logout from Dashboard">Logout</a>
-        <h4>Hello {user}</h4>
-      </div>
-    );
-  }
+  return (
+    <div>
+      <HelmetProvider>
+        <CustomHelmet />
+      </HelmetProvider>
+      <h1>Dashboard</h1>
+      <button onClick={handleLogout} aria-label="Logout from Dashboard">Logout</button>
+      <h4>Hello, {user ? `${user.profileData.firstName} (ID: ${user.id})` : 'Guest'}</h4>
+    </div>
+  );
 }
-
-// Prop types for Dashboard component
-Dashboard.propTypes = {
-  user: PropTypes.string,
-  isLoading: PropTypes.bool,
-  error: PropTypes.string
-};
 
 export default Dashboard;
