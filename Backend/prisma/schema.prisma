@@ -21,6 +21,14 @@ model User {
   patients Patient[]
 }
 
+enum Gender {
+Female
+Male
+Nonbinary
+DeclineToState
+Other
+}
+
 model user_data {
   id       BigInt   @id @default(autoincrement()) @db.BigInt
   first_name String

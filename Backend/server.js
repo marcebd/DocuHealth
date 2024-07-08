@@ -174,6 +174,27 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
   }
 });
 
+app.post("/patients", async (req, res) => {
+  let{firstName, middleName, lastName, idNumber, birthDate, prescriptions, conditions} = req.body;
+  try {
+    const patient = await prisma.patient.create({
+      data: {
+        firstName,
+        middleName,
+        lastName,
+        idNumber,
+        birthDate,
+        prescriptions,
+        conditions,
+      }
+    });
+    res.status(201).json({message: "Patient created successfully", patient});
+  } catch(error) {
+    console.error("Error creating patient", error);
+    res.status(500).json({message: "Failed to create patient", error: error.message});
+  }
+  });
+
 /********* Delete **********/
 app.delete('/users/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId); // Convert the userId to an integer
