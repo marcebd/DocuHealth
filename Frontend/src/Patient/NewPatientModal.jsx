@@ -10,7 +10,26 @@ const NewPatientModal = ({ onHide }) => {
   const [conditions, setConditions] = useState([]);
 
   const handleSave = () => {
-    // Save the new patient data here
+    const patientData = {
+      firstName,
+      middleName,
+      lastName,
+      idNumber,
+      birthDate,
+      prescriptions,
+      conditions
+    };
+
+    fetch("/patients", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(patientData)
+    })
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error("Error:", error));
   };
 
   return (
