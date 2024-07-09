@@ -186,25 +186,49 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
 });
 
 app.post("/patients", async (req, res) => {
-  let{firstName, middleName, lastName, idNumber, birthDate, prescriptions, conditions} = req.body;
+  const { userId, firstName, middleName, lastName, idNumber, birthDate, prescriptions, conditions } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
   try {
     const patient = await prisma.patient.create({
       data: {
+        userId: parseInt(userId), 
         firstName,
         middleName,
         lastName,
         idNumber,
-        birthDate,
-        prescriptions,
-        conditions,
+        birthDate: new Date(birthDate),
+        prescriptions: {
+          create: prescriptions.map(prescription => ({
+            name: prescription.name,
+            dose: prescription.dose,
+            instructions: prescription.instructions,
+            date: new Date(prescription.date)
+          }))
+        },
+        conditions: {
+          create: conditions.map(condition => ({
+            name: condition.name,
+            date: new Date(condition.date)
+          }))
+        }
       }
     });
-    res.status(201).json({message: "Patient created successfully", patient});
-  } catch(error) {
+    const responsePatient = {
+      ...patient,
+      id: patient.id.toString(),
+      userId: patient.userId.toString()
+    };
+
+    res.status(201).json({ message: "Patient created successfully", patient: responsePatient });
+  } catch (error) {
     console.error("Error creating patient", error);
-    res.status(500).json({message: "Failed to create patient", error: error.message});
+    res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
-  });
+});
 
 /********* Delete **********/
 app.delete('/users/:userId', async (req, res) => {

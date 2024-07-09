@@ -58,7 +58,7 @@ model Education {
 }
 
 model Patient {
-  id       BigInt   @id  @unique
+  id       BigInt    @id @default(autoincrement()) @db.BigInt
   firstName String
   middleName String?
   lastName String
@@ -67,7 +67,7 @@ model Patient {
   visitNotes VisitNote[]
   prescriptions Prescription[]
   conditions Condition[]
-  userId BigInt @unique
+  userId BigInt
   user User @relation(fields: [userId], references: [id])
 }
 
@@ -75,7 +75,7 @@ model VisitNote {
   id        BigInt   @id @default(autoincrement()) @db.BigInt
   date      DateTime
   notes     String
-  patientId BigInt @unique
+  patientId BigInt
   patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
@@ -85,7 +85,7 @@ model Prescription {
   dose      String
   instructions String?
   date      DateTime
-  patientId BigInt @unique
+  patientId BigInt
   patient   Patient  @relation(fields: [patientId], references: [id])
 }
 
@@ -93,6 +93,6 @@ model Condition {
   id        BigInt   @id @default(autoincrement()) @db.BigInt
   name      String
   date      DateTime
-  patientId BigInt @unique
+  patientId BigInt 
   patient   Patient  @relation(fields: [patientId], references: [id])
 }
