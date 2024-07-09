@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -8,6 +8,8 @@ function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const { setUser } = useUser();
+  const navigate = useNavigate();
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
@@ -26,13 +28,15 @@ function Login() {
       });
       const data = await response.json();
       if (response.ok && data.success) {
-        setUser(data.user);
-        Navigate('/dashboard');
+        setUser(data.user); // Update user context
+        localStorage.setItem('userData', JSON.stringify(data.user)); // Store user in local storage
+        navigate('/dashboard'); // Navigate to the dashboard
       } else {
         setError(data.message || 'Failed to login');
       }
     } catch (error) {
-      setError('Network error')
+      setError('Network error');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }

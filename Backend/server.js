@@ -1,7 +1,7 @@
 const express = require("express");
 const { pool } = require("./dbConfig");
 const multer = require('multer');
-const storage = multer.memoryStorage(); // Storing files in memory
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const bcrypt = require("bcrypt");
 const passport = require("passport");
@@ -92,6 +92,7 @@ app.post("/register", async (req, res) => {
          RETURNING id, password`,
         [email, hashedPassword]
       );
+      res.cookie("username", result.rows[0].email, { expires: new Date(Date.now() + 900000000), httpOnly: true });
       res.status(201).json({ message: "User registered successfully", userId: result.rows[0].id });
     } catch (err) {
       console.error("Error during registration:", err);
@@ -109,6 +110,16 @@ app.post(
     successFlash: "Welcome to the dashboard!"
   })
 );
+
+app.post("/login", (req, res) => {
+  const user = req.user;
+  if (user) {
+    res.cookie("username", user.username, { expires: new Date(Date.now() + 900000000), httpOnly: true });
+    res.redirect("/");
+  } else {
+    res.status(401).send("Invalid username or password");
+  }
+});
 
 function replacer(key, value) {
   if (typeof value === 'bigint') {
@@ -220,7 +231,7 @@ app.delete('/users/:userId', async (req, res) => {
     }
 
     // Finally, delete the user
-    await prisma.users.delete({
+    await prisma.user.delete({
       where: { id: userId },
     });
 

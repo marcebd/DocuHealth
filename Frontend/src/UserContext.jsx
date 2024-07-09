@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const UserContext = createContext(null);
 
@@ -27,6 +27,14 @@ export const UserProvider = ({ children }) => {
       userId: null,
     },
   });
+
+  // Load user data from local storage when the component mounts
+  useEffect(() => {
+    const storedUserData = localStorage.getItem('userData');
+    if (storedUserData) {
+      setUser(JSON.parse(storedUserData));
+    }
+  }, []);
 
   return (
     <UserContext.Provider value={{ user, setUser }}>

@@ -16,8 +16,8 @@ const NewPatientModal = ({ onHide, onCreate }) => {
       lastName,
       idNumber,
       birthDate,
-      prescriptions,
-      conditions
+      prescriptions: JSON.parse(prescriptions),
+      conditions: JSON.parse(conditions)
     };
 
     fetch("/patients", {

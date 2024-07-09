@@ -2,6 +2,7 @@ import './Register.css';
 import React, { useState } from 'react';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
+
 function Register() {
   const [formData, setFormData] = useState({
     email: '',
@@ -12,37 +13,66 @@ function Register() {
   const [error, setError] = useState('');
   const { setUser } = useUser();
   const navigate = useNavigate();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  const validateForm = () => {
+    if (!formData.email) {
+      setError('Email is required');
+      return false;
+    }
+    if (!formData.password) {
+      setError('Password is required');
+      return false;
+    }
+    if (formData.password !== formData.password2) {
+      setError('Passwords do not match');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError('');
+
     try {
-      const response = await fetch('http://localhost:3000/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams(formData)
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || 'Registration failed');
-        console.error('Registration failed:', errorData);
-      } else {
+        const response = await fetch('http://localhost:3000/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(formData)
+        });
         const data = await response.json();
-        setUser({ id: data.userId}); // Update user context
-        navigate('/profile'); // Navigate to the profile page
-      }
+        if (!response.ok) {
+            setError(data.message || 'Registration failed');
+            console.error('Registration failed:', data);
+        } else {
+            if (data.userId) {
+                // Construct the user object using the form data and userId from the server
+                const user = {
+                    id: data.userId,
+                    email: formData.email,
+                    password: formData.password, // Note: Storing passwords in local storage is not secure
+                };
+                setUser(user); // Update user context with the constructed user object
+                localStorage.setItem('userData', JSON.stringify(user)); // Store user in local storage
+                navigate('/profile'); // Navigate to the profile page
+            } else {
+                setError('Invalid user data received');
+            }
+        }
     } catch (error) {
-      setError('Network error or registration failed');
-      console.error('Registration failed:', error);
+        setError('Network error or registration failed');
+        console.error('Registration failed:', error);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   return (
     <div className="register-container">

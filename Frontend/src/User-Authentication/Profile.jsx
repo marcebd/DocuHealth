@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { useUser } from '../UserContext';
 import { isMobilePhone } from 'validator';
 import { useNavigate } from 'react-router-dom';
-
-
 function Profile() {
     const { user, setUser } = useUser();
     console.log(user);
@@ -147,11 +145,11 @@ function Profile() {
             }
         });
 
-         // Convert BigInt user ID to string and append to FormData
+        // Convert BigInt user ID to string and append to FormData
         if (user && user.id) {
             formData.append('userId', user.id.toString()); // Ensure user ID is a string
         }
-        user.profileData = profileData;
+
         // Send the data to the server
         try {
             const response = await fetch('http://localhost:3000/profile', {
@@ -159,11 +157,15 @@ function Profile() {
                 body: formData, // FormData will be sent as multipart/form-data
             });
             const responseData = await response.json();
-            console.log(formData.entries);
+
             if (!response.ok) {
                 console.error('Failed to submit profile:', responseData);
             } else {
-                navigate('/dashboard'); // Navigate to the profile page
+                // Update user context and local storage with the new profile data
+                const updatedUser = { ...user, profileData };
+                setUser(updatedUser);
+                localStorage.setItem('userData', JSON.stringify(updatedUser));
+                navigate('/dashboard'); // Navigate to the dashboard page
             }
         } catch (error) {
             console.error('Network or other error:', error);

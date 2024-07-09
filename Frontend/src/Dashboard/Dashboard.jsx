@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 import SearchBar from './SearchBar';
 import Notepad from './Notepad';
+import PatientTabs from './PatientTabs';
 import PastVisitNotes from './PastVisitNotes';
 import Prescriptions from './Prescriptions';
-// Reusable Helmet component for setting head elements
+
 const CustomHelmet = () => (
   <Helmet>
     <meta charSet="UTF-8" />
@@ -18,29 +19,34 @@ const CustomHelmet = () => (
 );
 
 function Dashboard() {
-  const { user } = useUser();
-  console.log("User information dahsboard", user);
+  const { user, setUser } = useUser(); // Use setUser to update the user state
+  console.log("User information dashboard", user);
   const navigate = useNavigate();
 
-  // Function to handle logout
   const handleLogout = () => {
-    // Implement logout functionality here
-    // For example, clearing user context and redirecting
-    // setUser(null); // Uncomment if setUser is correctly destructured from useUser
+    localStorage.removeItem('userData');
     navigate('/login');
   };
+
+  useEffect(() => {
+    const retrievedUserData = localStorage.getItem('userData');
+    if (retrievedUserData) {
+      setUser(JSON.parse(retrievedUserData)); // Update the user state with the retrieved data
+    }
+  }, [setUser]); // Dependency array includes setUser to ensure it's available
 
   return (
     <div>
       <HelmetProvider>
         <CustomHelmet />
       </HelmetProvider>
-      <h1>Hello, {user ? `${user.profileData.firstName}` : 'Guest'}</h1>
-      <img src={user.profileData.profilePicture} />
+      <h1>Hello, {user && user.profileData ? user.profileData.firstName : 'Guest'}</h1>
+      <img src={user && user.profileData ? user.profileData.profilePicture : 'default.jpg'} alt="Profile" />
       <button onClick={handleLogout} aria-label="Logout from Dashboard">Logout</button>
       <div>
         <SearchBar />
         <Notepad />
+        <PatientTabs />
       </div>
     </div>
   );
