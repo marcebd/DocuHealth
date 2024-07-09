@@ -26,7 +26,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: "secret",
     resave: false,
     saveUninitialized: false
 }));
@@ -87,7 +87,7 @@ app.post("/register", async (req, res) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const result = await pool.query(
-        `INSERT INTO users (email, password)
+        `INSERT INTO "User" (email, password)
          VALUES ($1, $2)
          RETURNING id, password`,
         [email, hashedPassword]
@@ -163,7 +163,7 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
           education: { create: JSON.parse(req.body.education) },
           biography: req.body.biography,
           profile_picture: req.file ? req.file.buffer : null,
-        }
+        },
       });
       const serializedProfile = JSON.stringify(newProfile, replacer);
       res.json(serializedProfile);
