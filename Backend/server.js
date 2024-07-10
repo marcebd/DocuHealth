@@ -72,8 +72,6 @@ app.get("/users/:userId/patients", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
     const patients = await prisma.patient.findMany({ where: { userId: userId } });
-    console.log("Backendpatients", patients);
-    // Convert the id property to a string
     patients.forEach(patient => {
       patient.id = patient.id.toString();
       patient.userId = patient.userId.toString();

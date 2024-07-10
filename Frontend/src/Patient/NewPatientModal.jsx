@@ -14,6 +14,8 @@ const NewPatientModal = ({ onHide, onCreate }) => {
   const [conditions, setConditions] = useState([{ name: '', date: '' }]);
   const [searchTerm, setSearchTerm] = useState('');
   const [patients, setPatients] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const userId = user.id;
@@ -35,9 +37,6 @@ const NewPatientModal = ({ onHide, onCreate }) => {
     fetchData();
   }, []);
 
-  console.log("Fetched Data", patients);
-  console.log(typeof patients);
-
   const handlePrescriptionChange = (index, event) => {
     const newPrescriptions = [...prescriptions];
     newPrescriptions[index][event.target.name] = event.target.value;
@@ -56,38 +55,46 @@ const NewPatientModal = ({ onHide, onCreate }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setIsLoading(true);
-    setError('');
+
+    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.instructions && p.date);
+    const areConditionsValid = conditions.every(c => c.name && c.date);
+
+    if (!arePrescriptionsValid || !areConditionsValid) {
+      console.error("All fields in prescriptions and conditions must be filled.");
+      return;
+    }
+
+    const userId = user.id;
+    const patientData = {
+      userId,
+      firstName,
+      middleName,
+      lastName,
+      idNumber,
+      birthDate,
+      prescriptions,
+      conditions
+    };
+
+    console.log("Frontend", patientData);
 
     try {
-      const formData = new FormData(event.target);
       const response = await fetch('http://localhost:3000/patients', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json'
         },
-        body: new URLSearchParams(formData)
+        body: JSON.stringify(patientData)
       });
-      const data = await response.json();
+      const responseData = await response.json();
       if (!response.ok) {
-        setError(data.message || 'Registration failed');
-        console.error('Registration failed:', data);
+        console.error('Failed to create patient:', responseData);
       } else {
-        // Construct the user object using the form data and userId from the server
-        const user = {
-          id: data.userId,
-          email: formData.get('email'),
-          password: formData.get('password'), // Note: Storing passwords in local storage is not secure
-        };
-        setUser(user); // Update user context with the constructed user object
-        localStorage.setItem('userData', JSON.stringify(user)); // Store user in local storage
-        navigate('/profile'); // Navigate to the profile page
+        onCreate(firstName + " " + lastName);
+        onHide();
       }
     } catch (error) {
-      setError('Network error or registration failed');
-      console.error('Registration failed:', error);
-    } finally {
-      setIsLoading(false);
+      console.error("Error creating patient:", error);
     }
   };
 
@@ -110,8 +117,8 @@ const NewPatientModal = ({ onHide, onCreate }) => {
               <tbody>
                 {patients.map((patient) => (
                   <tr key={patient.id}>
-                    <td>{patient.name}</td>
-                    <td>{patient.idNumber}</td>
+                    <td>{patient.firstName}</td>
+                    <td>{patient.id}</td>
                     <td>{patient.birthDate}</td>
                   </tr>
                 ))}
