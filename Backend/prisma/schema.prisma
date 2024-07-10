@@ -93,6 +93,6 @@ model Condition {
   id        BigInt   @id @default(autoincrement()) @db.BigInt
   name      String
   date      DateTime
-  patientId BigInt 
+  patientId BigInt
   patient   Patient  @relation(fields: [patientId], references: [id])
 }

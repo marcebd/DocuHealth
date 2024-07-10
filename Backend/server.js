@@ -64,6 +64,27 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get("/users/:userId/patients", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const patients = await prisma.patient.findMany({ where: { userId: userId } });
+    console.log("Backendpatients", patients);
+    // Convert the id property to a string
+    patients.forEach(patient => {
+      patient.id = patient.id.toString();
+      patient.userId = patient.userId.toString();
+    });
+    return res.json(patients);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 /*************** POST ******************/
 app.post("/register", async (req, res) => {
   let { email, password, password2 } = req.body;
@@ -195,7 +216,7 @@ app.post("/patients", async (req, res) => {
   try {
     const patient = await prisma.patient.create({
       data: {
-        userId: parseInt(userId), 
+        userId: parseInt(userId),
         firstName,
         middleName,
         lastName,
@@ -227,6 +248,24 @@ app.post("/patients", async (req, res) => {
   } catch (error) {
     console.error("Error creating patient", error);
     res.status(500).json({ message: "Failed to create patient", error: error.message });
+  }
+});
+
+app.post("/notes", async (req, res) => {
+  const { patientId, date, notes } = req.body;
+  if (!patient) {
+    return res.status(400).json({ message: "patientId is required" });
+  }
+  try {
+    const patient = await Patient.findUnique({ where: { id: patientId } });
+
+    const visitNote = await VisitNote.create({ date, notes, patientId });
+    patient.visitNotes.push(visitNote);
+    await patient.save();
+    res.json({ message: "Note added successfully" });
+  } catch (error) {
+    console.error("Error adding note", error);
+    res.status(500).json({ message: "Failed to add note", error: error.message });
   }
 });
 

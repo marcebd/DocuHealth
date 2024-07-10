@@ -2,11 +2,8 @@ import React, { useEffect } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
-import SearchBar from './SearchBar';
-import Notepad from './Notepad';
 import PatientTabs from './PatientTabs';
-import PastVisitNotes from './PastVisitNotes';
-import Prescriptions from './Prescriptions';
+import DashboardData from './DashboardData';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -44,9 +41,8 @@ function Dashboard() {
       <img src={user && user.profileData ? user.profileData.profilePicture : 'default.jpg'} alt="Profile" />
       <button onClick={handleLogout} aria-label="Logout from Dashboard">Logout</button>
       <div>
-        <SearchBar />
-        <Notepad />
         <PatientTabs />
+        <DashboardData />
       </div>
     </div>
   );
