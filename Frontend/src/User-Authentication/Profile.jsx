@@ -4,7 +4,6 @@ import { isMobilePhone } from 'validator';
 import { useNavigate } from 'react-router-dom';
 function Profile() {
     const { user, setUser } = useUser();
-    console.log(user);
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState({
         firstName: '',
@@ -145,27 +144,24 @@ function Profile() {
             }
         });
 
-        // Convert BigInt user ID to string and append to FormData
         if (user && user.id) {
-            formData.append('userId', user.id.toString()); // Ensure user ID is a string
+            formData.append('userId', user.id.toString());
         }
 
-        // Send the data to the server
         try {
             const response = await fetch('http://localhost:3000/profile', {
                 method: 'POST',
-                body: formData, // FormData will be sent as multipart/form-data
+                body: formData,
             });
             const responseData = await response.json();
 
             if (!response.ok) {
                 console.error('Failed to submit profile:', responseData);
             } else {
-                // Update user context and local storage with the new profile data
                 const updatedUser = { ...user, profileData };
                 setUser(updatedUser);
                 localStorage.setItem('userData', JSON.stringify(updatedUser));
-                navigate('/dashboard'); // Navigate to the dashboard page
+                navigate('/dashboard'); 
             }
         } catch (error) {
             console.error('Network or other error:', error);

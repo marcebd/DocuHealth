@@ -31,7 +31,6 @@ const NewPatientModal = ({ onClose, onCreate}) => {
           if (storedUserData) {
             const userData = JSON.parse(storedUserData);
             setUser({ ...userData, patients: patientsData });
-            console.log("User after fetching", user);
           }
         }
       } catch (error) {
@@ -79,8 +78,6 @@ const NewPatientModal = ({ onClose, onCreate}) => {
       prescriptions,
       conditions
     };
-
-    console.log("Frontend", patientData);
 
     try {
       const response = await fetch('http://localhost:3000/patients', {

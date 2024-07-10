@@ -47,8 +47,6 @@ function initialize(passport) {
   );
 
   passport.serializeUser((user, done) => {
-    // Store the user's ID in the cookie
-    console.log("serialize", user);
     done(null, user.id);
   });
 

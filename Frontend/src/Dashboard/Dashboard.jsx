@@ -17,7 +17,6 @@ const CustomHelmet = () => (
 
 function Dashboard() {
   const { user, setUser } = useUser(); // Use setUser to update the user state
-  console.log("User information dashboard", user);
   const navigate = useNavigate();
 
   const handleLogout = () => {
