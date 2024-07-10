@@ -30,7 +30,6 @@ function Dashboard() {
       setUser(JSON.parse(retrievedUserData)); // Update the user state with the retrieved data
     }
   }, [setUser]); // Dependency array includes setUser to ensure it's available
-
   return (
     <div>
       <HelmetProvider>

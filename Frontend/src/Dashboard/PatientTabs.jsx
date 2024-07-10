@@ -28,11 +28,6 @@ const PatientTabs = () => {
     setTabs([...tabs, name]);
   };
 
-  const handlePatientClick = (patient) => {
-    setSelectedPatient(patient);
-    setTabs([...tabs, patient.firstName + " " + patient.middleName + " " + patient.lastName]);
-  };
-
   return (
     <div>
       <button onClick={handleCreate}>+</button>

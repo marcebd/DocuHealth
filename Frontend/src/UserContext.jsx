@@ -1,11 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-const UserContext = createContext(null);
-
-export const useUser = () => useContext(UserContext);
-
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState({
+const UserContext = createContext({
+  user: {
     id: null,
     email: '',
     password: '',
@@ -26,8 +22,36 @@ export const UserProvider = ({ children }) => {
       profilePicture: null,
       userId: null,
     },
-    patients: []
-  });
+    patients: [],
+    patientsTabs: []
+  },
+  setId: (newId) => {
+    user.id = newId;
+  },
+  setEmail: (newEmail) => {
+    user.email = newEmail;
+  },
+  setPassword: (newPassword) => {
+    user.password = newPassword;
+  },
+  setUserData: (newUserData) => {
+    user.userData = newUserData;
+  },
+  setPatients: (newPatients) => {
+    user.patients = newPatients;
+  },
+  setPatientsTabs: (newPatientsTabs) => {
+    user.patientsTabs = newPatientsTabs;
+  },
+  setUser: (newUser) => {
+    user = newUser;
+  }
+});
+
+export const useUser = () => useContext(UserContext);
+
+export const UserProvider = ({ children }) => {
+  const [user, setUser] = useState(UserContext.user);
 
   // Load user data from local storage when the component mounts
   useEffect(() => {
@@ -44,3 +68,7 @@ export const UserProvider = ({ children }) => {
     </UserContext.Provider>
   );
 };
+
+// Export the set functions
+export const { user, setId, setEmail, setPassword, setUserData, setPatients, setPatientsTabs, setUser } = UserContext;
+export { UserContext };

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootstrap';
-import { useUser } from '../UserContext';
+import { UserContext, useUser, setPatientsTabs} from '../UserContext';
 import SearchBarPatient from './SearchBarPatient';
 
 const NewPatientModal = ({ onClose, onCreate}) => {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
+  const [patients, setPatients] = useState([]);
+  const [patientsTabs] = useState([]);
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setlastName] = useState('');
@@ -13,11 +15,9 @@ const NewPatientModal = ({ onClose, onCreate}) => {
   const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
   const [conditions, setConditions] = useState([{ name: '', date: '' }]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [patients, setPatients] = useState([]);
-
+  let patientsData;
   useEffect(() => {
     const userId = user.id;
-    const storedUserData = localStorage.getItem('userData');
     async function fetchData() {
       try {
         const response = await fetch(`http://localhost:3000/users/${userId}/patients`, {
@@ -25,16 +25,15 @@ const NewPatientModal = ({ onClose, onCreate}) => {
         });
         if (!response.ok) {
           console.error('Failed to fetch patients:', response);
+          setPatients([]);
         } else {
-          const patientsData = await response.json();
+          patientsData = await response.json();
           setPatients(patientsData);
-          if (storedUserData) {
-            const userData = JSON.parse(storedUserData);
-            setUser({ ...userData, patients: patientsData });
-          }
+          user.patients = patientsData;
         }
       } catch (error) {
         console.error('Error fetching patients:', error);
+        setPatients([]);
       }
     }
     fetchData();
@@ -91,8 +90,17 @@ const NewPatientModal = ({ onClose, onCreate}) => {
       if (!response.ok) {
         console.error('Failed to create patient:', responseData);
       } else {
-        const newPatient = { ...patientData };
-        setUser((prevUser) => ({ ...prevUser, patients: [...prevUser.patients, newPatient] }));
+        setPatients([...user.patients, patientsData]);
+        if(!user.patients){
+          user.patients = ([patientData]);
+        } else{
+          user.patients = ([...user.patients, patientData]);
+        }
+        if (!user.patientsTabs) {
+          user.patientsTabs= ([patientData]);
+        } else {
+          user.patientsTabs = ([...user.patientsTabs, patient]);
+        }
         onCreate(firstName + " " + lastName);
         onClose();
       }
@@ -102,10 +110,15 @@ const NewPatientModal = ({ onClose, onCreate}) => {
   };
 
   const handlePatientClick = (patient) => {
+    if (!user.patientsTabs) {
+      user.patientsTabs= ([patient]);
+    } else {
+      user.patientsTabs = ([...user.patientsTabs, patient]);
+    }
     onCreate(patient.firstName + " " + patient.lastName);
     onClose();
   };
-
+  console.log(user);
   return (
     <Modal show={true} onHide={handlePatientClick}>
       <Modal.Header>
@@ -127,8 +140,8 @@ const NewPatientModal = ({ onClose, onCreate}) => {
                 {patients.map((patient) => (
                   <tr key={patient.id}>
                     <td onClick={() => handlePatientClick(patient)}>{patient.firstName}</td>
-                    <td>{patient.middleName}</td>
-                    <td>{patient.lastName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patient.middleName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patient.lastName}</td>
                   </tr>
                 ))}
               </tbody>
