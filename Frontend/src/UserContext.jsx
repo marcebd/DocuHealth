@@ -26,13 +26,15 @@ export const UserProvider = ({ children }) => {
       profilePicture: null,
       userId: null,
     },
+    patients: []
   });
 
   // Load user data from local storage when the component mounts
   useEffect(() => {
     const storedUserData = localStorage.getItem('userData');
     if (storedUserData) {
-      setUser(JSON.parse(storedUserData));
+      const userData = JSON.parse(storedUserData);
+      setUser({ ...userData, patients: [] });
     }
   }, []);
 

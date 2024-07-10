@@ -4,7 +4,7 @@ import { useUser } from '../UserContext';
 import SearchBarPatient from './SearchBarPatient';
 
 const NewPatientModal = ({ onHide, onCreate }) => {
-  const { user } = useUser();
+  const { user, setUser } = useUser();
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -19,6 +19,7 @@ const NewPatientModal = ({ onHide, onCreate }) => {
 
   useEffect(() => {
     const userId = user.id;
+    const storedUserData = localStorage.getItem('userData');
     async function fetchData() {
       try {
         const response = await fetch(`http://localhost:3000/users/${userId}/patients`, {
@@ -29,6 +30,11 @@ const NewPatientModal = ({ onHide, onCreate }) => {
         } else {
           const patientsData = await response.json();
           setPatients(patientsData);
+          if (storedUserData) {
+            const userData = JSON.parse(storedUserData);
+            setUser({ ...userData, patients: patientsData });
+            console.log("User after fetching", user);
+          }
         }
       } catch (error) {
         console.error('Error fetching patients:', error);
@@ -90,6 +96,8 @@ const NewPatientModal = ({ onHide, onCreate }) => {
       if (!response.ok) {
         console.error('Failed to create patient:', responseData);
       } else {
+        const newPatient = { ...patientData };
+        setUser((prevUser) => ({ ...prevUser, patients: [...prevUser.patients, newPatient] }));
         onCreate(firstName + " " + lastName);
         onHide();
       }
@@ -101,30 +109,30 @@ const NewPatientModal = ({ onHide, onCreate }) => {
   return (
     <Modal show={true} onHide={onHide}>
       <Modal.Header>
-        <Modal.Title>New Patient</Modal.Title>
+        <Modal.Title>Find Patient or Create One</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row>
           <Col sm={6}>
+          <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
             <Table striped bordered hover>
               <thead>
                 <tr>
-                  <th>Name</th>
-                  <th>ID Number</th>
-                  <th>Birth Date</th>
+                  <th>First Name</th>
+                  <th>Middle Name</th>
+                  <th>Last Name</th>
                 </tr>
               </thead>
               <tbody>
                 {patients.map((patient) => (
                   <tr key={patient.id}>
                     <td>{patient.firstName}</td>
-                    <td>{patient.id}</td>
-                    <td>{patient.birthDate}</td>
+                    <td> {patient.middleName}</td>
+                    <td>{patient.lastName}</td>
                   </tr>
                 ))}
               </tbody>
             </Table>
-            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
           </Col>
           <Col sm={6}>
             <Form onSubmit={handleSubmit}>
