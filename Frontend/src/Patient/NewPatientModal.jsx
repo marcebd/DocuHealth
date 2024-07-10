@@ -3,19 +3,17 @@ import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootst
 import { useUser } from '../UserContext';
 import SearchBarPatient from './SearchBarPatient';
 
-const NewPatientModal = ({ onHide, onCreate }) => {
+const NewPatientModal = ({ onClose, onCreate}) => {
   const { user, setUser } = useUser();
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [idNumber, setIdNumber] = useState('');
+  const [lastName, setlastName] = useState('');
+  const [idNumber, setidNumber] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
   const [conditions, setConditions] = useState([{ name: '', date: '' }]);
   const [searchTerm, setSearchTerm] = useState('');
   const [patients, setPatients] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
     const userId = user.id;
@@ -99,22 +97,27 @@ const NewPatientModal = ({ onHide, onCreate }) => {
         const newPatient = { ...patientData };
         setUser((prevUser) => ({ ...prevUser, patients: [...prevUser.patients, newPatient] }));
         onCreate(firstName + " " + lastName);
-        onHide();
+        onClose();
       }
     } catch (error) {
       console.error("Error creating patient:", error);
     }
   };
 
+  const handlePatientClick = (patient) => {
+    onCreate(patient.firstName + " " + patient.lastName);
+    onClose();
+  };
+
   return (
-    <Modal show={true} onHide={onHide}>
+    <Modal show={true} onHide={handlePatientClick}>
       <Modal.Header>
         <Modal.Title>Find Patient or Create One</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Row>
           <Col sm={6}>
-          <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
             <Table striped bordered hover>
               <thead>
                 <tr>
@@ -126,8 +129,8 @@ const NewPatientModal = ({ onHide, onCreate }) => {
               <tbody>
                 {patients.map((patient) => (
                   <tr key={patient.id}>
-                    <td>{patient.firstName}</td>
-                    <td> {patient.middleName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patient.firstName}</td>
+                    <td>{patient.middleName}</td>
                     <td>{patient.lastName}</td>
                   </tr>
                 ))}
@@ -137,37 +140,38 @@ const NewPatientModal = ({ onHide, onCreate }) => {
           <Col sm={6}>
             <Form onSubmit={handleSubmit}>
               <FormGroup>
-                <FormLabel>First Name:</FormLabel>
+                <label>First Name:</label>
                 <input type="text" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Middle Name:</FormLabel>
+                <label>Middle Name:</label>
                 <input type="text" value={middleName} onChange={(event) => setMiddleName(event.target.value)} />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Last Name:</FormLabel>
-                <input type="text" value={lastName} onChange={(event) => setLastName(event.target.value)} />
+                <label>last Name:</label>
+                <input type="text" value={lastName} onChange={(event) => setlastName(event.target.value)} />
               </FormGroup>
               <FormGroup>
-                <FormLabel>ID Number:</FormLabel>
-                <input type="text" value={idNumber} onChange={(event) => setIdNumber(event.target.value)} />
+                <label>iD Number:</label>
+                <input type="text" value={idNumber} onChange={(event) => setidNumber(event.target.value)} />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Birth Date:</FormLabel>
+                <label>Birth Date:</label>
                 <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
-                <FormGroup>
-                <FormLabel>Prescriptions:</FormLabel>
+              </FormGroup>
+              <FormGroup>
+                <label>Prescriptions:</label>
                 {prescriptions.map((prescription, index) => (
                   <div key={index}>
                     <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" />
                     <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" />
-                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Instructions" />
+                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="instructions" />
                     <input type="date" name="date" value={prescription.date} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Date" />
                   </div>
                 ))}
               </FormGroup>
               <FormGroup>
-                <FormLabel>Conditions:</FormLabel>
+                <label>Conditions:</label>
                 {conditions.map((condition, index) => (
                   <div key={index}>
                     <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" />
@@ -176,13 +180,12 @@ const NewPatientModal = ({ onHide, onCreate }) => {
                 ))}
               </FormGroup>
               <button type="submit">Create Patient</button>
-            </FormGroup>
             </Form>
           </Col>
         </Row>
       </Modal.Body>
     </Modal>
   );
-};
+  };
 
-export default NewPatientModal;
+  export default NewPatientModal;

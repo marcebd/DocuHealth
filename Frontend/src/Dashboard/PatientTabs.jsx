@@ -4,25 +4,24 @@ import { useUser } from '../UserContext';
 
 const PatientTabs = () => {
   const { user} = useUser();
-  const [showModal, setShowModal] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabs, setTabs] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
-    if (showModal) {
-      // Fetch patients data here
+    if (isModalOpen) {
       const patientsData = user.patients;
       setPatients(patientsData);
     }
-  }, [showModal]);
+  }, [isModalOpen]);
 
   const handleCreate = () => {
-    setShowModal(true);
+    setIsModalOpen(true);
   };
 
-  const handleClose = (onHide) => {
-    onHide();
+  const handleCloseModal = (onHide) => {
+    setIsModalOpen(false);
   };
 
   const handleTabCreate = (name) => {
@@ -31,29 +30,18 @@ const PatientTabs = () => {
 
   const handlePatientClick = (patient) => {
     setSelectedPatient(patient);
-    setTabs([...tabs, patient.firstName]);
+    setTabs([...tabs, patient.firstName + " " + patient.middleName + " " + patient.lastName]);
   };
 
   return (
     <div>
       <button onClick={handleCreate}>+</button>
-      {showModal && (
-        <NewPatientModal onHide={handleClose} onCreate={handleTabCreate} />
+      {isModalOpen && (
+        <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
       {tabs.map((tab, index) => (
         <div key={index}>{tab}</div>
       ))}
-      {patients.length > 0 && (
-        <div>
-          {patients.map((patient, index) => (
-            <div key={index}>
-              <a href="#" onClick={() => handlePatientClick(patient)}>
-                {patient.firstName}
-              </a>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
