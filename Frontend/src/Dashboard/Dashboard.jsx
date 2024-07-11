@@ -16,24 +16,22 @@ const CustomHelmet = () => (
 
 function Dashboard() {
   const userId = JSON.parse(localStorage.getItem("userId"));
-  let {userFirstName} = {};
-  let {userProfilePicture} = {};
-
-
+  let [userFirstName, setUserFirstName] = useState('');
+  let [userProfilePicture, setUserProfilePicture] = useState('');
   useEffect(() => {
     async function fetchData() {
       try {
         const response = await fetch(`http://localhost:3000/${userId}/dashboard/name/picture`, {
-          method: 'GET',
+          method: 'GET'
         });
         if (!response.ok) {
           console.error('Failed to fetch user data in dashboard:', response);
         } else {
           const data = await response.json();
-          userFirstName = data.first_name;
-          userProfilePicture = data.profile_picture;
+          setUserFirstName(data.first_name);
+          setUserProfilePicture(data.profile_picture);
 
-          console.log("User Data", data); //make sure this has the right data
+          console.log("User Data", data);
         }
       } catch (error) {
         console.error('Error fetching User Data in dashboard:', error);
@@ -47,7 +45,7 @@ function Dashboard() {
       <HelmetProvider>
         <CustomHelmet />
       </HelmetProvider>
-      <h1>Hello, {userId && userFirstName ? userFirstName : 'Guest'}</h1>
+      <h1>Hello, {userFirstName }</h1>
       <img src={userId && userProfilePicture ? userProfilePicture : 'default.jpg'} alt="Profile" />
       <button aria-label="Logout from Dashboard">Logout</button>
       <div>

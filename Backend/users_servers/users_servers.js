@@ -11,6 +11,7 @@ require("dotenv").config();
 const { PrismaClient } = require('@prisma/client');
 const minPasswordLength = 6;
 const noErrors = 0;
+const jwt = require("jsonwebtoken");
 const { initialize } = require("../passportConfig");
 initialize(passport);
 const express = require('express');
@@ -56,22 +57,18 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/:userId/dashboard/name/picture", async (req, res) => {
-  if (req.user) {
-    const userId = req.params.userId;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (user) {
+app.get("/:userId/dashboard/name/picture",  async(req, res) => {
+    try {
+      const userId = req.params.userId;
+      const userData = await prisma.user_data.findUnique({ where: { user_id: userId } });
       res.json({
-        userId: user.id,
-        first_name: user.first_name,
-        profile_picture: user.profile_picture,
+        first_name: userData.first_name,
+        profile_picture: userData.profile_picture,
       });
-    } else {
-      res.status(404).json({ message: "User or patient not found" });
+    } catch (error) {
+      res.status(401).json({ message: "Unauthorized" });
     }
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
+
 });
 
 app.post("/register", async (req, res) => {
@@ -136,8 +133,7 @@ app.post("/login", (req, res, next) => {
         res.status(500).send("Internal Server Error");
         return;
       }
-
-      res.json(user);
+      res.json({ userId: user.id });
     });
   })(req, res, next);
 });

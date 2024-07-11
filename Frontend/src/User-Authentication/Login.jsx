@@ -28,8 +28,8 @@ function Login() {
       } else {
         const jsonData = await response.json();
         console.log('Data:', jsonData);
-        console.log(jsonData.success);
-        localStorage.setItem('userId', JSON.stringify(jsonData.id));
+        localStorage.setItem('userId', JSON.stringify(jsonData.userId));
+        localStorage.setItem('token', jsonData.token);
         navigate('/dashboard');
       }
     } catch (error) {
