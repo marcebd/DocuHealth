@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -7,7 +6,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { setUser } = useUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -15,24 +13,24 @@ function Login() {
     setIsLoading(true);
     setError('');
     try {
+      const data = { email, password };
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-          email: email,
-          password: password
-        }),
+        body: JSON.stringify(data),
         credentials: 'include',
       });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setUser(data.user); // Update user context
-        localStorage.setItem('userData', JSON.stringify(data.user)); // Store user in local storage
-        navigate('/dashboard'); // Navigate to the dashboard
+      console.log('Response:', response);
+      if (!response.ok) {
+        setError(response.statusText || 'Failed to login');
       } else {
-        setError(data.message || 'Failed to login');
+        const jsonData = await response.json();
+        console.log('Data:', jsonData);
+        console.log(jsonData.success);
+        localStorage.setItem('userId', JSON.stringify(jsonData.id));
+        navigate('/dashboard');
       }
     } catch (error) {
       setError('Network error');

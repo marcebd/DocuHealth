@@ -1,31 +1,8 @@
-const passport = require("passport");
-const session = require("express-session");
-const cors = require("cors");
-const flash = require("connect-flash");
 require("dotenv").config();
 const { PrismaClient } = require('@prisma/client');
-const initializePassport = require("../passportConfig");
-initializePassport(passport);
 const express = require('express');
 const prisma = new PrismaClient();
 const app = express();
-
-// Middleware
-app.use(express.json());
-app.use(cors({
-    origin: 'http://localhost:5174',
-    credentials: true,
-}));
-app.use(express.urlencoded({ extended: false }));
-app.use(session({
-    secret: "secret",
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(flash());  // Use connect-flash middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });

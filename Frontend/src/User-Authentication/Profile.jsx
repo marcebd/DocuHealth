@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { useUser } from '../UserContext';
 import { isMobilePhone } from 'validator';
 import { useNavigate } from 'react-router-dom';
 function Profile() {
-    const { user, setUser } = useUser();
-    console.log("Profile User Before:", user);
+    const userId = JSON.parse(localStorage.getItem("userId"));
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState({
         firstName: '',
@@ -124,29 +122,23 @@ function Profile() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Validate the form
         if (!validateForm()) {
             console.error('Validation errors:', errors);
             return;
         }
 
-        // Prepare FormData for submission
         const formData = new FormData();
         Object.keys(profileData).forEach(key => {
             if (key === 'education' || key === 'languages' || key === 'locations') {
-                // Stringify array or object data
                 formData.append(key, JSON.stringify(profileData[key]));
             } else if (key === 'profilePicture' && profileData[key]) {
-                // Append file data
                 formData.append(key, profileData[key], profileData[key].name);
             } else {
-                // Append other data
                 formData.append(key, profileData[key]);
             }
         });
-
-        if (user && user.id) {
-            formData.append('userId', user.id.toString());
+        if (userId) {
+            formData.append('userId', userId.toString());
         }
 
         try {
@@ -159,16 +151,12 @@ function Profile() {
             if (!response.ok) {
                 console.error('Failed to submit profile:', responseData);
             } else {
-                const updatedUser = { ...user, profileData };
-                setUser(updatedUser);
-                localStorage.setItem('userData', JSON.stringify(updatedUser));
-                navigate('/dashboard');
+                navigate('/login');
             }
         } catch (error) {
             console.error('Network or other error:', error);
         }
     };
-console.log("Profile User After:", user);
     return (
         <div>
             <h1>Create Profile</h1>

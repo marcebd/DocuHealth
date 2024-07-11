@@ -6,7 +6,7 @@ const PatientTabs = () => {
   const { user} = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabs, setTabs] = useState([]);
-  const [selectedPatient, setSelectedPatient] = useState(null);
+  let {tabCreated} = false;
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
@@ -25,14 +25,15 @@ const PatientTabs = () => {
   };
 
   const handleTabCreate = () => {
-    console.log(user);
-    const newTabs = user.patientsTabs.map(patient => (
+    tabCreated = true;
+    const newTabs = patients.map(patient => (
       <div key={patient.id}>
         {patient.firstName} {patient.lastName}
       </div>
     ));
     setTabs(newTabs);
   };
+  console.log("User in Patient Tabs", user);
 
   return (
     <div>
@@ -40,7 +41,7 @@ const PatientTabs = () => {
       {isModalOpen && (
         <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
-      {tabs.map((tab, index) => (
+      {tabCreated && tabs.map((tab, index) => (
         <div key={index}>{tab}</div>
       ))}
     </div>

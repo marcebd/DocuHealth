@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootstrap';
-import { UserContext, useUser, setPatientsTabs} from '../UserContext';
+import { UserContext, useUser} from '../UserContext';
 import SearchBarPatient from './SearchBarPatient';
 
 const NewPatientModal = ({ onClose, onCreate}) => {
-  const { user } = useUser();
+  const { user } = useUser(); //This is working getting the correct user
   const [patients, setPatients] = useState([]);
   const [patientsTabs] = useState([]);
   const [firstName, setFirstName] = useState('');
@@ -15,22 +15,21 @@ const NewPatientModal = ({ onClose, onCreate}) => {
   const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
   const [conditions, setConditions] = useState([{ name: '', date: '' }]);
   const [searchTerm, setSearchTerm] = useState('');
-  let patientsData;
+  let [patientsData, setPatientsData] = useState([]);
   useEffect(() => {
     const userId = user.id;
     async function fetchData() {
       try {
-        const response = await fetch(`http://localhost:3000/users/${userId}/patients`, {
+        const response = await fetch(`http://localhost:3001/users/${userId}/patients`, {
           method: 'GET',
         });
         if (!response.ok) {
           console.error('Failed to fetch patients:', response);
           setPatients([]);
         } else {
-          patientsData = await response.json();
-          setPatients(patientsData);
-          user.patients = patientsData;
-          const updatedUser = { ...user, patientsData };
+          const data = await response.json();
+          setPatientsData(data);
+          console.log("Patient Data", patientsData); 
         }
       } catch (error) {
         console.error('Error fetching patients:', error);
@@ -39,7 +38,6 @@ const NewPatientModal = ({ onClose, onCreate}) => {
     }
     fetchData();
   }, []);
-
   const handlePrescriptionChange = (index, event) => {
     const newPrescriptions = [...prescriptions];
     newPrescriptions[index][event.target.name] = event.target.value;
@@ -80,7 +78,7 @@ const NewPatientModal = ({ onClose, onCreate}) => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/patients', {
+      const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -91,18 +89,8 @@ const NewPatientModal = ({ onClose, onCreate}) => {
       if (!response.ok) {
         console.error('Failed to create patient:', responseData);
       } else {
-        setPatients([...user.patients, patientsData]);
-        if(!user.patients){
-          user.patients = ([patientData]);
-        } else{
-          user.patients = ([...user.patients, patientData]);
-        }
-        if (!user.patientsTabs) {
-          user.patientsTabs= ([patientData]);
-        } else {
-          user.patientsTabs = ([...user.patientsTabs, patient]);
-        }
-        const updatedUser = { ...user, patientData };
+        const updatedPatientTabs = { ...user, patientData };
+        localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
         onCreate();
         onClose();
       }
@@ -110,16 +98,13 @@ const NewPatientModal = ({ onClose, onCreate}) => {
       console.error("Error creating patient:", error);
     }
   };
-
   const handlePatientClick = (patient) => {
-    if (!user.patientsTabs) {
-      user.patientsTabs= ([patient]);
-    } else {
-      user.patientsTabs = ([...user.patientsTabs, patient]);
-    }
+    const updatedPatientTabs = { ...user, patient };
+    localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
     onCreate();
     onClose();
   };
+
   return (
     <Modal show={true} onHide={handlePatientClick}>
       <Modal.Header>
@@ -138,11 +123,11 @@ const NewPatientModal = ({ onClose, onCreate}) => {
                 </tr>
               </thead>
               <tbody>
-                {patients.map((patient) => (
-                  <tr key={patient.id}>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.firstName}</td>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.middleName}</td>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.lastName}</td>
+                {patientsData.map((patient) => (
+                  <tr key={patientsData.id}>
+                    <td onClick={() => handlePatientClick(patient)}>{patientsData[2].firstName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patientsData[2].middleName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patientsData[2].lastName}</td>
                   </tr>
                 ))}
               </tbody>

@@ -3,35 +3,40 @@ const { pool } = require("./dbConfig");
 const bcrypt = require("bcrypt");
 
 function initialize(passport) {
-
-  const authenticateUser = (email, password, done) => {
+  const authenticateUser = (email, password, next, req) => {
+    console.log(req);
+    console.log("Authenticate user called with email:", email);
+    console.log("Authenticate user called with password:", password);
+    console.log("Authenticate user req:", req);
+    console.log("Authenticate user next", next);
     pool.query(
       `SELECT * FROM "User" WHERE email = $1`,
       [email],
       (err, results) => {
         if (err) {
           console.error("Database error during authentication:", err);
-          return done(err);
+          return next(err);
         }
 
         if (results.rows.length > 0) {
           const user = results.rows[0];
-          // Make sure the user object has an id property
           user.id = user.id;
           bcrypt.compare(password, user.password, (err, isMatch) => {
             if (err) {
               console.error("Error comparing passwords:", err);
-              return done(err);
+              return next(err);
             }
             if (isMatch) {
-              // Return the valid user object
-              return done(null, user);
+              console.log("User authenticated successfully!");
+              return next(null, user);
             } else {
-              return done(null, false, { message: "Password is incorrect" });
+              console.log("Password is incorrect");
+              return next(null, false, { message: "Password is incorrect" });
             }
           });
         } else {
-          return done(null, false, {
+          console.log("No user with that email address");
+          return next(null, false, {
             message: "No user with that email address"
           });
         }
@@ -40,10 +45,10 @@ function initialize(passport) {
   };
 
   passport.use(
-    new LocalStrategy(
-      { usernameField: "email", passwordField: "password" },
-      authenticateUser
-    )
+    new LocalStrategy({
+      usernameField: "email",
+      passwordField: "password"
+    }, authenticateUser)
   );
 
   passport.serializeUser((user, done) => {
@@ -61,4 +66,4 @@ function initialize(passport) {
   });
 }
 
-module.exports = initialize;
+module.exports = { initialize };

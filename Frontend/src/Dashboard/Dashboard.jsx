@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
 import DashboardData from './DashboardData';
@@ -16,17 +15,40 @@ const CustomHelmet = () => (
 );
 
 function Dashboard() {
-  const { user } = useUser();
-  const {userData, setUserData} = useState('');
-  const navigate = useNavigate();
+  const userId = JSON.parse(localStorage.getItem("userId"));
+  let {userFirstName} = {};
+  let {userProfilePicture} = {};
+
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(`http://localhost:3000/${userId}/dashboard/name/picture`, {
+          method: 'GET',
+        });
+        if (!response.ok) {
+          console.error('Failed to fetch user data in dashboard:', response);
+        } else {
+          const data = await response.json();
+          userFirstName = data.first_name;
+          userProfilePicture = data.profile_picture;
+
+          console.log("User Data", data); //make sure this has the right data
+        }
+      } catch (error) {
+        console.error('Error fetching User Data in dashboard:', error);
+      }
+    }
+    fetchData();
+  }, [userId]);
 
   return (
     <div>
       <HelmetProvider>
         <CustomHelmet />
       </HelmetProvider>
-      <h1>Hello, {user && user.profileData ? user.profileData.firstName : 'Guest'}</h1>
-      <img src={user && user.profileData ? user.profileData.profilePicture : 'default.jpg'} alt="Profile" />
+      <h1>Hello, {userId && userFirstName ? userFirstName : 'Guest'}</h1>
+      <img src={userId && userProfilePicture ? userProfilePicture : 'default.jpg'} alt="Profile" />
       <button aria-label="Logout from Dashboard">Logout</button>
       <div>
         <PatientTabs />

@@ -1,6 +1,7 @@
+//Saved as local storage Id
+
 import './Register.css';
 import React, { useState } from 'react';
-import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
@@ -11,7 +12,6 @@ function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { setUser } = useUser();
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -38,8 +38,8 @@ function Register() {
     event.preventDefault();
     setIsLoading(true);
     setError('');
-
-    try {
+    validateForm();
+      try {
         const response = await fetch('http://localhost:3000/register', {
             method: 'POST',
             headers: {
@@ -53,15 +53,8 @@ function Register() {
             console.error('Registration failed:', data);
         } else {
             if (data.userId) {
-                // Construct the user object using the form data and userId from the server
-                const user = {
-                    id: data.userId,
-                    email: formData.email,
-                    password: formData.password, // Note: Storing passwords in local storage is not secure
-                };
-                setUser(user); // Update user context with the constructed user object
-                localStorage.setItem('userData', JSON.stringify(user)); // Store user in local storage
-                navigate('/profile'); // Navigate to the profile page
+                localStorage.setItem('userId', JSON.stringify(data.userId));
+                navigate('/profile');
             } else {
                 setError('Invalid user data received');
             }
@@ -73,8 +66,6 @@ function Register() {
         setIsLoading(false);
     }
 };
-
-console.log("Register user:", setUser);
 
   return (
     <div className="register-container">

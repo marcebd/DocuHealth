@@ -1,56 +1,13 @@
-const passport = require("passport");
-const session = require("express-session");
-const cors = require("cors");
-const flash = require("connect-flash");
 require("dotenv").config();
 const { PrismaClient } = require('@prisma/client');
-const PORT = process.env.PORT || 3000;
-const initializePassport = require("/Users/marcebd/Desktop/DocuHealth/Backend/passportConfig.js");
-initializePassport(passport);
 
 const express = require('express');
 const prisma = new PrismaClient();
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cors({
-    origin: 'http://localhost:5174',
-    credentials: true,
-}));
-app.use(express.urlencoded({ extended: false }));
-app.use(session({
-    secret: "secret",
-    resave: false,
-    saveUninitialized: false
-}));
-app.use(flash());  // Use connect-flash middleware
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
-});
-
-app.get("/:userId/dashboard/name/picture", checkNotAuthenticated, async (req, res) => {
-  if (req.user) {
-    const userId = req.params.userId;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    const patient = await prisma.patient.findUnique({ where: { userId: user.id } });
-
-    if (user && patient) {
-      res.json({
-        userId: user.id,
-        first_name: patient.firstName,
-        profile_picture: patient.profilePicture,
-      });
-    } else {
-      res.status(404).json({ message: "User or patient not found" });
-    }
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
 });
 
 app.get('/visitNotes', async (req, res) => {
