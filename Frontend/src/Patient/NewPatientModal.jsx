@@ -1,54 +1,201 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootstrap';
+import { UserContext, useUser, setPatientsTabs} from '../UserContext';
+import SearchBarPatient from './SearchBarPatient';
 
-const NewPatientModal = ({ onHide }) => {
+const NewPatientModal = ({ onClose, onCreate}) => {
+  const { user } = useUser();
+  const [patients, setPatients] = useState([]);
+  const [patientsTabs] = useState([]);
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [idNumber, setIdNumber] = useState('');
+  const [lastName, setlastName] = useState('');
+  const [idNumber, setidNumber] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [prescriptions, setPrescriptions] = useState([]);
-  const [conditions, setConditions] = useState([]);
+  const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
+  const [conditions, setConditions] = useState([{ name: '', date: '' }]);
+  const [searchTerm, setSearchTerm] = useState('');
+  let patientsData;
+  useEffect(() => {
+    const userId = user.id;
+    async function fetchData() {
+      try {
+        const response = await fetch(`http://localhost:3000/users/${userId}/patients`, {
+          method: 'GET',
+        });
+        if (!response.ok) {
+          console.error('Failed to fetch patients:', response);
+          setPatients([]);
+        } else {
+          patientsData = await response.json();
+          setPatients(patientsData);
+          user.patients = patientsData;
+        }
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+        setPatients([]);
+      }
+    }
+    fetchData();
+  }, []);
 
-  const handleSave = () => {
-    // Save the new patient data here
+  const handlePrescriptionChange = (index, event) => {
+    const newPrescriptions = [...prescriptions];
+    newPrescriptions[index][event.target.name] = event.target.value;
+    setPrescriptions(newPrescriptions);
   };
 
-  return (
-    <div>
-      <h2>New Patient</h2>
-      <form>
-        <label>
-          First Name:
-          <input type="text" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
-        </label>
-        <label>
-          Middle Name:
-          <input type="text" value={middleName} onChange={(event) => setMiddleName(event.target.value)} />
-        </label>
-        <label>
-          Last Name:
-          <input type="text" value={lastName} onChange={(event) => setLastName(event.target.value)} />
-        </label>
-        <label>
-          ID Number:
-          <input type="text" value={idNumber} onChange={(event) => setIdNumber(event.target.value)} />
-        </label>
-        <label>
-          Birth Date:
-          <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
-        </label>
-        <label>
-          Prescriptions:
-          <textarea value={prescriptions} onChange={(event) => setPrescriptions(event.target.value)} />
-        </label>
-        <label>
-          Conditions:
-          <textarea value={conditions} onChange={(event) => setConditions(event.target.value)} />
-        </label>
-        <button type="submit" onClick={handleSave}>Save</button>
-      </form>
-    </div>
-  );
-};
+  const handleConditionChange = (index, event) => {
+    const newConditions = [...conditions];
+    newConditions[index][event.target.name] = event.target.value;
+    setConditions(newConditions);
+  };
 
-export default NewPatientModal;
+  const handleSearch = (event) => {
+    // Handle search logic here
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.instructions && p.date);
+    const areConditionsValid = conditions.every(c => c.name && c.date);
+
+    if (!arePrescriptionsValid || !areConditionsValid) {
+      console.error("All fields in prescriptions and conditions must be filled.");
+      return;
+    }
+
+    const userId = user.id;
+    const patientData = {
+      userId,
+      firstName,
+      middleName,
+      lastName,
+      idNumber,
+      birthDate,
+      prescriptions,
+      conditions
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/patients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patientData)
+      });
+      const responseData = await response.json();
+      if (!response.ok) {
+        console.error('Failed to create patient:', responseData);
+      } else {
+        setPatients([...user.patients, patientsData]);
+        if(!user.patients){
+          user.patients = ([patientData]);
+        } else{
+          user.patients = ([...user.patients, patientData]);
+        }
+        if (!user.patientsTabs) {
+          user.patientsTabs= ([patientData]);
+        } else {
+          user.patientsTabs = ([...user.patientsTabs, patient]);
+        }
+        onCreate(firstName + " " + lastName);
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error creating patient:", error);
+    }
+  };
+
+  const handlePatientClick = (patient) => {
+    if (!user.patientsTabs) {
+      user.patientsTabs= ([patient]);
+    } else {
+      user.patientsTabs = ([...user.patientsTabs, patient]);
+    }
+    onCreate(patient.firstName + " " + patient.lastName);
+    onClose();
+  };
+  console.log(user);
+  return (
+    <Modal show={true} onHide={handlePatientClick}>
+      <Modal.Header>
+        <Modal.Title>Find Patient or Create One</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <Row>
+          <Col sm={6}>
+            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Middle Name</th>
+                  <th>Last Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {patients.map((patient) => (
+                  <tr key={patient.id}>
+                    <td onClick={() => handlePatientClick(patient)}>{patient.firstName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patient.middleName}</td>
+                    <td onClick={() => handlePatientClick(patient)}>{patient.lastName}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Col>
+          <Col sm={6}>
+            <Form onSubmit={handleSubmit}>
+              <FormGroup>
+                <label>First Name:</label>
+                <input type="text" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
+              </FormGroup>
+              <FormGroup>
+                <label>Middle Name:</label>
+                <input type="text" value={middleName} onChange={(event) => setMiddleName(event.target.value)} />
+              </FormGroup>
+              <FormGroup>
+                <label>last Name:</label>
+                <input type="text" value={lastName} onChange={(event) => setlastName(event.target.value)} />
+              </FormGroup>
+              <FormGroup>
+                <label>iD Number:</label>
+                <input type="text" value={idNumber} onChange={(event) => setidNumber(event.target.value)} />
+              </FormGroup>
+              <FormGroup>
+                <label>Birth Date:</label>
+                <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
+              </FormGroup>
+              <FormGroup>
+                <label>Prescriptions:</label>
+                {prescriptions.map((prescription, index) => (
+                  <div key={index}>
+                    <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" />
+                    <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" />
+                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="instructions" />
+                    <input type="date" name="date" value={prescription.date} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Date" />
+                  </div>
+                ))}
+              </FormGroup>
+              <FormGroup>
+                <label>Conditions:</label>
+                {conditions.map((condition, index) => (
+                  <div key={index}>
+                    <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" />
+                    <input type="date" name="date" value={condition.date} onChange={(e) => handleConditionChange(index, e)} placeholder="Date" />
+                  </div>
+                ))}
+              </FormGroup>
+              <button type="submit">Create Patient</button>
+            </Form>
+          </Col>
+        </Row>
+      </Modal.Body>
+    </Modal>
+  );
+  };
+
+  export default NewPatientModal;

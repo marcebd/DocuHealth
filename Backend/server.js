@@ -1,7 +1,7 @@
 const express = require("express");
 const { pool } = require("./dbConfig");
 const multer = require('multer');
-const storage = multer.memoryStorage(); // Storing files in memory
+const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const bcrypt = require("bcrypt");
 const passport = require("passport");
@@ -26,7 +26,7 @@ app.use(cors({
 }));
 app.use(express.urlencoded({ extended: false }));
 app.use(session({
-    secret: process.env.SESSION_SECRET,
+    secret: "secret",
     resave: false,
     saveUninitialized: false
 }));
@@ -64,6 +64,25 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get("/users/:userId/patients", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const patients = await prisma.patient.findMany({ where: { userId: userId } });
+    patients.forEach(patient => {
+      patient.id = patient.id.toString();
+      patient.userId = patient.userId.toString();
+    });
+    return res.json(patients);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 /*************** POST ******************/
 app.post("/register", async (req, res) => {
   let { email, password, password2 } = req.body;
@@ -87,11 +106,12 @@ app.post("/register", async (req, res) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const result = await pool.query(
-        `INSERT INTO users (email, password)
+        `INSERT INTO "User" (email, password)
          VALUES ($1, $2)
          RETURNING id, password`,
         [email, hashedPassword]
       );
+      res.cookie("username", result.rows[0].email, { expires: new Date(Date.now() + 900000000), httpOnly: true });
       res.status(201).json({ message: "User registered successfully", userId: result.rows[0].id });
     } catch (err) {
       console.error("Error during registration:", err);
@@ -109,6 +129,16 @@ app.post(
     successFlash: "Welcome to the dashboard!"
   })
 );
+
+app.post("/login", (req, res) => {
+  const user = req.user;
+  if (user) {
+    res.cookie("username", user.username, { expires: new Date(Date.now() + 900000000), httpOnly: true });
+    res.redirect("/");
+  } else {
+    res.status(401).send("Invalid username or password");
+  }
+});
 
 function replacer(key, value) {
   if (typeof value === 'bigint') {
@@ -163,7 +193,7 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
           education: { create: JSON.parse(req.body.education) },
           biography: req.body.biography,
           profile_picture: req.file ? req.file.buffer : null,
-        }
+        },
       });
       const serializedProfile = JSON.stringify(newProfile, replacer);
       res.json(serializedProfile);
@@ -171,6 +201,69 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
   } catch (error) {
     console.error('Error creating profile:', error);
     res.status(500).json({ message: "Failed to create profile", error: error.message });
+  }
+});
+
+app.post("/patients", async (req, res) => {
+  const { userId, firstName, middleName, lastName, idNumber, birthDate, prescriptions, conditions } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ message: "userId is required" });
+  }
+
+  try {
+    const patient = await prisma.patient.create({
+      data: {
+        userId: parseInt(userId),
+        firstName,
+        middleName,
+        lastName,
+        idNumber,
+        birthDate: new Date(birthDate),
+        prescriptions: {
+          create: prescriptions.map(prescription => ({
+            name: prescription.name,
+            dose: prescription.dose,
+            instructions: prescription.instructions,
+            date: new Date(prescription.date)
+          }))
+        },
+        conditions: {
+          create: conditions.map(condition => ({
+            name: condition.name,
+            date: new Date(condition.date)
+          }))
+        }
+      }
+    });
+    const responsePatient = {
+      ...patient,
+      id: patient.id.toString(),
+      userId: patient.userId.toString()
+    };
+
+    res.status(201).json({ message: "Patient created successfully", patient: responsePatient });
+  } catch (error) {
+    console.error("Error creating patient", error);
+    res.status(500).json({ message: "Failed to create patient", error: error.message });
+  }
+});
+
+app.post("/notes", async (req, res) => {
+  const { patientId, date, notes } = req.body;
+  if (!patient) {
+    return res.status(400).json({ message: "patientId is required" });
+  }
+  try {
+    const patient = await Patient.findUnique({ where: { id: patientId } });
+
+    const visitNote = await VisitNote.create({ date, notes, patientId });
+    patient.visitNotes.push(visitNote);
+    await patient.save();
+    res.json({ message: "Note added successfully" });
+  } catch (error) {
+    console.error("Error adding note", error);
+    res.status(500).json({ message: "Failed to add note", error: error.message });
   }
 });
 
@@ -199,7 +292,7 @@ app.delete('/users/:userId', async (req, res) => {
     }
 
     // Finally, delete the user
-    await prisma.users.delete({
+    await prisma.user.delete({
       where: { id: userId },
     });
 
