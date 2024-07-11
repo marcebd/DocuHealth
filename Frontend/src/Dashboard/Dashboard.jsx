@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
@@ -16,21 +16,10 @@ const CustomHelmet = () => (
 );
 
 function Dashboard() {
-  const { user, setUser } = useUser();
+  const { user } = useUser();
+  const {userData, setUserData} = useState('');
   const navigate = useNavigate();
-  console.log("Dashboard", user);
 
-  const handleLogout = () => {
-    localStorage.removeItem('localUser');
-    navigate('/login');
-  };
-
-  useEffect(() => {
-    const retrievedUserData = localStorage.getItem('localUser');
-    if (retrievedUserData) {
-      setUser(JSON.parse(retrievedUserData));
-    }
-  }, [setUser]); 
   return (
     <div>
       <HelmetProvider>
@@ -38,7 +27,7 @@ function Dashboard() {
       </HelmetProvider>
       <h1>Hello, {user && user.profileData ? user.profileData.firstName : 'Guest'}</h1>
       <img src={user && user.profileData ? user.profileData.profilePicture : 'default.jpg'} alt="Profile" />
-      <button onClick={handleLogout} aria-label="Logout from Dashboard">Logout</button>
+      <button aria-label="Logout from Dashboard">Logout</button>
       <div>
         <PatientTabs />
         <DashboardData />

@@ -4,6 +4,7 @@ import { isMobilePhone } from 'validator';
 import { useNavigate } from 'react-router-dom';
 function Profile() {
     const { user, setUser } = useUser();
+    console.log("Profile User Before:", user);
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState({
         firstName: '',
@@ -161,13 +162,13 @@ function Profile() {
                 const updatedUser = { ...user, profileData };
                 setUser(updatedUser);
                 localStorage.setItem('userData', JSON.stringify(updatedUser));
-                navigate('/dashboard'); 
+                navigate('/dashboard');
             }
         } catch (error) {
             console.error('Network or other error:', error);
         }
     };
-
+console.log("Profile User After:", user);
     return (
         <div>
             <h1>Create Profile</h1>

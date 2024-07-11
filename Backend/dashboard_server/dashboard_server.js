@@ -33,9 +33,21 @@ app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });
 
-app.get("/dashboard", checkNotAuthenticated, (req, res) => {
+app.get("/:userId/dashboard/name/picture", checkNotAuthenticated, async (req, res) => {
   if (req.user) {
-    res.json({ user: req.user.name });
+    const userId = req.params.userId;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    const patient = await prisma.patient.findUnique({ where: { userId: user.id } });
+
+    if (user && patient) {
+      res.json({
+        userId: user.id,
+        first_name: patient.firstName,
+        profile_picture: patient.profilePicture,
+      });
+    } else {
+      res.status(404).json({ message: "User or patient not found" });
+    }
   } else {
     res.status(401).json({ message: "Unauthorized" });
   }

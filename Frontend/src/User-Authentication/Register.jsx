@@ -74,6 +74,8 @@ function Register() {
     }
 };
 
+console.log("Register user:", setUser);
+
   return (
     <div className="register-container">
       <form onSubmit={handleSubmit} aria-live="polite" className="register-form">
