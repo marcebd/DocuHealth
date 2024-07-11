@@ -1,5 +1,4 @@
-const express = require("express");
-const { pool } = require("./dbConfig");
+const { pool } = require("/Users/marcebd/Desktop/DocuHealth/Backend/dbConfig.js");
 const multer = require('multer');
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -9,14 +8,24 @@ const session = require("express-session");
 const cors = require("cors");
 const flash = require("connect-flash");
 require("dotenv").config();
-const app = express();
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 const minPasswordLength = 6;
 const noErrors = 0;
-const initializePassport = require("./passportConfig");
+const initializePassport = require("/Users/marcebd/Desktop/DocuHealth/Backend/passportConfig.js");
 initializePassport(passport);
+const express = require('express');
+const prisma = new PrismaClient();
+
+const app = express();
+
+app.get("/", (req, res) => {
+  res.json({ message: "Welcome to the API" });
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
 
 // Middleware
 app.use(express.json());
@@ -34,25 +43,12 @@ app.use(flash());  // Use connect-flash middleware
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to the API" });
-});
-
-/*************** GET ******************/
 app.get("/register", checkAuthenticated, (req, res) => {
   res.json({ message: "Registration page" });
 });
 
 app.get("/login", checkAuthenticated, (req, res) => {
   res.json({ message: "Login page" });
-});
-
-app.get("/dashboard", checkNotAuthenticated, (req, res) => {
-  if (req.user) {
-    res.json({ user: req.user.name });
-  } else {
-    res.status(401).json({ message: "Unauthorized" });
-  }
 });
 
 app.get("/logout", (req, res) => {
@@ -64,26 +60,6 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/users/:userId/patients", async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const patients = await prisma.patient.findMany({ where: { userId: userId } });
-    patients.forEach(patient => {
-      patient.id = patient.id.toString();
-      patient.userId = patient.userId.toString();
-    });
-    return res.json(patients);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-/*************** POST ******************/
 app.post("/register", async (req, res) => {
   let { email, password, password2 } = req.body;
   let errors = [];
@@ -147,6 +123,7 @@ function replacer(key, value) {
       return value; // Return other values unchanged
   }
 }
+
 app.post("/profile", upload.single('profilePicture'), async (req, res) => {
   try {
     const existingProfile = await prisma.user_data.findUnique({
@@ -204,70 +181,6 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
   }
 });
 
-app.post("/patients", async (req, res) => {
-  const { userId, firstName, middleName, lastName, idNumber, birthDate, prescriptions, conditions } = req.body;
-
-  if (!userId) {
-    return res.status(400).json({ message: "userId is required" });
-  }
-
-  try {
-    const patient = await prisma.patient.create({
-      data: {
-        userId: parseInt(userId),
-        firstName,
-        middleName,
-        lastName,
-        idNumber,
-        birthDate: new Date(birthDate),
-        prescriptions: {
-          create: prescriptions.map(prescription => ({
-            name: prescription.name,
-            dose: prescription.dose,
-            instructions: prescription.instructions,
-            date: new Date(prescription.date)
-          }))
-        },
-        conditions: {
-          create: conditions.map(condition => ({
-            name: condition.name,
-            date: new Date(condition.date)
-          }))
-        }
-      }
-    });
-    const responsePatient = {
-      ...patient,
-      id: patient.id.toString(),
-      userId: patient.userId.toString()
-    };
-
-    res.status(201).json({ message: "Patient created successfully", patient: responsePatient });
-  } catch (error) {
-    console.error("Error creating patient", error);
-    res.status(500).json({ message: "Failed to create patient", error: error.message });
-  }
-});
-
-app.post("/notes", async (req, res) => {
-  const { patientId, date, notes } = req.body;
-  if (!patient) {
-    return res.status(400).json({ message: "patientId is required" });
-  }
-  try {
-    const patient = await Patient.findUnique({ where: { id: patientId } });
-
-    const visitNote = await VisitNote.create({ date, notes, patientId });
-    patient.visitNotes.push(visitNote);
-    await patient.save();
-    res.json({ message: "Note added successfully" });
-  } catch (error) {
-    console.error("Error adding note", error);
-    res.status(500).json({ message: "Failed to add note", error: error.message });
-  }
-});
-
-/********* Delete **********/
 app.delete('/users/:userId', async (req, res) => {
   const userId = parseInt(req.params.userId); // Convert the userId to an integer
 
@@ -306,6 +219,7 @@ app.delete('/users/:userId', async (req, res) => {
     res.status(500).json({ message: 'Failed to delete user', error: error.message });
   }
 });
+
 /*********  Helper Functions *********/
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
@@ -320,7 +234,3 @@ function checkNotAuthenticated(req, res, next) {
   }
   res.redirect("/login");
 }
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});

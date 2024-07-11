@@ -30,6 +30,7 @@ const NewPatientModal = ({ onClose, onCreate}) => {
           patientsData = await response.json();
           setPatients(patientsData);
           user.patients = patientsData;
+          const updatedUser = { ...user, patientsData };
         }
       } catch (error) {
         console.error('Error fetching patients:', error);
@@ -101,7 +102,8 @@ const NewPatientModal = ({ onClose, onCreate}) => {
         } else {
           user.patientsTabs = ([...user.patientsTabs, patient]);
         }
-        onCreate(firstName + " " + lastName);
+        const updatedUser = { ...user, patientData };
+        onCreate();
         onClose();
       }
     } catch (error) {
@@ -115,10 +117,9 @@ const NewPatientModal = ({ onClose, onCreate}) => {
     } else {
       user.patientsTabs = ([...user.patientsTabs, patient]);
     }
-    onCreate(patient.firstName + " " + patient.lastName);
+    onCreate();
     onClose();
   };
-  console.log(user);
   return (
     <Modal show={true} onHide={handlePatientClick}>
       <Modal.Header>

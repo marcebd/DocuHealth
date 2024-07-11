@@ -16,20 +16,21 @@ const CustomHelmet = () => (
 );
 
 function Dashboard() {
-  const { user, setUser } = useUser(); // Use setUser to update the user state
+  const { user, setUser } = useUser();
   const navigate = useNavigate();
+  console.log("Dashboard", user);
 
   const handleLogout = () => {
-    localStorage.removeItem('userData');
+    localStorage.removeItem('localUser');
     navigate('/login');
   };
 
   useEffect(() => {
-    const retrievedUserData = localStorage.getItem('userData');
+    const retrievedUserData = localStorage.getItem('localUser');
     if (retrievedUserData) {
-      setUser(JSON.parse(retrievedUserData)); // Update the user state with the retrieved data
+      setUser(JSON.parse(retrievedUserData));
     }
-  }, [setUser]); // Dependency array includes setUser to ensure it's available
+  }, [setUser]); 
   return (
     <div>
       <HelmetProvider>

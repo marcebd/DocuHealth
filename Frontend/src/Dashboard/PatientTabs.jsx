@@ -24,8 +24,14 @@ const PatientTabs = () => {
     setIsModalOpen(false);
   };
 
-  const handleTabCreate = (name) => {
-    setTabs([...tabs, name]);
+  const handleTabCreate = () => {
+    console.log(user);
+    const newTabs = user.patientsTabs.map(patient => (
+      <div key={patient.id}>
+        {patient.firstName} {patient.lastName}
+      </div>
+    ));
+    setTabs(newTabs);
   };
 
   return (
