@@ -107,9 +107,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", (req, res, next) => {
   const { email, password } = req.body;
-//natis
-  console.log("Login email", email);
-  console.log("login password", password);
   if (!email || !password) {
     res.status(400).send("Email and password are required");
     return;

@@ -4,11 +4,6 @@ const bcrypt = require("bcrypt");
 
 function initialize(passport) {
   const authenticateUser = (email, password, next, req) => {
-    console.log(req);
-    console.log("Authenticate user called with email:", email);
-    console.log("Authenticate user called with password:", password);
-    console.log("Authenticate user req:", req);
-    console.log("Authenticate user next", next);
     pool.query(
       `SELECT * FROM "User" WHERE email = $1`,
       [email],

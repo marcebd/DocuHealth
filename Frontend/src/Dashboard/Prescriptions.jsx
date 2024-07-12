@@ -16,8 +16,6 @@ const Prescriptions = () => {
     return () => clearInterval(intervalId);
   }, [viewingPatientId]);
 
-  console.log(viewingPatientId);
-
   const [showModal, setShowModal] = useState(false);
   const [prescriptions, setPrescriptions] = useState([{
     name: '',
@@ -44,7 +42,6 @@ const Prescriptions = () => {
         body: JSON.stringify({ prescriptions: prescriptions.map(prescription => ({ ...prescription, patientId: viewingPatientId })) })
       });
       if (response.ok) {
-        console.log('Prescriptions added successfully');
         setPrescriptions([{
           name: '',
           dose: '',

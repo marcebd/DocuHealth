@@ -46,7 +46,6 @@ const Notepad = () => {
       }
 
       const responseData = await response.json();
-      console.log(responseData);
     } catch (error) {
       console.error("Error creating note:", error);
     }

@@ -22,12 +22,10 @@ function Login() {
         body: JSON.stringify(data),
         credentials: 'include',
       });
-      console.log('Response:', response);
       if (!response.ok) {
         setError(response.statusText || 'Failed to login');
       } else {
         const jsonData = await response.json();
-        console.log('Data:', jsonData);
         localStorage.setItem('userId', JSON.stringify(jsonData.userId));
         localStorage.setItem('token', jsonData.token);
         navigate('/dashboard');

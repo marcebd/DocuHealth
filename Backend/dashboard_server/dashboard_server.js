@@ -79,7 +79,6 @@ app.post('/visitNotes', async (req, res) => {
 
 app.post('/prescriptions', async (req, res) => {
   const prescriptions = req.body.prescriptions;
-  console.log(prescriptions);
 
   if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
     return res.status(400).json({ message: "No prescriptions provided or incorrect format" });
