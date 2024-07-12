@@ -77,6 +77,33 @@ app.post('/visitNotes', async (req, res) => {
   }
 });
 
+app.post('/prescription', async (req, res) => {
+  const { patientId, name, dose, instructions, date } = req.body;
+  if (!patientId || !name || !dose || !instructions || !date) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+  try {
+    const patientExists = await prisma.patient.findUnique({
+      where: { id: parseInt(patientId) }
+    });
+    if (!patientExists) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+    const prescription = await prisma.prescription.create({
+      data: { patientId: parseInt(patientId), name, dose, instructions, date: new Date(date) }
+    });
+    const prescriptionForResponse = {
+      ...prescription,
+      id: prescription.id.toString(),
+      patientId: prescription.patientId.toString()
+    };
+    res.status(201).json(prescriptionForResponse);
+  } catch (error) {
+    console.error('Failed to create visit note:', error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.listen(3002, () => {
   console.log('Server running on port 3002');
 });
