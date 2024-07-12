@@ -26,8 +26,19 @@ const PatientTabs = () => {
         console.error('Failed to fetch patients', response);
       } else {
         const data = await response.json();
-        setPatients(data);
-        handleTabCreate(); 
+        setPatients(prevPatients => {
+          const updatedPatients = [...prevPatients, ...data];
+          const uniquePatients = updatedPatients.reduce((acc, current) => {
+            const x = acc.find(item => item.id === current.id);
+            if (!x) {
+              return acc.concat([current]);
+            } else {
+              return acc;
+            }
+          }, []);
+          return uniquePatients;
+        });
+        handleTabCreate();
       }
     } catch (error) {
       console.error('Error fetching patients', error);
