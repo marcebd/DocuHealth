@@ -49,12 +49,16 @@ const PatientTabs = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = (onHide) => {
+  const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
   const handleTabCreate = () => {
     setTabCreated(true);
+  };
+
+  const handlePatientClick = (patientId) => {
+    localStorage.setItem('viewingPatient', patientId);
   };
 
   return (
@@ -64,7 +68,7 @@ const PatientTabs = () => {
         <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
       {tabCreated && patients.map(patient => (
-        <div key={patient.id}>
+        <div key={patient.id} onClick={() => handlePatientClick(patient.id)}>
           {patient.firstName} {patient.middleName || ''} {patient.lastName}
         </div>
       ))}
