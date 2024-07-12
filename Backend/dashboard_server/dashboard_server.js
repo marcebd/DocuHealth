@@ -77,11 +77,49 @@ app.post('/visitNotes', async (req, res) => {
   }
 });
 
-app.post('/prescription', async (req, res) => {
-  const { patientId, name, dose, instructions, date } = req.body;
-  if (!patientId || !name || !dose || !instructions || !date) {
-    return res.status(400).json({ message: "Missing required fields" });
+app.post('/prescriptions', async (req, res) => {
+  const prescriptions = req.body.prescriptions;
+  console.log(prescriptions);
+
+  if (!Array.isArray(prescriptions) || prescriptions.length === 0) {
+    return res.status(400).json({ message: "No prescriptions provided or incorrect format" });
   }
+
+  try {
+    const createdPrescriptions = [];
+    for (const { patientId, name, dose, instructions, date } of prescriptions) {
+      if (!patientId || !name || !dose || !date) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const patientExists = await prisma.patient.findUnique({
+        where: { id: parseInt(patientId) }
+      });
+
+      if (!patientExists) {
+        return res.status(404).json({ message: "Patient not found" });
+      }
+
+      const prescription = await prisma.prescription.create({
+        data: { patientId: parseInt(patientId), name, dose, instructions, date: new Date(date) }
+      });
+
+      createdPrescriptions.push({
+        ...prescription,
+        id: prescription.id.toString(),
+        patientId: prescription.patientId.toString()
+      });
+    }
+
+    res.status(201).json(createdPrescriptions);
+  } catch (error) {
+    console.error('Failed to create prescriptions:', error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get('/prescriptions/:patientId', async (req, res) => {
+  const patientId = req.params.patientId;
   try {
     const patientExists = await prisma.patient.findUnique({
       where: { id: parseInt(patientId) }
@@ -89,18 +127,15 @@ app.post('/prescription', async (req, res) => {
     if (!patientExists) {
       return res.status(404).json({ message: "Patient not found" });
     }
-    const prescription = await prisma.prescription.create({
-      data: { patientId: parseInt(patientId), name, dose, instructions, date: new Date(date) }
-    });
-    const prescriptionForResponse = {
-      ...prescription,
-      id: prescription.id.toString(),
-      patientId: prescription.patientId.toString()
-    };
-    res.status(201).json(prescriptionForResponse);
-  } catch (error) {
-    console.error('Failed to create visit note:', error);
-    res.status(500).json({ message: "Internal server error" });
+    const prescriptions = await prisma.prescription.findMany({where: {patientId: patientId}});
+    prescriptions.forEach(prescription => {
+      prescription.patientId = prescription.patientId.toString();
+      prescription.id = prescription.id.toString();
+    })
+    return res.json(prescriptions);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
