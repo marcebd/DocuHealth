@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
-import DashboardData from './DashboardData';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -18,6 +17,16 @@ function Dashboard() {
   const userId = JSON.parse(localStorage.getItem("userId"));
   let [userFirstName, setUserFirstName] = useState('');
   let [userProfilePicture, setUserProfilePicture] = useState('');
+  const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setViewingPatientId(localStorage.getItem('viewingPatient'));
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
   useEffect(() => {
     async function fetchData() {
       try {
@@ -38,6 +47,7 @@ function Dashboard() {
     fetchData();
   }, [userId]);
 
+
   return (
     <div>
       <HelmetProvider>
@@ -47,8 +57,7 @@ function Dashboard() {
       <img src={userId && userProfilePicture ? userProfilePicture : 'default.jpg'} alt="Profile" />
       <button aria-label="Logout from Dashboard">Logout</button>
       <div>
-        <PatientTabs />
-        <DashboardData />
+        <PatientTabs viewingPatientId={viewingPatientId} />
       </div>
     </div>
   );

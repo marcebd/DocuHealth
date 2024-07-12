@@ -11,7 +11,6 @@ require("dotenv").config();
 const { PrismaClient } = require('@prisma/client');
 const minPasswordLength = 6;
 const noErrors = 0;
-const jwt = require("jsonwebtoken");
 const { initialize } = require("../passportConfig");
 initialize(passport);
 const express = require('express');

@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import NewPatientModal from '../Patient/NewPatientModal';
+import Notepad from "./Notepad";
+import SearchBar from "./SearchBar";
 
-const PatientTabs = () => {
+const PatientTabs = ({viewingPatientId}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
@@ -72,6 +74,8 @@ const PatientTabs = () => {
           {patient.firstName} {patient.middleName || ''} {patient.lastName}
         </div>
       ))}
+      <SearchBar patientId={viewingPatientId}/>
+      <Notepad />
     </div>
   );
 };

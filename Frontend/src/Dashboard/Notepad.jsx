@@ -1,10 +1,23 @@
-import React, { useState, useRef } from 'react';
-import { useUser } from '../UserContext';
+import React, { useState, useEffect } from 'react';
+import PastVisitNotes from './PastVisitNotes';
 
 const Notepad = () => {
+  const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentPatientId = localStorage.getItem('viewingPatient');
+      if (currentPatientId !== viewingPatientId) {
+        setViewingPatientId(currentPatientId);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [viewingPatientId]);
+
   const [note, setNote] = useState('');
   const [visitDate, setVisitDate] = useState('');
-  const { user } = useUser();
+
   const handleNoteChange = (event) => {
     setNote(event.target.value);
   };
@@ -12,43 +25,45 @@ const Notepad = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const userId = user.id;
-
     const patientData = {
-      userId,
+      patientId: viewingPatientId,
       note,
       visitDate
     };
 
     try {
-      const response = await fetch('http://localhost:3000/notes', {
+      const response = await fetch('http://localhost:3002/visitNotes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(patientData)
       });
-      const responseData = await response.json();
       if (!response.ok) {
-        console.error('Failed to create patient:', responseData);
-      } else {
-        onCreate(firstName + " " + lastName);
-        onHide();
+        const responseData = await response.json();
+        console.error('Failed to create note:', responseData);
+        return;
       }
+
+      const responseData = await response.json();
+      console.log(responseData);
     } catch (error) {
-      console.error("Error creating patient:", error);
+      console.error("Error creating note:", error);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
+    <div>
+      <form onSubmit={handleSubmit}>
+        <label>
           Visit Date:
           <input type="date" value={visitDate} onChange={(event) => setVisitDate(event.target.value)} />
         </label>
-      <textarea value={note} onChange={handleNoteChange} />
-      <button type="submit">Save Note</button>
-    </form>
+        <textarea value={note} onChange={handleNoteChange} />
+        <button type="submit">Save Note</button>
+      </form>
+      <PastVisitNotes patientId={viewingPatientId}/>
+    </div>
   );
 };
 
