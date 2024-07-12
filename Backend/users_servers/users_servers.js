@@ -57,7 +57,7 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/:userId/dashboard/name/picture",  async(req, res) => {
+app.get("/:userId/dashboard/name/picture", checkNotAuthenticated, async(req, res) => {
     try {
       const userId = req.params.userId;
       const userData = await prisma.user_data.findUnique({ where: { user_id: userId } });
@@ -236,7 +236,6 @@ function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return res.redirect("/dashboard");
   }
-  console.log("Here")
   next();
 }
 

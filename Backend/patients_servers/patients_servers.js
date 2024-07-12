@@ -3,6 +3,27 @@ const { PrismaClient } = require('@prisma/client');
 const express = require('express');
 const prisma = new PrismaClient();
 const app = express();
+const cors = require("cors");
+const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
+
+// Middleware
+app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:5174',
+    credentials: true,
+}));
+app.use(express.urlencoded({ extended: false }));
+app.use(session({
+    secret: "secret",
+    resave: false,
+    saveUninitialized: false
+}));
+app.use(flash());
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });

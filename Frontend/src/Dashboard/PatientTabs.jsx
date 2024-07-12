@@ -1,20 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import NewPatientModal from '../Patient/NewPatientModal';
-import { useUser } from '../UserContext';
 
 const PatientTabs = () => {
-  const { user} = useUser();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabs, setTabs] = useState([]);
   let {tabCreated} = false;
   const [patients, setPatients] = useState([]);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      const patientsData = user.patients;
-      setPatients(patientsData);
-    }
-  }, [isModalOpen]);
 
   const handleCreate = () => {
     setIsModalOpen(true);
@@ -33,7 +25,6 @@ const PatientTabs = () => {
     ));
     setTabs(newTabs);
   };
-  console.log("User in Patient Tabs", user);
 
   return (
     <div>

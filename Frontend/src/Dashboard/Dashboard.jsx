@@ -30,8 +30,6 @@ function Dashboard() {
           const data = await response.json();
           setUserFirstName(data.first_name);
           setUserProfilePicture(data.profile_picture);
-
-          console.log("User Data", data);
         }
       } catch (error) {
         console.error('Error fetching User Data in dashboard:', error);
