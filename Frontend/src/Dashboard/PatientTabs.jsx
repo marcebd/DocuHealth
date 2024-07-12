@@ -8,6 +8,7 @@ const PatientTabs = ({viewingPatientId}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
+  const [hoveredButton, setHoveredButton] = useState(false);
 
   useEffect(() => {
     const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
@@ -62,20 +63,57 @@ const PatientTabs = ({viewingPatientId}) => {
 
   const handlePatientClick = (patientId) => {
     localStorage.setItem('viewingPatient', patientId);
+    window.location.reload();
+  };
+
+  const tabStyle = (patientId) => ({
+    cursor: 'pointer',
+    padding: '10px 20px',
+    margin: '5px',
+    borderRadius: '10px 10px 0 0',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    backgroundColor: patientId.toString() === viewingPatientId.toString() ? 'white' : 'lightgrey',
+    flex: 1,
+    textAlign: 'center'
+  });
+
+  const buttonStyle = {
+    cursor: 'pointer',
+    padding: '10px 20px',
+    margin: '5px',
+    borderRadius: '10px 10px 0 0',
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    backgroundColor: hoveredButton ? 'lightgrey' : 'transparent',
+    border: 'none',
+    flex: '0',
+    textAlign: 'center',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
   };
 
   return (
     <div>
-      <button onClick={handleCreate}>+</button>
       {isModalOpen && (
         <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
-      {tabCreated && patients.map(patient => (
-        <div key={patient.id} onClick={() => handlePatientClick(patient.id)}>
-          {patient.firstName} {patient.middleName || ''} {patient.lastName}
+      <div style={{ display: 'flex', margin: '0 10px' }}>
+        {tabCreated && patients.map(patient => (
+          <div key={patient.id}
+               onClick={() => handlePatientClick(patient.id)}
+               style={tabStyle(patient.id)}>
+            {patient.firstName} {patient.middleName || ''} {patient.lastName}
+          </div>
+        ))}
+        <div
+          onClick={handleCreate}
+          onMouseEnter={() => setHoveredButton(true)}
+          onMouseLeave={() => setHoveredButton(false)}
+          style={buttonStyle}
+        >
+          +
         </div>
-      ))}
-      <SearchBar patientId={viewingPatientId}/>
+      </div>
       <Notepad />
       <Prescriptions />
     </div>
