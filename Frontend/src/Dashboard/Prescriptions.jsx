@@ -71,10 +71,11 @@ const Prescriptions = () => {
 
   return (
     <>
+      <PastPrescriptions patientId={viewingPatientId} />
       <Button variant="primary" onClick={() => setShowModal(true)}>
         Add New Prescription
       </Button>
-      <PastPrescriptions patientId={viewingPatientId} />
+
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Add New Prescription</Modal.Title>
