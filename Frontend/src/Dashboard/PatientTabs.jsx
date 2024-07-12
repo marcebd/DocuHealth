@@ -3,10 +3,36 @@ import NewPatientModal from '../Patient/NewPatientModal';
 
 const PatientTabs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tabs, setTabs] = useState([]);
-  let {tabCreated} = false;
+  const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
 
+  useEffect(() => {
+    const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
+    if (storedPatients && storedPatients.length > 0) {
+      fetchData(storedPatients);
+    }
+  }, [isModalOpen]);
+
+  const fetchData = async (patientsIds) => {
+    try {
+      const response = await fetch(`http://localhost:3001/patients/names`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(patientsIds),
+      });
+      if (!response.ok) {
+        console.error('Failed to fetch patients', response);
+      } else {
+        const data = await response.json();
+        setPatients(data);
+        handleTabCreate(); 
+      }
+    } catch (error) {
+      console.error('Error fetching patients', error);
+    }
+  }
 
   const handleCreate = () => {
     setIsModalOpen(true);
@@ -17,13 +43,7 @@ const PatientTabs = () => {
   };
 
   const handleTabCreate = () => {
-    tabCreated = true;
-    const newTabs = patients.map(patient => (
-      <div key={patient.id}>
-        {patient.firstName} {patient.lastName}
-      </div>
-    ));
-    setTabs(newTabs);
+    setTabCreated(true);
   };
 
   return (
@@ -32,8 +52,10 @@ const PatientTabs = () => {
       {isModalOpen && (
         <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
-      {tabCreated && tabs.map((tab, index) => (
-        <div key={index}>{tab}</div>
+      {tabCreated && patients.map(patient => (
+        <div key={patient.id}>
+          {patient.firstName} {patient.middleName || ''} {patient.lastName}
+        </div>
       ))}
     </div>
   );

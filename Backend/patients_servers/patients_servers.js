@@ -96,6 +96,23 @@ app.get("/users/:userId/patients", async (req, res) => {
     }
   });
 
+  app.post("/patients/names", async (req, res) => {
+    const patientIds = req.body;
+    if (!patientIds || patientIds.length === 0) {
+      return res.status(400).json({ message: "No patient IDs provided" });
+    }
+    const patientsData = await Promise.all(patientIds.map(async (id) => {
+      id = parseInt(id);
+      const patient = await prisma.patient.findUnique({ where: { id } });
+      return {
+        id,
+        firstName: patient.firstName,
+        middleName: patient.middleName,
+        lastName: patient.lastName,
+      };
+    }));
+    return res.json(patientsData);
+  });
 
 
   app.post("/notes/:userId/:id", async (req, res) => {
