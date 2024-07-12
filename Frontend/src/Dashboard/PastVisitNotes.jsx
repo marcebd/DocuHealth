@@ -27,7 +27,6 @@ const PastVisitNotes = ({ patientId }) => {
 
   const openModal = (note) => {
     setSelectedNote(note);
-    console.log(selectedNote);
     setShowModal(true);
   };
 

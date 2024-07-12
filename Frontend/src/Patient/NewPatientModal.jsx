@@ -94,6 +94,7 @@ const NewPatientModal = ({ onClose, onCreate}) => {
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
+        localStorage.setItem('viewingPatient',  responseData.patient.id);
         onCreate();
         onClose();
       }
@@ -106,6 +107,7 @@ const NewPatientModal = ({ onClose, onCreate}) => {
     const updatedPatientTabs = [...patientsInTabs, patient.id];
     setPatientsInTabs(updatedPatientTabs);
     localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
+    localStorage.setItem('viewingPatient', patient.id);
     onCreate();
     onClose();
   };
