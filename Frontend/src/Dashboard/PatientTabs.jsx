@@ -81,7 +81,7 @@ const PatientTabs = ({ viewingPatientId }) => {
     marginRight: '5px',
     marginLeft: '5px',
     borderRadius: '10px 10px 0 0',
-    boxShadow: patientId.toString() === viewingPatientId.toString() ? '0 4px 0 0 white inset' : 'none',
+    boxShadow: patientId.toString() === viewingPatientId.toString() ? '0 4px 0 0 white inset, 0 2px 5px rgba(0, 0, 0, 0.3)' : 'none',
     backgroundColor: patientId.toString() === viewingPatientId.toString() ? 'white' : generateLightColor(index),
     flex: '0 1 auto',
     textAlign: 'center',
@@ -133,9 +133,20 @@ const PatientTabs = ({ viewingPatientId }) => {
           +
         </div>
       </div>
-      <div id='notesPrescriptions' style={{border: '1px solid lightgrey', borderRadius: '10px', padding: '2%', background: 'white', marginTop: '-4px'}}>
-        <Notepad />
-        <Prescriptions />
+      <div id='notesPrescriptions' style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-evenly',
+          alignItems: 'flex-start',
+          border: '1px solid lightgrey',
+          borderRadius: '10px',
+          padding: '2%',
+          background: 'white',
+          marginTop: '-4px',
+          height: '100vh'
+      }}>
+          <Notepad />
+          <Prescriptions />
       </div>
     </div>
   );

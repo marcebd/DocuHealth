@@ -67,9 +67,9 @@ const Prescriptions = () => {
   };
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '50%' }}>
       <PastPrescriptions patientId={viewingPatientId} />
-      <Button variant="primary" onClick={() => setShowModal(true)}>
+      <Button variant="primary" onClick={() => setShowModal(true)} style={{ marginTop: '20px' }}>
         Add New Prescription
       </Button>
 
@@ -131,7 +131,7 @@ const Prescriptions = () => {
           </Form>
         </Modal.Body>
       </Modal>
-    </>
+    </div>
   );
 };
 

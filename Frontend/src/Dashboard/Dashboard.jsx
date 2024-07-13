@@ -52,7 +52,6 @@ function Dashboard() {
         width: '110%',
         height: '80px',
         top: '0',
-        position: 'fixed',
         background: 'white',
         zIndex: '1000',
         marginTop: '1%'
@@ -64,9 +63,9 @@ function Dashboard() {
           marginRight: '20px'
         }} />
         <h1 style={{ margin: '0', lineHeight: '80px' }}>Hello, {userFirstName}</h1>
-        <button aria-label="Logout from Dashboard" style={{ marginLeft: 'auto' }}>Logout</button>
+        <button aria-label="Logout from Dashboard" style={{ }}>Logout</button>
       </header>
-      <main style={{ paddingTop: '80px' }}>
+      <main style={{ paddingTop: '2%' }}>
         <PatientTabs viewingPatientId={viewingPatientId} />
       </main>
     </div>
