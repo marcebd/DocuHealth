@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
 
 const CustomHelmet = () => (
@@ -18,15 +17,7 @@ function Dashboard() {
   let [userFirstName, setUserFirstName] = useState('');
   let [userProfilePicture, setUserProfilePicture] = useState('');
   const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setViewingPatientId(localStorage.getItem('viewingPatient'));
-    };
-    window.addEventListener('storage', handleStorageChange);
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -38,7 +29,9 @@ function Dashboard() {
         } else {
           const data = await response.json();
           setUserFirstName(data.first_name);
-          setUserProfilePicture(data.profile_picture);
+          const buffer = data.profile_picture.data;
+          const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+          setUserProfilePicture(`data:image/jpeg;base64,${base64String}`);
         }
       } catch (error) {
         console.error('Error fetching User Data in dashboard:', error);
@@ -47,18 +40,35 @@ function Dashboard() {
     fetchData();
   }, [userId]);
 
-
   return (
-    <div>
+    <div id="wholePage">
       <HelmetProvider>
         <CustomHelmet />
       </HelmetProvider>
-      <h1>Hello, {userFirstName }</h1>
-      <img src={userId && userProfilePicture ? userProfilePicture : 'default.jpg'} alt="Profile" />
-      <button aria-label="Logout from Dashboard">Logout</button>
-      <div>
+      <header id='header' style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        width: '110%',
+        height: '80px',
+        top: '0',
+        position: 'fixed',
+        background: 'white',
+        zIndex: '1000',
+        marginTop: '1%'
+      }}>
+        <img src={userProfilePicture || 'default.jpg'} alt="Profile" style={{
+          width: '80px',
+          height: '80px',
+          borderRadius: '50%',
+          marginRight: '20px'
+        }} />
+        <h1 style={{ margin: '0', lineHeight: '80px' }}>Hello, {userFirstName}</h1>
+        <button aria-label="Logout from Dashboard" style={{ marginLeft: 'auto' }}>Logout</button>
+      </header>
+      <main style={{ paddingTop: '80px' }}>
         <PatientTabs viewingPatientId={viewingPatientId} />
-      </div>
+      </main>
     </div>
   );
 }

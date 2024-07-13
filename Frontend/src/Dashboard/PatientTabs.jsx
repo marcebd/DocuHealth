@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
-import SearchBar from "./SearchBar";
 import Prescriptions from './Prescriptions';
 
-const PatientTabs = ({viewingPatientId}) => {
+const PatientTabs = ({ viewingPatientId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
@@ -66,23 +65,38 @@ const PatientTabs = ({viewingPatientId}) => {
     window.location.reload();
   };
 
-  const tabStyle = (patientId) => ({
+  const tabContainerStyle = {
+    display: 'flex',
+    overflowX: 'auto',
+    flexWrap: 'nowrap',
+    margin: '0',
+    padding: '0',
+    width: '100%',
+    maxWidth: '100vw',
+  };
+
+  const tabStyle = (patientId, index) => ({
     cursor: 'pointer',
     padding: '10px 20px',
-    margin: '5px',
+    marginRight: '5px',
+    marginLeft: '5px',
     borderRadius: '10px 10px 0 0',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-    backgroundColor: patientId.toString() === viewingPatientId.toString() ? 'white' : 'lightgrey',
-    flex: 1,
-    textAlign: 'center'
+    boxShadow: patientId.toString() === viewingPatientId.toString() ? '0 4px 0 0 white inset' : 'none',
+    backgroundColor: patientId.toString() === viewingPatientId.toString() ? 'white' : generateLightColor(index),
+    flex: '0 1 auto',
+    textAlign: 'center',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: '120px'
   });
 
   const buttonStyle = {
     cursor: 'pointer',
-    padding: '10px 20px',
-    margin: '5px',
-    borderRadius: '10px 10px 0 0',
-    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+    padding: '10px 10px',
+    marginRight: '5px',
+    marginLeft: '5px',
+    borderRadius: '10px 10px 10px 10px',
     backgroundColor: hoveredButton ? 'lightgrey' : 'transparent',
     border: 'none',
     flex: '0',
@@ -92,16 +106,21 @@ const PatientTabs = ({viewingPatientId}) => {
     alignItems: 'center'
   };
 
+  const generateLightColor = (index) => {
+    const hue = index * 137;
+    return `hsl(${hue}, 70%, 85%)`;
+  };
+
   return (
     <div>
       {isModalOpen && (
         <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
-      <div style={{ display: 'flex', margin: '0 10px' }}>
-        {tabCreated && patients.map(patient => (
+      <div style={tabContainerStyle}>
+        {tabCreated && patients.map((patient, index) => (
           <div key={patient.id}
                onClick={() => handlePatientClick(patient.id)}
-               style={tabStyle(patient.id)}>
+               style={tabStyle(patient.id, index)}>
             {patient.firstName} {patient.middleName || ''} {patient.lastName}
           </div>
         ))}
@@ -114,10 +133,11 @@ const PatientTabs = ({viewingPatientId}) => {
           +
         </div>
       </div>
-      <Notepad />
-      <Prescriptions />
+      <div id='notesPrescriptions' style={{border: '1px solid lightgrey', borderRadius: '10px', padding: '2%', background: 'white', marginTop: '-4px'}}>
+        <Notepad />
+        <Prescriptions />
+      </div>
     </div>
   );
 };
-
 export default PatientTabs;

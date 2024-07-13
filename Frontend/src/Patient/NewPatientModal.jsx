@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
 
-const NewPatientModal = ({ onClose, onCreate}) => {
+const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
-  const [lastName, setlastName] = useState('');
-  const [idNumber, setidNumber] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
   const [conditions, setConditions] = useState([{ name: '', date: '' }]);
   const [searchTerm, setSearchTerm] = useState('');
   const [patientsInTabs, setPatientsInTabs] = useState([]);
+  const [patientsData, setPatientsData] = useState([]);
+  const userId = JSON.parse(localStorage.getItem("userId"));
+
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {
@@ -20,8 +23,6 @@ const NewPatientModal = ({ onClose, onCreate}) => {
       setPatientsInTabs([]);
     }
   }, []);
-  let [patientsData, setPatientsData] = useState([]);
-  const userId = JSON.parse(localStorage.getItem("userId"));;
 
   useEffect(() => {
     async function fetchData() {
@@ -94,7 +95,7 @@ const NewPatientModal = ({ onClose, onCreate}) => {
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
-        localStorage.setItem('viewingPatient',  responseData.patient.id);
+        localStorage.setItem('viewingPatient', responseData.patient.id);
         window.location.reload();
         onCreate();
         onClose();
@@ -112,85 +113,87 @@ const NewPatientModal = ({ onClose, onCreate}) => {
     window.location.reload();
     onCreate();
     onClose();
-  };
+    };
 
-  return (
-    <Modal show={true} onHide={handlePatientClick}>
-      <Modal.Header>
-        <Modal.Title>Find Patient or Create One</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Row>
-          <Col sm={6}>
-            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>First Name</th>
-                  <th>Middle Name</th>
-                  <th>Last Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {patientsData.map((patient) => (
-                  <tr key={patient.id}>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.firstName}</td>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.middleName}</td>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.lastName}</td>
+    return (
+      <Modal show={true} onHide={onClose} >
+      <Modal.Dialog>
+        <Modal.Header closeButton>
+          <Modal.Title>Find Patient or Create One</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Row>
+            <Col sm={6} style={{ maxHeight: '90%', overflowY: 'auto' }}>
+              <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+              <Table striped bordered hover size="sm">
+                <thead>
+                  <tr>
+                    <th>First Name</th>
+                    <th>Middle Name</th>
+                    <th>Last Name</th>
                   </tr>
-                ))}
-              </tbody>
-            </Table>
+                </thead>
+                <tbody>
+                  {patientsData.map((patient) => (
+                    <tr key={patient.id} onClick={() => handlePatientClick(patient)}>
+                      <td>{patient.firstName}</td>
+                      <td>{patient.middleName}</td>
+                      <td>{patient.lastName}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
           </Col>
           <Col sm={6}>
             <Form onSubmit={handleSubmit}>
               <FormGroup>
-                <label>First Name:</label>
-                <input type="text" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
+                <FormLabel>First Name:</FormLabel>
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <label>Middle Name:</label>
-                <input type="text" value={middleName} onChange={(event) => setMiddleName(event.target.value)} />
+                <FormLabel>Middle Name:</FormLabel>
+                <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <label>last Name:</label>
-                <input type="text" value={lastName} onChange={(event) => setlastName(event.target.value)} />
+                <FormLabel>Last Name:</FormLabel>
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <label>iD Number:</label>
-                <input type="text" value={idNumber} onChange={(event) => setidNumber(event.target.value)} />
+                <FormLabel>ID Number:</FormLabel>
+                <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <label>Birth Date:</label>
-                <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
+                <FormLabel>Birth Date:</FormLabel>
+                <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <label>Prescriptions:</label>
+                <FormLabel>Prescriptions:</FormLabel>
                 {prescriptions.map((prescription, index) => (
-                  <div key={index}>
-                    <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" />
-                    <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" />
-                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="instructions" />
-                    <input type="date" name="date" value={prescription.date} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Date" />
+                  <div key={index} className="mb-2">
+                    <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" className="form-control" />
+                    <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" className="form-control" />
+                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Instructions" className="form-control" />
+                    <input type="date" name="date" value={prescription.date} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Date" className="form-control" />
                   </div>
                 ))}
               </FormGroup>
               <FormGroup>
-                <label>Conditions:</label>
+                <FormLabel>Conditions:</FormLabel>
                 {conditions.map((condition, index) => (
-                  <div key={index}>
-                    <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" />
-                    <input type="date" name="date" value={condition.date} onChange={(e) => handleConditionChange(index, e)} placeholder="Date" />
+                  <div key={index} className="mb-2">
+                    <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" className="form-control" />
+                    <input type="date" name="date" value={condition.date} onChange={(e) => handleConditionChange(index, e)} placeholder="Date" className="form-control" />
                   </div>
                 ))}
               </FormGroup>
-              <button type="submit">Create Patient</button>
+              <button type="submit" className="btn btn-primary">Create Patient</button>
             </Form>
           </Col>
         </Row>
       </Modal.Body>
+      </Modal.Dialog>
     </Modal>
-  );
-  };
+    );
+    };
 
-  export default NewPatientModal;
+    export default NewPatientModal;
