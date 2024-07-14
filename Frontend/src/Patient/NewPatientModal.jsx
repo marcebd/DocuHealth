@@ -55,6 +55,14 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     setConditions(newConditions);
   };
 
+  const onImageCapture = (image, success) => {
+    if (success) {
+      setError("Patient image saved correctly");
+    } else {
+      setError("Patient image wasn't saved correctly");
+    }
+  };
+
   const handleSearch = (event) => {
     // Handle search logic here
   };
@@ -170,6 +178,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
+
                 <FacialRecognitionPatientButton/>
               </FormGroup>
               <FormGroup>

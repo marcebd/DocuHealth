@@ -138,26 +138,21 @@ app.get("/users/:userId/patients", async (req, res) => {
     }
   });
 
-  app.put("/img/:id", async (req, res) => {
+  app.delete("/img/:id", async (req, res) => {
     const patientId = req.params.userId;
-    const picture = req.body;
-    if (!patientId ) {
+    if (!patientId) {
       return res.status(400).json({ message: "No patient IDs provided" });
-    }
-    if (!picture) {
-      return res.status(400).json({ message: "No patient picture provided" });
     }
     try {
       const patient = await prisma.patient.findUnique({ where: { id: patientId } });
-      if(!patient){
+      if (!patient) {
         return res.status(404).json({ message: "Patient not found" });
       }
-      await prisma.picture.update({
+      await prisma.picture.delete({
         where: { patientId: parseInt(patientId) },
-        data: { picture }
       });
-      res.status(200).json({message: 'Patient Picture Was Updated Successfully.'})
-    } catch{
-      res.status(500).json({ message: "Error Updating Patient's Picture, try again." });
+      res.status(200).json({ message: "Patient Picture Was Deleted Successfully." })
+    } catch {
+      res.status(500).json({ message: "Error Deleting Patient's Picture, try again." });
     }
   });
