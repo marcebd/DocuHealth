@@ -46,29 +46,25 @@ const PastVisitNotes = ({ patientId }) => {
         height: '50vh',
         overflowY: 'auto'
       }}>
-        {visitNotes.map((note, index) => (
-          <div key={note.id} onClick={() => openModal(note)} style={{
-            cursor: 'pointer',
-            marginBottom: '10px',
-            borderBottom: index !== visitNotes.length - 1 ? '1px solid #ccc' : 'none'
-          }}>
-            <p><strong>Date:</strong> {new Date(note.date).toLocaleDateString()}</p>
-            <p><strong>Note Preview:</strong> {note.notes ? note.notes.substring(0, 100) + '...' : 'No content available'}</p>
-          </div>
-        ))}
+        {visitNotes.length > 0 ? (
+          visitNotes.map((note, index) => (
+            <div key={note.id} onClick={() => openModal(note)} style={{
+              cursor: 'pointer',
+              marginBottom: '10px',
+              borderBottom: index !== visitNotes.length - 1 ? '1px solid #ccc' : 'none'
+            }}>
+              <p><strong>Date:</strong> {new Date(note.date).toLocaleDateString()}</p>
+              <p><strong>Note Preview:</strong> {note.notes ? note.notes.substring(0, 100) + '...' : 'No content available'}</p>
+            </div>
+          ))
+        ) : (
+          <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any notes.</p>
+        )}
 
-        <Modal show={showModal} onHide={closeModal} centered
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.5)'
-        }}>
+        <Modal show={showModal} onHide={closeModal} centered>
           <Modal.Dialog style={{
             width: '70vw',
-            height: '50vh',  
+            height: '50vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',

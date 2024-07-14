@@ -34,28 +34,31 @@ const PastConditions = ({ patientId }) => {
     setShowModal(false);
   };
 
-  // Calculate and set the maximum height for the table
   const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
 
   return (
     <>
       <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            {conditions.map(condition => (
-              <tr key={condition.id} onClick={() => handleRowClick(condition)}>
-                <td>{condition.name}</td>
-                <td>{new Date(condition.date).toLocaleDateString()}</td>
+        {conditions.length > 0 ? (
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Date</th>
               </tr>
-            ))}
-          </tbody>
-        </Table>
+            </thead>
+            <tbody>
+              {conditions.map(condition => (
+                <tr key={condition.id} onClick={() => handleRowClick(condition)}>
+                  <td>{condition.name}</td>
+                  <td>{new Date(condition.date).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        ) : (
+          <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any conditions.</p>
+        )}
       </div>
 
       <Modal show={showModal} onHide={handleCloseModal}>

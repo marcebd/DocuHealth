@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,65 +8,57 @@ datasource db {
 }
 
 model User {
-  id       BigInt   @id @default(autoincrement()) @db.BigInt
-  email    String   @unique
+  id       BigInt     @id @default(autoincrement())
+  email    String     @unique
   password String
-  userData user_data?
   patients Patient[]
-}
-
-enum Gender {
-Female
-Male
-Nonbinary
-DeclineToState
-Other
+  userData user_data?
 }
 
 model user_data {
-  id       BigInt   @id @default(autoincrement()) @db.BigInt
-  first_name String
-  middle_name String?
-  last_name String
-  phone_number String?
-  specialty String[]
-  id_number String
-  date_of_birth DateTime
-  gender Gender
-  languages String[]
-  location String[]
-  education Education[]
-  biography String
+  id              BigInt      @id @default(autoincrement())
+  first_name      String
+  middle_name     String?
+  last_name       String
+  phone_number    String?
+  specialty       String[]
+  id_number       String
+  date_of_birth   DateTime
+  gender          Gender
+  languages       String[]
+  location        String[]
+  biography       String
+  user_id         BigInt      @unique
   profile_picture Bytes?
-  user_id BigInt @unique
-  user User @relation(fields: [user_id], references: [id])
+  education       Education[]
+  user            User        @relation(fields: [user_id], references: [id])
 }
 
 model Education {
-  id           BigInt   @id @default(autoincrement()) @db.BigInt
+  id           BigInt    @id @default(autoincrement())
   institution  String
   degree       String
-  graduation   String
   user_data_id BigInt
+  graduation   String
   userData     user_data @relation(fields: [user_data_id], references: [id])
 }
 
 model Patient {
-  id       BigInt    @id @default(autoincrement()) @db.BigInt
-  firstName String
-  middleName String?
-  lastName String
-  idNumber String
-  birthDate DateTime
-  visitNotes VisitNote[]
+  id            BigInt         @id @default(autoincrement())
+  firstName     String
+  middleName    String?
+  lastName      String
+  idNumber      String
+  birthDate     DateTime
+  userId        BigInt
+  conditions    Condition[]
+  user          User           @relation(fields: [userId], references: [id])
   prescriptions Prescription[]
-  conditions Condition[]
-  userId BigInt
-  user User @relation(fields: [userId], references: [id])
+  visitNotes    VisitNote[]
 }
 
 model VisitNote {
-  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  id        BigInt   @id @default(autoincrement())
   date      DateTime
   notes     String
   patientId BigInt
@@ -80,19 +66,29 @@ model VisitNote {
 }
 
 model Prescription {
-  id        BigInt   @id @default(autoincrement()) @db.BigInt
-  name      String
-  dose      String
+  id           BigInt    @id @default(autoincrement())
+  name         String
+  dose         String
   instructions String?
-  date      DateTime
-  patientId BigInt
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  patientId    BigInt
+  dateEnd      DateTime?
+  dateStart    DateTime?
+  patient      Patient   @relation(fields: [patientId], references: [id])
 }
 
 model Condition {
-  id        BigInt   @id @default(autoincrement()) @db.BigInt
+  id        BigInt    @id @default(autoincrement())
   name      String
-  date      DateTime
   patientId BigInt
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  dateEnd   DateTime?
+  dateStart DateTime?
+  patient   Patient   @relation(fields: [patientId], references: [id])
+}
+
+enum Gender {
+  Female
+  Male
+  Nonbinary
+  DeclineToState
+  Other
 }

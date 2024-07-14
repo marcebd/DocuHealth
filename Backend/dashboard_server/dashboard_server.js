@@ -86,8 +86,8 @@ app.post('/prescriptions', async (req, res) => {
 
   try {
     const createdPrescriptions = [];
-    for (const { patientId, name, dose, instructions, date } of prescriptions) {
-      if (!patientId || !name || !dose || !date) {
+    for (const { patientId, name, dose, instructions, dateEnd, dataStart } of prescriptions) {
+      if (!patientId || !name || !dose || !dateEnd || !dateStart) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
@@ -100,7 +100,7 @@ app.post('/prescriptions', async (req, res) => {
       }
 
       const prescription = await prisma.prescription.create({
-        data: { patientId: parseInt(patientId), name, dose, instructions, date: new Date(date) }
+        data: { patientId: parseInt(patientId), name, dose, instructions, dateStart: new Date(dateStart), dateEnd: new Date(dateEnd) }
       });
 
       createdPrescriptions.push({
@@ -151,8 +151,8 @@ app.post('/conditions', async (req, res) => {
 
   try {
     const createdCondition = [];
-    for (const { patientId, name, date } of conditions) {
-      if (!patientId || !name || !date) {
+    for (const { patientId, name, dateStart, dateEnd } of conditions) {
+      if (!patientId || !name || !dateStart || !dateEnd) {
         return res.status(400).json({ message: "Missing required fields" });
       }
       const patientExists = await prisma.patient.findUnique({
@@ -164,7 +164,7 @@ app.post('/conditions', async (req, res) => {
       }
 
       const condition = await prisma.condition.create({
-        data: { patientId: parseInt(patientId), name, date: new Date(date) }
+        data: { patientId: parseInt(patientId), name, dateStart: new Date(dateStart), dateEnd: new Date(dateEnd) }
       });
 
       createdCondition.push({

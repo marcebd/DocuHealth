@@ -38,25 +38,29 @@ const PastPrescriptions = ({ patientId }) => {
 
   return (
     <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Dose</th>
-          </tr>
-        </thead>
-        <tbody>
-          {prescriptions.map(prescription => (
-            <tr key={prescription.id} onClick={() => handleRowClick(prescription)}>
-              <td>{prescription.name}</td>
-              <td>{prescription.dose}</td>
+      {prescriptions.length > 0 ? (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Dose</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {prescriptions.map(prescription => (
+              <tr key={prescription.id} onClick={() => handleRowClick(prescription)}>
+                <td>{prescription.name}</td>
+                <td>{prescription.dose}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any prescriptions.</p>
+      )}
 
       <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header >
+        <Modal.Header closeButton>
           <Modal.Title>Prescription Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>

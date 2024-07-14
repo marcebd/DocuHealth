@@ -48,24 +48,40 @@ function Dashboard() {
       <header id='header' style={{
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-start',
-        width: '110%',
+        justifyContent: 'space-between',
+        width: '100vw',
         height: '80px',
-        top: '0',
         background: 'white',
-        zIndex: '1000',
-        marginTop: '1%'
+        padding: '0 20px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        position: 'fixed', 
+        top: 0,
+        left: 0,
+        right: 0
       }}>
-        <img src={userProfilePicture || 'default.jpg'} alt="Profile" style={{
-          width: '80px',
-          height: '80px',
-          borderRadius: '50%',
-          marginRight: '20px'
-        }} />
-        <h1 style={{ margin: '0', lineHeight: '80px' }}>Hello, {userFirstName}</h1>
-        <button aria-label="Logout from Dashboard" style={{ }}>Logout</button>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={userProfilePicture || 'default.jpg'} alt="Profile" style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            marginRight: '20px'
+          }} />
+          <h1 style={{ margin: '0' }}>Hello, {userFirstName}</h1>
+        </div>
+        <button aria-label="Logout from Dashboard" style={{
+          padding: '10px 20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 'auto',
+          height: '40px',
+          background: 'transparent',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          marginTop: '1%'
+        }}>Logout</button>
       </header>
-      <main style={{ paddingTop: '2%' }}>
+      <main style={{ paddingTop: '2%', marginTop: '80px' }}>
         <PatientTabs viewingPatientId={viewingPatientId} />
       </main>
     </div>

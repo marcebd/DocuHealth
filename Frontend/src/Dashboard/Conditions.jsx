@@ -19,7 +19,8 @@ const Conditions = () => {
   const [showModal, setShowModal] = useState(false);
   const [conditions, setConditions] = useState([{
     name: '',
-    date: ''
+    dateStart: '',
+    dateEnd: ''
   }]);
 
   const handleInputChange = (index, event) => {
@@ -52,7 +53,7 @@ const Conditions = () => {
   };
 
   const addConditionForm = () => {
-    setConditions([...conditions, { name: '', date: '' }]);
+    setConditions([...conditions, { name: '', dateStart: '', dateEnd: '' }]);
   };
 
   return (
@@ -100,11 +101,21 @@ const Conditions = () => {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label>Date</Form.Label>
+                  <Form.Label>Start Date </Form.Label>
                   <Form.Control
                     type="date"
                     name="date"
-                    value={condition.date}
+                    value={condition.dateStart}
+                    onChange={(e) => handleInputChange(index, e)}
+                    required
+                  />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>End Date</Form.Label>
+                  <Form.Control
+                    type="date"
+                    name="date"
+                    value={condition.dateEnd}
                     onChange={(e) => handleInputChange(index, e)}
                     required
                   />

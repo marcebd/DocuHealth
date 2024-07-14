@@ -21,7 +21,8 @@ const Prescriptions = () => {
     name: '',
     dose: '',
     instructions: '',
-    date: ''
+    dateStart: '',
+    dateEnd: ''
   }]);
 
   const handleInputChange = (index, event) => {
@@ -46,7 +47,8 @@ const Prescriptions = () => {
           name: '',
           dose: '',
           instructions: '',
-          date: ''
+          dateStart: '',
+          dateEnd: ''
         }]);
         setShowModal(false);
       } else {
@@ -133,11 +135,21 @@ const Prescriptions = () => {
                     />
                   </Form.Group>
                   <Form.Group className="mb-3">
-                    <Form.Label>Date</Form.Label>
+                    <Form.Label>Start Date</Form.Label>
                     <Form.Control
                       type="date"
-                      name="date"
-                      value={prescription.date}
+                      name="dateStart"
+                      value={prescription.dateStart}
+                      onChange={(e) => handleInputChange(index, e)}
+                      required
+                    />
+                  </Form.Group>
+                  <Form.Group className="mb-3">
+                    <Form.Label>End Date</Form.Label>
+                    <Form.Control
+                      type="date"
+                      name="dateEnd"
+                      value={prescription.dateEnd}
                       onChange={(e) => handleInputChange(index, e)}
                       required
                     />
