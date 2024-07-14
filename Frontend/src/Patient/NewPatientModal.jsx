@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
+import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -147,7 +148,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
           {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <Form onSubmit={handleSubmit}>
-
+              <h3>Patient Data</h3>
               <FormGroup>
                 <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" />
@@ -169,7 +170,10 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel><h3>Prescriptions:</h3></FormLabel>
+                <FacialRecognitionPatientButton/>
+              </FormGroup>
+              <FormGroup>
+                <FormLabel><h3>Prescriptions</h3></FormLabel>
                 {prescriptions.map((prescription, index) => (
                   <div key={index} className="mb-2">
                     <label>
@@ -196,7 +200,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 ))}
               </FormGroup>
               <FormGroup>
-                <FormLabel>Conditions:</FormLabel>
+                <FormLabel><h3>Conditions</h3></FormLabel>
                 {conditions.map((condition, index) => (
                   <div key={index} className="mb-2">
                     <label>
