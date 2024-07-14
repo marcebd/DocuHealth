@@ -5,8 +5,7 @@ const Notepad = () => {
   const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
   const [note, setNote] = useState('');
   const [visitDate, setVisitDate] = useState('');
-  const [error, setError] = useState('');  // State to hold error messages
-
+  const [error, setError] = useState('');
   useEffect(() => {
     const intervalId = setInterval(() => {
       const currentPatientId = localStorage.getItem('viewingPatient');
@@ -20,13 +19,11 @@ const Notepad = () => {
 
   const handleNoteChange = (event) => {
     setNote(event.target.value);
-    setError('');  // Clear error when user starts typing
+    setError('');
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Check if the note or visit date is empty
     if (!note.trim() || !visitDate.trim()) {
       setError('Both the visit date and note content are required.');
       return;

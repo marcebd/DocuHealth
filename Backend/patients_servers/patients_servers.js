@@ -115,6 +115,25 @@ app.get("/users/:userId/patients", async (req, res) => {
   });
 
 
-  app.post("/notes/:userId/:id", async (req, res) => {
-
+  app.post("/img/:id", async (req, res) => {
+    const patientId = req.params.userId;
+    const picture = req.body;
+    if (!patientId ) {
+      return res.status(400).json({ message: "No patient IDs provided" });
+    }
+    if (!picture) {
+      return res.status(400).json({ message: "No patient picture provided" });
+    }
+    try {
+      const patient = await prisma.patient.findUnique({ where: { id: patientId } });
+      if(!patient){
+        return res.status(404).json({ message: "Patient not found" });
+      }
+      await prisma.picture.create({
+        data: {patientId: parseInt(patientId), picture}
+      });
+      res.status(201).json({message: 'Patient Picture Uploaded Successfully.'})
+    } catch{
+      res.status(500).json({ message: "Error Uploading Patient's Picture, try again." });
+    }
   });

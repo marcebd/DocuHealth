@@ -72,7 +72,6 @@ app.post('/visitNotes', async (req, res) => {
     };
     res.status(201).json(visitNoteForResponse);
   } catch (error) {
-    console.error('Failed to create visit note:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
