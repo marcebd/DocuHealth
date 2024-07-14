@@ -65,7 +65,7 @@ app.get("/:userId/dashboard/name/picture", checkNotAuthenticated, async(req, res
         profile_picture: userData.profile_picture,
       });
     } catch (error) {
-      res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized, dashboard" });
     }
 
 });
@@ -108,28 +108,20 @@ app.post("/register", async (req, res) => {
 app.post("/login", (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    res.status(400).send("Email and password are required");
-    return;
+    return res.status(400).json({ message: "Email and password are required" });
   }
   passport.authenticate("local", { session: true }, (err, user, info) => {
     if (err) {
-      console.error(err);
-      res.status(500).send("Internal Server Error");
-      return;
+      return res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
-
     if (!user) {
-      res.status(401).send({ message: "Invalid credentials" });
-      return;
+      return res.status(401).json({ message: info.message });
     }
-
     req.login(user, err => {
       if (err) {
-        console.error(err);
-        res.status(500).send("Internal Server Error");
-        return;
+        return res.status(500).json({ message: "Error logging in", error: err.message });
       }
-      res.json({ userId: user.id });
+      return res.json({ userId: user.id });
     });
   })(req, res, next);
 });

@@ -22,17 +22,16 @@ function Login() {
         body: JSON.stringify(data),
         credentials: 'include',
       });
+      const jsonData = await response.json();
       if (!response.ok) {
-        setError(response.statusText || 'Failed to login');
+        setError(jsonData.message || 'Failed to login'); 
       } else {
-        const jsonData = await response.json();
         localStorage.setItem('userId', JSON.stringify(jsonData.userId));
         localStorage.setItem('token', jsonData.token);
         navigate('/dashboard');
       }
     } catch (error) {
-      setError('Network error');
-      console.error('Login error:', error);
+      setError('Network error or server is unreachable');
     } finally {
       setIsLoading(false);
     }
@@ -41,6 +40,7 @@ function Login() {
   return (
     <div className='loginForm' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
       <form onSubmit={handleSubmit} aria-live="polite" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        {error && <p style={{ color: 'red', margin: '10px 0' }}>{error}</p>}
         <h2 style={{ marginBottom: '20px' }}>Login</h2>
         <input
           type="email"
@@ -71,7 +71,6 @@ function Login() {
             Sign up
           </a>
         </p>
-        {error && <p style={{ color: 'red', margin: '10px 0' }}>{error}</p>}
       </form>
     </div>
   );
