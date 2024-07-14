@@ -53,7 +53,7 @@ const PastVisitNotes = ({ patientId }) => {
               marginBottom: '10px',
               borderBottom: index !== visitNotes.length - 1 ? '1px solid #ccc' : 'none'
             }}>
-              <p><strong>Date:</strong> {new Date(note.date).toLocaleDateString()}</p>
+              <p><strong>Date:</strong> {new Date(note.date).toDateString()}</p>
               <p><strong>Note Preview:</strong> {note.notes ? note.notes.substring(0, 100) + '...' : 'No content available'}</p>
             </div>
           ))

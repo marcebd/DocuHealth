@@ -24,7 +24,6 @@ const Conditions = () => {
     return () => clearInterval(intervalId);
   }, [viewingPatientId]);
 
-
   const handleInputChange = (index, event) => {
     const { name, value } = event.target;
     const newConditions = [...conditions];
@@ -40,7 +39,7 @@ const Conditions = () => {
       condition.dateStart.trim() !== ''
     );
     if (!isValid) {
-      setError('All fields are required. Please fill in all data.');
+      setError('Name and Start Date are required for all conditions.');
       return;
     }
     try {
@@ -49,10 +48,10 @@ const Conditions = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ prescriptions: conditions.map(condition => ({ ...condition, patientId: viewingPatientId })) })
+        body: JSON.stringify({ conditions: conditions.map(condition => ({ ...condition, patientId: viewingPatientId })) })
       });
       if (response.ok) {
-        setConditions([{ name: '', date: '' }]);
+        setConditions([{ name: '', dateStart: '', dateEnd: '' }]);
         setShowModal(false);
         window.location.reload();
       } else {
@@ -73,8 +72,7 @@ const Conditions = () => {
       <h1>Conditions</h1>
       <PastConditions patientId={viewingPatientId} />
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <Button variant="primary" onClick={() => setShowModal(true)}
-        style={{
+        <Button variant="primary" onClick={() => setShowModal(true)} style={{
           marginTop: '20px',
           backgroundColor: 'white',
           color: 'black',
@@ -86,25 +84,17 @@ const Conditions = () => {
           Add New Condition
         </Button>
       </div>
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '100vw',
-        height: '100vh',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)'
-      }}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Condition</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+          {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
           <Form onSubmit={handleSubmit}>
             {conditions.map((condition, index) => (
               <div key={index}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Name</Form.Label>
+                  <Form.Label>Name<span style={{color: 'red'}}>*</span></Form.Label>
                   <Form.Control
                     type="text"
                     name="name"
@@ -114,10 +104,10 @@ const Conditions = () => {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label>Start Date </Form.Label>
+                  <Form.Label>Start Date<span style={{color: 'red'}}>*</span></Form.Label>
                   <Form.Control
                     type="date"
-                    name="date"
+                    name="dateStart"
                     value={condition.dateStart}
                     onChange={(e) => handleInputChange(index, e)}
                     required
@@ -127,40 +117,43 @@ const Conditions = () => {
                   <Form.Label>End Date</Form.Label>
                   <Form.Control
                     type="date"
-                    name="date"
+                    name="dateEnd"
                     value={condition.dateEnd}
                     onChange={(e) => handleInputChange(index, e)}
-                    required
                   />
                 </Form.Group>
               </div>
             ))}
             <div style={{display:'flex', width: '100%', justifyContent: 'center', marginTop:'0%'}}>
-            <Button variant="secondary" onClick={addConditionForm} >
-              Add Another Condition
-            </Button>
-            </div>
-            <div style={{display:'flex', width: '100%', justifyContent: 'center'}}>
-            <Button
-              variant="primary"
-              type="submit"
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-              style={{
-                backgroundColor: isHovering ? '#ffcccc' : 'white',
-                color: 'black',
-                borderColor: '#ccc',
-                boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
-                transition: 'background-color 0.3s' // Smooth transition for background color
-              }}>
-              Submit
-            </Button>
-          </div>
+              <Button variant="secondary" onClick={addConditionForm}>
+                Add Another Condition
+              </Button>
+              </div>
+              <div style={{display:'flex', width: '100%', justifyContent: 'center'}}>
+              <Button
+                variant="primary"
+                type="submit"
+                onMouseEnter={() => setIsHovering(true)}
+                onMouseLeave={() => setIsHovering(false)}
+                style={{
+                  backgroundColor: isHovering ? '#ffcccc' : 'white',
+                  color: 'black',
+                  borderColor: '#ccc',
+                  boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
+                  transition: 'background-color 0.3s'
+                }}>
+                Submit
+              </Button>
+              </div>
           </Form>
         </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
       </Modal>
     </div>
   );
 };
-
 export default Conditions;

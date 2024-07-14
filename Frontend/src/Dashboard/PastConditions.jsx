@@ -51,7 +51,7 @@ const PastConditions = ({ patientId }) => {
               {conditions.map(condition => (
                 <tr key={condition.id} onClick={() => handleRowClick(condition)}>
                   <td>{condition.name}</td>
-                  <td>{new Date(condition.date).toLocaleDateString()}</td>
+                  <td>{new Date(condition.dateStart).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>

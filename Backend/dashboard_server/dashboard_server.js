@@ -142,16 +142,16 @@ app.listen(3002, () => {
 });
 
 app.post('/conditions', async (req, res) => {
-  const conditions = req.body.prescriptions;
+  const conditions = req.body.conditions;
 
   if (!Array.isArray(conditions) || conditions.length === 0) {
-    return res.status(400).json({ message: "No prescriptions provided or incorrect format" });
+    return res.status(400).json({ message: "No conditions provided or incorrect format" });
   }
 
   try {
     const createdCondition = [];
     for (const { patientId, name, dateStart, dateEnd } of conditions) {
-      if (!patientId || !name || !dateStart || !dateEnd) {
+      if (!patientId || !name || !dateStart) {
         return res.status(400).json({ message: "Missing required fields" });
       }
       const patientExists = await prisma.patient.findUnique({
@@ -163,16 +163,16 @@ app.post('/conditions', async (req, res) => {
       }
 
       const condition = await prisma.condition.create({
-        data: { patientId: parseInt(patientId), name, dateStart: new Date(dateStart), dateEnd: new Date(dateEnd) }
+        data: { patientId: parseInt(patientId), name, dateStart: new Date(dateStart), dateEnd: dateEnd ? new Date(dateEnd) : null }
       });
 
       createdCondition.push({
         ...condition,
-        id: condtion.id.toString(),
+        id: condition.id.toString(),
         patientId: condition.patientId.toString()
       });
     }
-    res.status(201).json(createdPrescriptions);
+    res.status(201).json(createdCondition);
   } catch (error) {
     console.error('Failed to create condition:', error);
     res.status(500).json({ message: "Internal server error" });

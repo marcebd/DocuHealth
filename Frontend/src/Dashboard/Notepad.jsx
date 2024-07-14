@@ -52,9 +52,9 @@ const Notepad = () => {
         setError('Failed to save the note. Please try again.');
         return;
       }
-      // Clear the form on successful submission
       setNote('');
       setVisitDate('');
+      window.location.reload();
     } catch (error) {
       console.error("Error creating note:", error);
       setError('An error occurred while saving the note.');

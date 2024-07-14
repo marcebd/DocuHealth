@@ -64,6 +64,7 @@ const Prescriptions = () => {
           dateEnd: ''
         }]);
         setShowModal(false);
+        window.location.reload();
       } else {
         const errorResponse = await response.json();
         console.error('Failed to add prescriptions:', errorResponse);
@@ -176,7 +177,7 @@ const Prescriptions = () => {
                 color: 'black',
                 borderColor: '#ccc',
                 boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
-                transition: 'background-color 0.3s' // Smooth transition for background color
+                transition: 'background-color 0.3s' 
               }}>
               Submit
             </Button>
