@@ -67,10 +67,10 @@ const Prescriptions = () => {
         window.location.reload();
       } else {
         const errorResponse = await response.json();
-        console.error('Failed to add prescriptions:', errorResponse);
+        setError('Failed to add prescriptions:', errorResponse);
       }
     } catch (error) {
-      console.error('Error adding prescriptions:', error);
+      setError('Error adding prescriptions:', error);
     }
   };
 
@@ -111,7 +111,7 @@ const Prescriptions = () => {
             {prescriptions.map((prescription, index) => (
               <div key={index}>
                 <Form.Group className="mb-3">
-                  <Form.Label>Name <span style={{color: 'red'}}>*</span></Form.Label>
+                  <Form.Label>Name<span style={{color: 'red'}}>*</span></Form.Label>
                   <Form.Control
                     type="text"
                     name="name"
@@ -121,7 +121,7 @@ const Prescriptions = () => {
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                  <Form.Label>Dose <span style={{color: 'red'}}>*</span></Form.Label>
+                  <Form.Label>Dose<span style={{color: 'red'}}>*</span></Form.Label>
                   <Form.Control
                     type="text"
                     name="dose"
@@ -177,7 +177,7 @@ const Prescriptions = () => {
                 color: 'black',
                 borderColor: '#ccc',
                 boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
-                transition: 'background-color 0.3s' 
+                transition: 'background-color 0.3s'
               }}>
               Submit
             </Button>

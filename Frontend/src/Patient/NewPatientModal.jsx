@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Row, Col, Table, Form, FormGroup, FormLabel, Button } from 'react-bootstrap';
+import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
-
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
   const [idNumber, setIdNumber] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
-  const [conditions, setConditions] = useState([{ name: '', date: '' }]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', dateStart: '', dateEnd: '' }]);
+  const [conditions, setConditions] = useState([{ name: '', dateStart: '', dateEnd: '' }]);
+  const userId = JSON.parse(localStorage.getItem("userId"));
   const [patientsInTabs, setPatientsInTabs] = useState([]);
   const [patientsData, setPatientsData] = useState([]);
-  const userId = JSON.parse(localStorage.getItem("userId"));
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
@@ -61,12 +60,14 @@ const NewPatientModal = ({ onClose, onCreate }) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.instructions && p.date);
-    const areConditionsValid = conditions.every(c => c.name && c.date);
-
+    if (!firstName || !lastName || !idNumber || !birthDate) {
+      setError("Required fields must be filled.");
+      return;
+    }
+    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.dateStart);
+    const areConditionsValid = conditions.every(c => c.name && c.dateStart);
     if (!arePrescriptionsValid || !areConditionsValid) {
-      console.error("All fields in prescriptions and conditions must be filled.");
+      setError("All fields in prescriptions and conditions must be filled.");
       return;
     }
     const patientData = {
@@ -90,7 +91,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       });
       const responseData = await response.json();
       if (!response.ok) {
-        console.error('Failed to create patient:', responseData);
+        setError('Failed to create patient:', responseData);
       } else {
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
@@ -101,7 +102,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         onClose();
       }
     } catch (error) {
-      console.error("Error creating patient:", error);
+      setError("Error creating patient:", error);
     }
   };
 
@@ -144,35 +145,53 @@ const NewPatientModal = ({ onClose, onCreate }) => {
             </Table>
           </div>
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
+          {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <Form onSubmit={handleSubmit}>
+
               <FormGroup>
-                <FormLabel>First Name:</FormLabel>
+                <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Middle Name:</FormLabel>
+                <FormLabel>Middle Name</FormLabel>
                 <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Last Name:</FormLabel>
+                <FormLabel>Last Name<span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel>ID Number:</FormLabel>
+                <FormLabel>ID Number<span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Birth Date:</FormLabel>
+                <FormLabel>Birth Date<span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel>Prescriptions:</FormLabel>
+                <FormLabel><h3>Prescriptions:</h3></FormLabel>
                 {prescriptions.map((prescription, index) => (
                   <div key={index} className="mb-2">
-                    <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" className="form-control" />
-                    <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" className="form-control" />
-                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Instructions" className="form-control" />
-                    <input type="date" name="date" value={prescription.date} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Date" className="form-control" />
+                    <label>
+                      Name <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" className="form-control" required />
+                    </label>
+                    <label>
+                      Dose <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" className="form-control" required />
+                    </label>
+                    <label>
+                      Instructions
+                      <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Instructions" className="form-control" />
+                    </label>
+                    <label>
+                      Start Date <span style={{ color: 'red' }}>*</span>
+                      <input type="date" name="dateStart" value={prescription.dateStart} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Start Date" className="form-control" required />
+                    </label>
+                    <label>
+                      End Date
+                      <input type="date" name="dateEnd" value={prescription.dateEnd} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="End Date" className="form-control" />
+                    </label>
                   </div>
                 ))}
               </FormGroup>
@@ -180,8 +199,18 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <FormLabel>Conditions:</FormLabel>
                 {conditions.map((condition, index) => (
                   <div key={index} className="mb-2">
-                    <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" className="form-control" />
-                    <input type="date" name="date" value={condition.date} onChange={(e) => handleConditionChange(index, e)} placeholder="Date" className="form-control" />
+                    <label>
+                      Name <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" className="form-control" required />
+                    </label>
+                    <label>
+                      Start Date <span style={{ color: 'red' }}>*</span>
+                      <input type="date" name="dateStart" value={condition.dateStart} onChange={(e) => handleConditionChange(index, e)} placeholder="Start Date" className="form-control" required />
+                    </label>
+                    <label>
+                      End Date
+                      <input type="date" name="dateEnd" value={condition.dateEnd} onChange={(e) => handleConditionChange(index, e)} placeholder="End Date" className="form-control" />
+                    </label>
                   </div>
                 ))}
               </FormGroup>

@@ -50,6 +50,8 @@ model Patient {
   lastName      String
   idNumber      String
   birthDate     DateTime
+  phoneNumber   
+  email   String?
   userId        BigInt
   conditions    Condition[]
   user          User           @relation(fields: [userId], references: [id])
