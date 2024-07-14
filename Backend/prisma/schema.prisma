@@ -50,7 +50,7 @@ model Patient {
   lastName      String
   idNumber      String
   birthDate     DateTime
-  phoneNumber   
+  phoneNumber
   email   String?
   userId        BigInt
   conditions    Condition[]
