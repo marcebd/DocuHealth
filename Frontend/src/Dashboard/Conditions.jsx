@@ -56,10 +56,19 @@ const Conditions = () => {
   };
 
   return (
-    <div id='conditions' style={{ width: '100%' }}>
+    <div id='conditions' style={{ width: '100%', height: '50%' }}>
       <h1>Conditions</h1>
       <PastConditions patientId={viewingPatientId} />
-      <Button variant="primary" onClick={() => setShowModal(true)} style={{ marginTop: '20px' }}>
+      <Button variant="primary" onClick={() => setShowModal(true)}
+      style={{
+        marginTop: '20px',
+        backgroundColor: 'white',
+        color: 'black',
+        borderColor: '#ccc',
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)' 
+      }}>
         Add New Condition
       </Button>
 

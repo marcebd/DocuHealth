@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
 
 const PastPrescriptions = ({ patientId }) => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const tableRef = useRef(null);
 
   useEffect(() => {
     const fetchPrescriptions = async () => {
@@ -33,8 +34,10 @@ const PastPrescriptions = ({ patientId }) => {
     setShowModal(false);
   };
 
+  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
+
   return (
-    <>
+    <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
       <Table striped bordered hover>
         <thead>
           <tr>
@@ -72,7 +75,7 @@ const PastPrescriptions = ({ patientId }) => {
           </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </div>
   );
 };
 

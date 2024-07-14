@@ -68,13 +68,23 @@ const Prescriptions = () => {
   };
 
   return (
-    <div id='prescriptions' style={{ width: '100%' }}>
+    <div id='prescriptions' style={{ width: '100%', height: '50%' }}>
       <h1>Prescriptions</h1>
       <PastPrescriptions patientId={viewingPatientId} />
-      <Button variant="primary" onClick={() => setShowModal(true)} style={{ marginTop: '20px' }}>
+      <Button
+        onClick={() => setShowModal(true)}
+        style={{
+          marginTop: '20px',
+          backgroundColor: 'white',
+          color: 'black',
+          borderColor: '#ccc',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)' 
+        }}
+      >
         Add New Prescription
       </Button>
-
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Prescription</Modal.Title>

@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
 
 const PastConditions = ({ patientId }) => {
   const [conditions, setConditions] = useState([]);
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const tableRef = useRef(null);
 
   useEffect(() => {
     const fetchConditions = async () => {
@@ -33,24 +34,29 @@ const PastConditions = ({ patientId }) => {
     setShowModal(false);
   };
 
+  // Calculate and set the maximum height for the table
+  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
+
   return (
     <>
-      <Table striped bordered hover>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {conditions.map(condition => (
-            <tr key={condition.id} onClick={() => handleRowClick(condition)}>
-              <td>{condition.name}</td>
-              <td>{new Date(condition.date).toLocaleDateString()}</td>
+      <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Date</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {conditions.map(condition => (
+              <tr key={condition.id} onClick={() => handleRowClick(condition)}>
+                <td>{condition.name}</td>
+                <td>{new Date(condition.date).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </div>
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
