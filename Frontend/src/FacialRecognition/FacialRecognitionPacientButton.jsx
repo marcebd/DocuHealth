@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import FacialRecognitionModal from './FacialRecognitionModal';
 
-const FacialRecognitionPatientButton = () => {
+const FacialRecognitionPatientButton = ({ onImageCapture }) => {
     const [hoveredButton, setHoveredButton] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleCreate = () => {
@@ -44,9 +44,8 @@ const FacialRecognitionPatientButton = () => {
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         {isModalOpen && (
         <div style={modalStyle}>
-            <FacialRecognitionModal onClose={handleCloseModal} onImageCaptured={(imgSrc) => {
-            // Send the imgSrc to the parent component here
-            console.log(imgSrc);
+            <FacialRecognitionModal onClose={handleCloseModal} onImageCapture={(imgSrc) => {
+            onImageCapture(imgSrc);
             }} />
         </div>
         )}

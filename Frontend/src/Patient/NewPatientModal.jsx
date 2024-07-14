@@ -14,6 +14,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsInTabs, setPatientsInTabs] = useState([]);
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
+  const [imgSrc, setImgSrc] = useState('');
 
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
@@ -55,12 +56,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     setConditions(newConditions);
   };
 
-  const onImageCapture = (image, success) => {
-    if (success) {
-      setError("Patient image saved correctly");
-    } else {
-      setError("Patient image wasn't saved correctly");
-    }
+  const onImageCapture = (image) => {
+    setImgSrc(image);
   };
 
   const handleSearch = (event) => {
@@ -179,7 +176,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               </FormGroup>
               <FormGroup>
 
-                <FacialRecognitionPatientButton/>
+                <FacialRecognitionPatientButton onImageCapture={(onImageCapture)}/>
               </FormGroup>
               <FormGroup>
                 <FormLabel><h3>Prescriptions</h3></FormLabel>
