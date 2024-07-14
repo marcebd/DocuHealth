@@ -59,20 +59,29 @@ const Conditions = () => {
     <div id='conditions' style={{ width: '100%', height: '50%' }}>
       <h1>Conditions</h1>
       <PastConditions patientId={viewingPatientId} />
-      <Button variant="primary" onClick={() => setShowModal(true)}
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Button variant="primary" onClick={() => setShowModal(true)}
+        style={{
+          marginTop: '20px',
+          backgroundColor: 'white',
+          color: 'black',
+          borderColor: '#ccc',
+          borderWidth: '1px',
+          borderStyle: 'solid',
+          boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
+        }}>
+          Add New Condition
+        </Button>
+      </div>
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered
       style={{
-        marginTop: '20px',
-        backgroundColor: 'white',
-        color: 'black',
-        borderColor: '#ccc',
-        borderWidth: '1px',
-        borderStyle: 'solid',
-        boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)' 
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
       }}>
-        Add New Condition
-      </Button>
-
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Condition</Modal.Title>
         </Modal.Header>
@@ -102,12 +111,32 @@ const Conditions = () => {
                 </Form.Group>
               </div>
             ))}
-            <Button variant="secondary" onClick={addConditionForm} style={{ marginRight: '10px' }}>
-              Add Another Condition
-            </Button>
-            <Button variant="primary" type="submit">
-              Submit
-            </Button>
+            <div style={{display:'flex', flexDirection: 'column', alignItems: 'center', height: '40%'}}>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '50%',
+                  marginTop: '7%'
+                }}>
+              <Button variant="secondary" onClick={addConditionForm} style={{ marginRight: '10px' }}>
+                Add Another Condition
+              </Button>
+            </div>
+            <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  height: '50%',
+
+                }}>
+              <Button variant="primary" type="submit">
+                Submit
+              </Button>
+          </div>
+          </div>
           </Form>
         </Modal.Body>
       </Modal>
