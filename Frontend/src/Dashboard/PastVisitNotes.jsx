@@ -36,32 +36,67 @@ const PastVisitNotes = ({ patientId }) => {
 
   return (
     <div>
-      <h2>Past Visit Notes</h2>
-      {visitNotes.map((note) => (
-        <div key={note.id} onClick={() => openModal(note)} style={{ cursor: 'pointer', marginBottom: '10px' }}>
-          <p><strong>Date:</strong> {new Date(note.date).toLocaleDateString()}</p>
-          <p><strong>Note Preview:</strong> {note.notes ? note.notes.substring(0, 100) + '...' : 'No content available'}</p>
-        </div>
-      ))}
+      <h1>Past Visit Notes</h1>
+      <div style={{
+        border: '1px solid lightgrey',
+        borderRadius: '10px',
+        padding: '3%',
+        background: 'transparent',
+        marginTop: '-4px',
+        height: '50vh',
+        overflowY: 'auto'
+      }}>
+        {visitNotes.map((note, index) => (
+          <div key={note.id} onClick={() => openModal(note)} style={{
+            cursor: 'pointer',
+            marginBottom: '10px',
+            borderBottom: index !== visitNotes.length - 1 ? '1px solid #ccc' : 'none'
+          }}>
+            <p><strong>Date:</strong> {new Date(note.date).toLocaleDateString()}</p>
+            <p><strong>Note Preview:</strong> {note.notes ? note.notes.substring(0, 100) + '...' : 'No content available'}</p>
+          </div>
+        ))}
 
-      <Modal show={showModal} onHide={closeModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Note Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedNote && (
-            <>
-              <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
-              <p><strong>Note:</strong> {selectedNote.notes || 'No content available'}</p>
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={closeModal}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+        <Modal show={showModal} onHide={closeModal} centered
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)'
+        }}>
+          <Modal.Dialog style={{
+            width: '70vw',  // Set width to 70vw
+            height: '50vh',  // Set height to 50vh
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            margin: '0'
+          }}>
+            <Modal.Header closeButton style={{ width: '100%', borderBottom: '1px solid #dee2e6' }}>
+              <Modal.Title>Note Details</Modal.Title>
+            </Modal.Header>
+            <Modal.Body style={{
+              overflowY: 'auto',
+              backgroundColor: 'white',
+              flexGrow: 1,
+            }}>
+              {selectedNote && (
+                <>
+                  <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
+                  <p><strong>Note:</strong> {selectedNote.notes || 'No content available'}</p>
+                </>
+              )}
+            </Modal.Body>
+            <Modal.Footer style={{ width: '100%', borderTop: '1px solid #dee2e6' }}>
+              <Button variant="secondary" onClick={closeModal}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal>
+      </div>
     </div>
   );
 };

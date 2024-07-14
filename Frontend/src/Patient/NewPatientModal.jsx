@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootstrap';
+import { Modal, Row, Col, Table, Form, FormGroup, FormLabel, Button } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
 
 const NewPatientModal = ({ onClose, onCreate }) => {
@@ -113,38 +113,37 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     window.location.reload();
     onCreate();
     onClose();
-    };
+  };
 
-    return (
-      <Modal show={true} onHide={onClose} >
-      <Modal.Dialog>
-        <Modal.Header closeButton>
-          <Modal.Title>Find Patient or Create One</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Row>
-            <Col sm={6} style={{ maxHeight: '90%', overflowY: 'auto' }}>
-              <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
-              <Table striped bordered hover size="sm">
-                <thead>
-                  <tr>
-                    <th>First Name</th>
-                    <th>Middle Name</th>
-                    <th>Last Name</th>
+  return (
+    <Modal show={true} onHide={onClose} centered style={{ display: 'flex', alignItems: 'center', width: '100vw' }}>
+      <Modal.Dialog style={{ margin: 0, width: '50vw', maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Modal.Header closeButton style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1%' }}>
+        <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Find or Create a New Patient</Modal.Title>
+      </Modal.Header>
+        <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: '0', justifyContent: 'space-evenly' }}>
+          <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
+            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+            <Table striped bordered hover size="sm">
+              <thead>
+                <tr>
+                  <th>First Name</th>
+                  <th>Middle Name</th>
+                  <th>Last Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {patientsData.map((patient) => (
+                  <tr key={patient.id} onClick={() => handlePatientClick(patient)}>
+                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.firstName}</td>
+                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.middleName}</td>
+                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.lastName}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {patientsData.map((patient) => (
-                    <tr key={patient.id} onClick={() => handlePatientClick(patient)}>
-                      <td>{patient.firstName}</td>
-                      <td>{patient.middleName}</td>
-                      <td>{patient.lastName}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-          </Col>
-          <Col sm={6}>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+          <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
             <Form onSubmit={handleSubmit}>
               <FormGroup>
                 <FormLabel>First Name:</FormLabel>
@@ -187,13 +186,16 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 ))}
               </FormGroup>
               <button type="submit" className="btn btn-primary">Create Patient</button>
-            </Form>
-          </Col>
-        </Row>
+          </Form>
+        </div>
       </Modal.Body>
-      </Modal.Dialog>
-    </Modal>
-    );
-    };
-
-    export default NewPatientModal;
+      <Modal.Footer style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="secondary" onClick={onClose}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal.Dialog>
+  </Modal>
+);
+};
+export default NewPatientModal;

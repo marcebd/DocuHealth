@@ -56,7 +56,8 @@ const Prescriptions = () => {
     } catch (error) {
       console.error('Error adding prescriptions:', error);
     }
-};
+  };
+
   const addPrescriptionForm = () => {
     setPrescriptions([...prescriptions, {
       name: '',
@@ -73,7 +74,7 @@ const Prescriptions = () => {
         Add New Prescription
       </Button>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Add New Prescription</Modal.Title>
         </Modal.Header>

@@ -143,7 +143,7 @@ const PatientTabs = ({ viewingPatientId }) => {
           padding: '2%',
           background: 'white',
           marginTop: '-4px',
-          height: '100vh'
+          height: '150vh'
       }}>
           <Notepad />
           <Prescriptions />
