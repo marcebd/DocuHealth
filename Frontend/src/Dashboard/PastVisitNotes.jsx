@@ -67,8 +67,8 @@ const PastVisitNotes = ({ patientId }) => {
           backgroundColor: 'rgba(0, 0, 0, 0.5)'
         }}>
           <Modal.Dialog style={{
-            width: '70vw',  // Set width to 70vw
-            height: '50vh',  // Set height to 50vh
+            width: '70vw',
+            height: '50vh',  
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',

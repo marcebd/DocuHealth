@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
-import PastPrescriptions from './PastPrescriptions';
+import PastConditions from './PastConditions';
 
-const Prescriptions = () => {
+const Conditions = () => {
   const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
 
   useEffect(() => {
@@ -17,99 +17,68 @@ const Prescriptions = () => {
   }, [viewingPatientId]);
 
   const [showModal, setShowModal] = useState(false);
-  const [prescriptions, setPrescriptions] = useState([{
+  const [conditions, setConditions] = useState([{
     name: '',
-    dose: '',
-    instructions: '',
     date: ''
   }]);
 
   const handleInputChange = (index, event) => {
     const { name, value } = event.target;
-    const newPrescriptions = [...prescriptions];
-    newPrescriptions[index][name] = value;
-    setPrescriptions(newPrescriptions);
+    const newConditions = [...conditions];
+    newConditions[index][name] = value;
+    setConditions(newConditions);
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:3002/prescriptions', {
+      const response = await fetch('http://localhost:3002/conditions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ prescriptions: prescriptions.map(prescription => ({ ...prescription, patientId: viewingPatientId })) })
+        body: JSON.stringify({ prescriptions: conditions.map(condition => ({ ...condition, patientId: viewingPatientId })) })
       });
       if (response.ok) {
-        setPrescriptions([{
-          name: '',
-          dose: '',
-          instructions: '',
-          date: ''
-        }]);
+        setConditions([{ name: '', date: '' }]);
         setShowModal(false);
       } else {
         const errorResponse = await response.json();
-        console.error('Failed to add prescriptions:', errorResponse);
+        console.error('Failed to add conditions:', errorResponse);
       }
     } catch (error) {
-      console.error('Error adding prescriptions:', error);
+      console.error('Error adding conditions:', error);
     }
   };
 
-  const addPrescriptionForm = () => {
-    setPrescriptions([...prescriptions, {
-      name: '',
-      dose: '',
-      instructions: '',
-      date: ''
-    }]);
+  const addConditionForm = () => {
+    setConditions([...conditions, { name: '', date: '' }]);
   };
 
   return (
-    <div id='prescriptions' style={{ width: '100%' }}>
-      <h1>Prescriptions</h1>
-      <PastPrescriptions patientId={viewingPatientId} />
+    <div id='conditions' style={{ width: '100%' }}>
+      <h1>Conditions</h1>
+      <PastConditions patientId={viewingPatientId} />
       <Button variant="primary" onClick={() => setShowModal(true)} style={{ marginTop: '20px' }}>
-        Add New Prescription
+        Add New Condition
       </Button>
 
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Add New Prescription</Modal.Title>
+          <Modal.Title>Add New Condition</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form onSubmit={handleSubmit}>
-            {prescriptions.map((prescription, index) => (
+            {conditions.map((condition, index) => (
               <div key={index}>
                 <Form.Group className="mb-3">
                   <Form.Label>Name</Form.Label>
                   <Form.Control
                     type="text"
                     name="name"
-                    value={prescription.name}
+                    value={condition.name}
                     onChange={(e) => handleInputChange(index, e)}
                     required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Dose</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="dose"
-                    value={prescription.dose}
-                    onChange={(e) => handleInputChange(index, e)}
-                    required
-                  />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                  <Form.Label>Instructions</Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="instructions"
-                    value={prescription.instructions}
-                    onChange={(e) => handleInputChange(index, e)}
                   />
                 </Form.Group>
                 <Form.Group className="mb-3">
@@ -117,15 +86,15 @@ const Prescriptions = () => {
                   <Form.Control
                     type="date"
                     name="date"
-                    value={prescription.date}
+                    value={condition.date}
                     onChange={(e) => handleInputChange(index, e)}
                     required
                   />
                 </Form.Group>
               </div>
             ))}
-            <Button variant="secondary" onClick={addPrescriptionForm} style={{ marginRight: '10px' }}>
-              Add Another Prescription
+            <Button variant="secondary" onClick={addConditionForm} style={{ marginRight: '10px' }}>
+              Add Another Condition
             </Button>
             <Button variant="primary" type="submit">
               Submit
@@ -137,4 +106,4 @@ const Prescriptions = () => {
   );
 };
 
-export default Prescriptions;
+export default Conditions;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
-import Prescriptions from './Prescriptions';
+import PatientDetails from './PatientDetails';
 
 const PatientTabs = ({ viewingPatientId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -146,7 +146,7 @@ const PatientTabs = ({ viewingPatientId }) => {
           height: '150vh'
       }}>
           <Notepad />
-          <Prescriptions />
+          <PatientDetails />
       </div>
     </div>
   );

@@ -50,7 +50,7 @@ const Notepad = () => {
   };
 
   return (
-    <div style={{ width: '50%' }}>
+    <div id='notes' style={{ width: '45%' }}>
       <h1>Today's Visit Note:</h1>
       <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <label style={{ alignSelf: 'flex-start', width: '100%' }}>

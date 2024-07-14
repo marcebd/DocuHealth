@@ -142,8 +142,63 @@ app.listen(3002, () => {
   console.log('Server running on port 3002');
 });
 
-app.post("/dashboard/notes/:userId/:id", async (req, res) => {
+app.post('/conditions', async (req, res) => {
+  const conditions = req.body.prescriptions;
 
+  if (!Array.isArray(conditions) || conditions.length === 0) {
+    return res.status(400).json({ message: "No prescriptions provided or incorrect format" });
+  }
+
+  try {
+    const createdCondition = [];
+    for (const { patientId, name, date } of conditions) {
+      if (!patientId || !name || !date) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+      const patientExists = await prisma.patient.findUnique({
+        where: { id: parseInt(patientId) }
+      });
+
+      if (!patientExists) {
+        return res.status(404).json({ message: "Patient not found" });
+      }
+
+      const condition = await prisma.condition.create({
+        data: { patientId: parseInt(patientId), name, date: new Date(date) }
+      });
+
+      createdCondition.push({
+        ...condition,
+        id: condtion.id.toString(),
+        patientId: condition.patientId.toString()
+      });
+    }
+    res.status(201).json(createdPrescriptions);
+  } catch (error) {
+    console.error('Failed to create condition:', error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+app.get('/conditions/:patientId', async (req, res) => {
+  const patientId = req.params.patientId;
+  try {
+    const patientExists = await prisma.patient.findUnique({
+      where: { id: parseInt(patientId) }
+    });
+    if (!patientExists) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+    const conditions = await prisma.condition.findMany({where: {patientId: patientId}});
+    conditions.forEach(condition => {
+      condition.patientId = condition.patientId.toString();
+      condition.id = condition.id.toString();
+    })
+    return res.json(conditions);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 });
 
 /*********  Helper Functions *********/

@@ -5,7 +5,6 @@ import Home from './Home';
 import Login from './User-Authentication/Login';
 import Register from './User-Authentication/Register';
 import Profile from './User-Authentication/Profile';
-import { UserProvider } from './UserContext';
 
 function App() {
   const bodyStyle = {
@@ -17,7 +16,6 @@ function App() {
   };
 
   return (
-    <UserProvider>
       <Router>
         <div id='app' style={bodyStyle}>
           <Routes>
@@ -29,7 +27,6 @@ function App() {
           </Routes>
         </div>
       </Router>
-    </UserProvider>
   );
 }
 
