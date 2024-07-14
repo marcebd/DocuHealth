@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Modal, Form } from 'react-bootstrap';
+import Webcam from 'react-webcam';
 
 
 const FacialRecognitionModal= (onClose) => {
@@ -14,7 +15,7 @@ const FacialRecognitionModal= (onClose) => {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        Modal Body
+                    <Webcam />
                     </Modal.Body>
                     <Modal.Footer>
                         Close Button
