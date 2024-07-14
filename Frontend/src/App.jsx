@@ -8,11 +8,9 @@ import Profile from './User-Authentication/Profile';
 
 function App() {
   const bodyStyle = {
-    margin: '2%',
-    padding: 0,
     overflowX: 'hidden',
-    width: '95%',
-    minHeight: '100vh'
+    minHeight: '100vh',
+    minWidth: '100vw'
   };
 
   return (

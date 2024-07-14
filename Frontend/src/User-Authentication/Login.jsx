@@ -39,7 +39,7 @@ function Login() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <div className='loginForm' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
       <form onSubmit={handleSubmit} aria-live="polite" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
         <h2 style={{ marginBottom: '20px' }}>Login</h2>
         <input
@@ -60,9 +60,11 @@ function Login() {
           aria-label="Password"
           style={{ width: '100%', padding: '10px', margin: '10px 0', border: 'none', borderBottom: '1px solid #ccc' }}
         />
-        <button type="submit" disabled={isLoading} style={{ cursor: isLoading ? 'wait' : 'pointer' }}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button type="submit" disabled={isLoading} style={{ cursor: isLoading ? 'wait' : 'pointer' }}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </div>
         <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
           Don't have an account?{' '}
           <a href="/register" style={{ color: '#337ab7', textDecoration: 'none' }}>
