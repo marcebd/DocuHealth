@@ -12,7 +12,7 @@ const FacialRecognitionModal = ({ onClose }) => {
     };
 
     const deleteImage = () => {
-        setImgSrc(null); // Clear the captured image
+        setImgSrc(null);
     };
 
     return (
