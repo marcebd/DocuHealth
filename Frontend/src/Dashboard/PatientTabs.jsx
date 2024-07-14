@@ -119,8 +119,8 @@ const PatientTabs = ({ viewingPatientId }) => {
       <div style={tabContainerStyle}>
         {tabCreated && patients.map((patient, index) => (
           <div key={patient.id}
-               onClick={() => handlePatientClick(patient.id)}
-               style={tabStyle(patient.id, index)}>
+              onClick={() => handlePatientClick(patient.id)}
+              style={tabStyle(patient.id, index)}>
             {patient.firstName} {patient.middleName || ''} {patient.lastName}
           </div>
         ))}

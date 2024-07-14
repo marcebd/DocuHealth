@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
+import FacialRecognitionModal from './FacialRecognitionModal';
 
 const FacialRecognitionPatientButton = () => {
     const [hoveredButton, setHoveredButton] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const handleCreate = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+    };
+
     const buttonStyle = {
         padding: '10px 20px',
         display: 'flex',
@@ -14,15 +24,35 @@ const FacialRecognitionPatientButton = () => {
         borderRadius: '5px',
         marginTop: '1%',
         backgroundColor: hoveredButton ? 'lightgrey' : 'white',
+        textOverflow: 'ellipsis'
+    };
+
+    const modalStyle = {
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        zIndex: 1000
     };
 
     return (
         <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            {isModalOpen && (
+                <div style={modalStyle}>
+                    <FacialRecognitionModal onClose={handleCloseModal} />
+                </div>
+            )}
             <button
                 aria-label="Add Face Recognition to this Patient"
                 style={buttonStyle}
                 onMouseEnter={() => setHoveredButton(true)}
                 onMouseLeave={() => setHoveredButton(false)}
+                onClick={handleCreate}
             >
                 Add Face Recognition to this Patient
             </button>
