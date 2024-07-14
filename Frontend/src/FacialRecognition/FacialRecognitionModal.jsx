@@ -1,28 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Modal, Form } from 'react-bootstrap';
+import React from 'react';
+import { Modal, Button } from 'react-bootstrap';
 import Webcam from 'react-webcam';
 
-
-const FacialRecognitionModal= (onClose) => {
-
+const FacialRecognitionModal = ({ onClose }) => {
     return (
-        <div>
-            <Modal>
-                <Modal.Dialog>
-                    <Modal.Header>
-                        <Modal.Title>
-                            Stand infront of the camera and look forward
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                    <Webcam />
-                    </Modal.Body>
-                    <Modal.Footer>
-                        Close Button
-                    </Modal.Footer>
-                </Modal.Dialog>
-            </Modal>
-        </div>
+        <Modal show={true} onHide={onClose} centered size="lg">
+            <Modal.Header closeButton>
+                <Modal.Title>Stand in front of the camera and look forward</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Webcam
+                    audio={false}
+                    style={{ width: '100%' }}
+                />
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onClose}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 };
 
