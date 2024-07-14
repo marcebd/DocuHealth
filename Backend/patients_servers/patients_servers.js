@@ -132,8 +132,32 @@ app.get("/users/:userId/patients", async (req, res) => {
       await prisma.picture.create({
         data: {patientId: parseInt(patientId), picture}
       });
-      res.status(201).json({message: 'Patient Picture Uploaded Successfully.'})
+      res.status(201).json({message: 'Patient Picture Was Saved Successfully.'})
     } catch{
-      res.status(500).json({ message: "Error Uploading Patient's Picture, try again." });
+      res.status(500).json({ message: "Error Saving Patient's Picture, try again." });
+    }
+  });
+
+  app.put("/img/:id", async (req, res) => {
+    const patientId = req.params.userId;
+    const picture = req.body;
+    if (!patientId ) {
+      return res.status(400).json({ message: "No patient IDs provided" });
+    }
+    if (!picture) {
+      return res.status(400).json({ message: "No patient picture provided" });
+    }
+    try {
+      const patient = await prisma.patient.findUnique({ where: { id: patientId } });
+      if(!patient){
+        return res.status(404).json({ message: "Patient not found" });
+      }
+      await prisma.picture.update({
+        where: { patientId: parseInt(patientId) },
+        data: { picture }
+      });
+      res.status(200).json({message: 'Patient Picture Was Updated Successfully.'})
+    } catch{
+      res.status(500).json({ message: "Error Updating Patient's Picture, try again." });
     }
   });

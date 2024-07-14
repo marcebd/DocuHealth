@@ -5,15 +5,15 @@ import Webcam from 'react-webcam';
 const FacialRecognitionModal = ({ onClose }) => {
     const webcamRef = useRef(null);
     const [imgSrc, setImgSrc] = useState(null);
-
     const capture = () => {
         const imageSrc = webcamRef.current.getScreenshot();
         setImgSrc(imageSrc);
     };
-
     const deleteImage = () => {
         setImgSrc(null);
     };
+
+    
 
     return (
         <Modal show={true} onHide={onClose} centered size="lg">
