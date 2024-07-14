@@ -1,11 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
 
-const PastPrescriptions = ({ patientId }) => {
+const PastPrescriptions = () => {
   const [prescriptions, setPrescriptions] = useState([]);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [patientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
   const tableRef = useRef(null);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const currentPatientId = localStorage.getItem('viewingPatient');
+      if (currentPatientId !== patientId) {
+        setViewingPatientId(currentPatientId);
+      }
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }, [patientId]);
 
   useEffect(() => {
     const fetchPrescriptions = async () => {

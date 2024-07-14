@@ -86,8 +86,8 @@ app.post('/prescriptions', async (req, res) => {
 
   try {
     const createdPrescriptions = [];
-    for (const { patientId, name, dose, instructions, dateEnd, dataStart } of prescriptions) {
-      if (!patientId || !name || !dose || !dateEnd || !dateStart) {
+    for (const { patientId, name, dose, instructions, dateEnd, dateStart } of prescriptions) {
+      if (!patientId || !name || !dose || !dateStart) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
@@ -100,7 +100,7 @@ app.post('/prescriptions', async (req, res) => {
       }
 
       const prescription = await prisma.prescription.create({
-        data: { patientId: parseInt(patientId), name, dose, instructions, dateStart: new Date(dateStart), dateEnd: new Date(dateEnd) }
+        data: { patientId: parseInt(patientId), name, dose, instructions, dateStart: new Date(dateStart), dateEnd: dateEnd ? new Date(dateEnd) : null}
       });
 
       createdPrescriptions.push({
@@ -112,7 +112,6 @@ app.post('/prescriptions', async (req, res) => {
 
     res.status(201).json(createdPrescriptions);
   } catch (error) {
-    console.error('Failed to create prescriptions:', error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
