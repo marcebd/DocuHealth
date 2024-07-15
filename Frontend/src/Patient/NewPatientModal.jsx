@@ -84,7 +84,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       idNumber,
       birthDate,
       prescriptions,
-      conditions
+      conditions,
+      imgSrc
     };
 
     try {
@@ -99,13 +100,13 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       if (!response.ok) {
         setError('Failed to create patient:', responseData);
       } else {
+        onCreate();
+        onClose();
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
         localStorage.setItem('viewingPatient', responseData.patient.id);
         window.location.reload();
-        onCreate();
-        onClose();
       }
     } catch (error) {
       setError("Error creating patient:", error);
