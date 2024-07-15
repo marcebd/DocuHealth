@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
 import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
+import FacialRecognitionSearchButton from '../FacialRecognition/FacialRecognitionSearchButton';
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -131,7 +132,14 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       </Modal.Header>
         <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: '0', justifyContent: 'space-evenly' }}>
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
-            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <div>
+                <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+              </div>
+              <div style={{width: '20%'}} >
+                <FacialRecognitionSearchButton />
+              </div>
+            </div>
             <Table striped bordered hover size="sm">
               <thead>
                 <tr>
