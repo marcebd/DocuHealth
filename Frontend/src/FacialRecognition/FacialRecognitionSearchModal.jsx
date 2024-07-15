@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Button, Table } from 'react-bootstrap';
 import Webcam from 'react-webcam';
 
-const FacialRecognitionModal = ({ onClose }) => {
+const FacialRecognitionSearchModal = ({ onClose }) => {
     const userId = JSON.parse(localStorage.getItem("userId"));
     const webcamRef = useRef(null);
     const [imgSrc, setImgSrc] = useState(null);
@@ -120,4 +120,4 @@ const FacialRecognitionModal = ({ onClose }) => {
     );
 };
 
-export default FacialRecognitionModal;
+export default FacialRecognitionSearchModal;

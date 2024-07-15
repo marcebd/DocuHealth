@@ -84,10 +84,13 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       lastName,
       idNumber,
       birthDate,
+      imgSrc,
       prescriptions,
-      conditions,
-      imgSrc
+      conditions
+
     };
+
+    console.log(patientData);
 
     try {
       const response = await fetch('http://localhost:3001/patients', {
@@ -101,13 +104,13 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       if (!response.ok) {
         setError('Failed to create patient:', responseData);
       } else {
-        onCreate();
-        onClose();
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
         localStorage.setItem('viewingPatient', responseData.patient.id);
         window.location.reload();
+        onCreate();
+        onClose();
       }
     } catch (error) {
       setError("Error creating patient:", error);
@@ -184,7 +187,6 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-
                 <FacialRecognitionPatientButton onImageCapture={(onImageCapture)}/>
               </FormGroup>
               <FormGroup>

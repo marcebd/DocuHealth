@@ -22,7 +22,7 @@ const PastPrescriptions = () => {
   useEffect(() => {
     const fetchPrescriptions = async () => {
       try {
-        const response = await fetch(`http://localhost:3002/prescriptions/${patientId}`);
+        const response = await fetch(`http://localhost:3004/prescriptions/${patientId}`);
         if (response.ok) {
           const data = await response.json();
           setPrescriptions(data);

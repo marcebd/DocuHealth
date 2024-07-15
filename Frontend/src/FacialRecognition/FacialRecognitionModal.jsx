@@ -12,7 +12,12 @@ const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
     if (imageSrc) {
         setImgSrc(imageSrc);
         setError("Image Taken Correctly, you can close the screen.");
-        onImageCapture(imageSrc);
+        const block = imageSrc.split(";");
+        const contentType = block[0].split(":")[1];
+        const realData = block[1].split(",")[1];
+        const blob = b64toBlob(realData, contentType);
+        const file = new File([blob], 'captured-image.jpeg', { type: contentType });
+        onImageCapture(file);
     } else {
         setError("Error Taking Image, try again.");
     }
@@ -22,6 +27,23 @@ const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
     setImgSrc(null);
     setError(null);
     };
+
+    function b64toBlob(b64Data, contentType = '', sliceSize = 512) {
+    const byteCharacters = atob(b64Data);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+        const slice = byteCharacters.slice(offset, offset + sliceSize);
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, {type: contentType});
+    }
 
     return (
     <Modal show={true} onHide={onClose} centered size="lg">
@@ -39,7 +61,7 @@ const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
         )}
         {imgSrc && (
             <div style={{ position: 'relative', textAlign: 'center' }}>
-            <img src={imgSrc} alt="Captured" style={{ width: '100%' }} />
+            <img src={imgSrc} alt="Captured" style={{ width: '100%', height: 'auto' }} />
             <Button
                 variant="danger"
                 style={{ position: 'absolute', top: '10px', right: '10px' }}

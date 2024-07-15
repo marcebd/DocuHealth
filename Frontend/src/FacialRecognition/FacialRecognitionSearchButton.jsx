@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FacialRecognitionModal from './FacialRecognitionModal';
+import FacialRecognitionSearchModal from './FacialRecognitionSearchModal';
 
 
 
@@ -10,6 +10,9 @@ const FacialRecognitionSearchButton = ({  }) => {
     setIsModalOpen(true);
     };
 
+    const onImageCapture = (image) => {
+        setImgSrc(image);
+    };
     const handleCloseModal = () => {
     setIsModalOpen(false);
     };
@@ -46,9 +49,7 @@ const FacialRecognitionSearchButton = ({  }) => {
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         {isModalOpen && (
         <div style={modalStyle}>
-            <FacialRecognitionModal onClose={handleCloseModal} onImageCapture={(imgSrc) => {
-            onImageCapture(imgSrc);
-            }} />
+            <FacialRecognitionSearchModal/>
         </div>
         )}
         <button
