@@ -3,4 +3,3 @@ public/images/*
 .env
 # Keep environment variables out of version control
 Backend/.env
-/Users/marcebd/Desktop/DocuHealth/Backend/public/images
