@@ -92,9 +92,9 @@ app.post("/register", async (req, res) => {
     try {
       const hashedPassword = await bcrypt.hash(password, 10);
       const result = await pool.query(
-        `INSERT INTO "User" (email, password)
-         VALUES ($1, $2)
-         RETURNING id, password`,
+          `INSERT INTO "User" (email, password)
+          VALUES ($1, $2)
+          RETURNING id, password`,
         [email, hashedPassword]
       );
       res.status(201).json({ message: "User registered successfully", userId: result.rows[0].id });

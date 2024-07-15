@@ -1,31 +1,18 @@
+const { pool } = require("/Users/marcebd/Desktop/DocuHealth/Backend/dbConfig.js");
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+const passport = require("passport");
+const session = require("express-session");
+const cors = require("cors");
+const flash = require("connect-flash");
 require("dotenv").config();
 const { PrismaClient } = require('@prisma/client');
+const { initialize } = require("../passportConfig");
+initialize(passport);
 const express = require('express');
 const prisma = new PrismaClient();
 const app = express();
-const cors = require("cors");
-const session = require("express-session");
-const flash = require("connect-flash");
-const passport = require("passport");
-const multer = require('multer');
-
-const path = require('path');
-const fs = require('fs');
-
-
-// Set up storage options for multer
-const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
-        cb(null, 'uploads/')  // Ensure this directory exists
-    },
-    filename: function(req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-});
-const upload = multer({ storage: storage });
-
-app.use(express.json());
-
 
 // Middleware
 app.use(express.json());
@@ -60,33 +47,28 @@ app.listen(3001, () => {
 });
 
 app.post("/patients", upload.single('imgSrc'), async (req, res) => {
-  console.log('Received data:', req.body);
-
   try {
     const birthDate = new Date(req.body.birthDate);
-    const prescriptions = req.body.prescriptions.map(prescription => ({
+    const prescriptions = JSON.parse(req.body.prescriptions).map(prescription => ({
       ...prescription,
       dateStart: new Date(prescription.dateStart),
       dateEnd: new Date(prescription.dateEnd)
     }));
-    const conditions = req.body.conditions.map(condition => ({
+    const conditions = JSON.parse(req.body.conditions).map(condition => ({
       ...condition,
       dateStart: new Date(condition.dateStart),
       dateEnd: new Date(condition.dateEnd)
     }));
 
-    const picture = req.file ? await fs.promises.readFile(req.file.path) : null;
-    console.log(picture);
-
     const newPatient = await prisma.patient.create({
       data: {
-        userId: req.body.userId,
+        userId: parseInt(req.body.userId),
         firstName: req.body.firstName,
         middleName: req.body.middleName,
         lastName: req.body.lastName,
         idNumber: req.body.idNumber,
         birthDate: birthDate,
-        picture: picture,
+        picture: req.file ? req.file.buffer : null,
         prescriptions: { create: prescriptions },
         conditions: { create: conditions }
       },
@@ -94,6 +76,7 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
     const serializedPatient = JSON.stringify(newPatient, replacer);
     res.json(serializedPatient);
   } catch (error) {
+    console.error("Error creating patient:", error);
     res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
 });

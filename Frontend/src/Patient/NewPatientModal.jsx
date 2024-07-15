@@ -77,32 +77,28 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       setError("All fields in prescriptions and conditions must be filled.");
       return;
     }
-    const patientData = {
-      userId,
-      firstName,
-      middleName,
-      lastName,
-      idNumber,
-      birthDate,
-      imgSrc,
-      prescriptions,
-      conditions
 
-    };
-
-    console.log(patientData);
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('firstName', firstName);
+    formData.append('middleName', middleName);
+    formData.append('lastName', lastName);
+    formData.append('idNumber', idNumber);
+    formData.append('birthDate', birthDate);
+    if (imgSrc) {
+      formData.append('imgSrc', imgSrc);
+    }
+    formData.append('prescriptions', JSON.stringify(prescriptions));
+    formData.append('conditions', JSON.stringify(conditions));
 
     try {
       const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(patientData)
+        body: formData, 
       });
       const responseData = await response.json();
       if (!response.ok) {
-        setError('Failed to create patient:', responseData);
+        setError(`Failed to create patient: ${responseData.message}`);
       } else {
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
@@ -113,9 +109,9 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         onClose();
       }
     } catch (error) {
-      setError("Error creating patient:", error);
+      setError(`Error creating patient: ${error.message}`);
     }
-  };
+};
 
   const handlePatientClick = (patient) => {
     const updatedPatientTabs = [...patientsInTabs, patient.id];
