@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import Webcam from 'react-webcam';
 
-const FacialRecognitionModal = ({ onClose }) => {
+const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
     const webcamRef = useRef(null);
     const [imgSrc, setImgSrc] = useState(null);
     const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ const FacialRecognitionModal = ({ onClose }) => {
     const imageSrc = webcamRef.current.getScreenshot();
     if (imageSrc) {
         setImgSrc(imageSrc);
-        setError("Image Taken Correctly.");
+        setError("Image Taken Correctly, you can close the screen.");
         onImageCapture(imageSrc);
     } else {
         setError("Error Taking Image, try again.");

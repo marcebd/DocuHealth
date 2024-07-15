@@ -61,7 +61,6 @@ app.post("/patients", async (req, res) => {
     const filepath = path.join(process.cwd(), 'public', 'images', filename);
     fs.writeFileSync(filepath, buffer);
 
-    // Create a new patient record
     const patient = await prisma.patient.create({
       data: {
         userId: parseInt(userId),
@@ -70,7 +69,7 @@ app.post("/patients", async (req, res) => {
         lastName,
         idNumber,
         birthDate: new Date(birthDate),
-        picture: buffer.toString('base64'),
+        picture: buffer,  
         prescriptions: {
           create: prescriptions.map(prescription => ({
             name: prescription.name,
