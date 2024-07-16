@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import Webcam from 'react-webcam';
 
-const FacialRecognitionModal = ({ onClose, onSubmit }) => {
+const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
     const webcamRef = useRef(null);
     const [imgSrc, setImgSrc] = useState(null);
     const [error, setError] = useState(null);
@@ -37,7 +37,7 @@ const FacialRecognitionModal = ({ onClose, onSubmit }) => {
     const prepareFormData = (file) => {
         const formData = new FormData();
         formData.append('imgSrc', file);
-        onSubmit(formData);  
+        onImageCapture(formData);
     };
 
     const deleteImage = () => {

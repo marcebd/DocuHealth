@@ -10,9 +10,6 @@ const FacialRecognitionSearchButton = ({  }) => {
     setIsModalOpen(true);
     };
 
-    const onImageCapture = (image) => {
-        setImgSrc(image);
-    };
     const handleCloseModal = () => {
     setIsModalOpen(false);
     };
@@ -49,7 +46,7 @@ const FacialRecognitionSearchButton = ({  }) => {
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         {isModalOpen && (
         <div style={modalStyle}>
-            <FacialRecognitionSearchModal/>
+            <FacialRecognitionSearchModal onClose={handleCloseModal}/>
         </div>
         )}
         <button
