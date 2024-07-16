@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useUser } from '../UserContext';
-import { isMobilePhone } from 'validator';
 import { useNavigate } from 'react-router-dom';
 function Profile() {
-    const { user, setUser } = useUser();
+    const userId = JSON.parse(localStorage.getItem("userId"));
     const navigate = useNavigate();
     const [profileData, setProfileData] = useState({
         firstName: '',
@@ -18,10 +16,9 @@ function Profile() {
         contactNumber: '',
         education: [{ institution: '', degree: '', graduation: '' }],
         biography: '',
-        profilePicture: ''
+        profilePicture: null
     });
-
-
+    const [profilePicturePreview, setProfilePicturePreview] = useState('');
     const handleChange = (event) => {
         const { name, type, value, files } = event.target;
         if (type === 'file') {
@@ -29,6 +26,7 @@ function Profile() {
                 ...prevState,
                 [name]: files[0]
             }));
+            setProfilePicturePreview(URL.createObjectURL(files[0]));
         } else {
             setProfileData(prevState => ({
                 ...prevState,
@@ -123,29 +121,23 @@ function Profile() {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Validate the form
         if (!validateForm()) {
             console.error('Validation errors:', errors);
             return;
         }
 
-        // Prepare FormData for submission
         const formData = new FormData();
         Object.keys(profileData).forEach(key => {
             if (key === 'education' || key === 'languages' || key === 'locations') {
-                // Stringify array or object data
                 formData.append(key, JSON.stringify(profileData[key]));
             } else if (key === 'profilePicture' && profileData[key]) {
-                // Append file data
                 formData.append(key, profileData[key], profileData[key].name);
             } else {
-                // Append other data
                 formData.append(key, profileData[key]);
             }
         });
-
-        if (user && user.id) {
-            formData.append('userId', user.id.toString());
+        if (userId) {
+            formData.append('userId', userId.toString());
         }
 
         try {
@@ -158,109 +150,67 @@ function Profile() {
             if (!response.ok) {
                 console.error('Failed to submit profile:', responseData);
             } else {
-                const updatedUser = { ...user, profileData };
-                setUser(updatedUser);
-                localStorage.setItem('userData', JSON.stringify(updatedUser));
-                navigate('/dashboard'); 
+                navigate('/login');
             }
         } catch (error) {
             console.error('Network or other error:', error);
         }
     };
-
     return (
-        <div>
-            <h1>Create Profile</h1>
-            <form onSubmit={handleSubmit}>
-                <div className='name'>
-                    <h2>Complete Legal Name</h2>
-                    <input type="text" name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" aria-label="First Name" className="profile-input" />
-                    {errors.firstName && <div className="error">{errors.firstName}</div>}
-                    <input type="text" name="middleName" value={profileData.middleName} onChange={handleChange} placeholder="Middle Name" aria-label="Middle Name" className="profile-input" />
-                    <input type="text" name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" aria-label="Last Name" className="profile-input" />
-                    {errors.lastName && <div className="error">{errors.lastName}</div>}
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'white' }}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '800px', padding: '30px', borderRadius: '10px', boxShadow: '0 6px 12px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
+                <h1>Create Profile</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+                    <div style={{ width: '48%' }}>
+                        <h2>Name</h2>
+                        <input type="text" name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" required style={{ marginBottom: '15px' }} />
+                        <input type="text" name="middleName" value={profileData.middleName} onChange={handleChange} placeholder="Middle Name" style={{ marginBottom: '15px' }} />
+                        <input type="text" name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" required style={{ marginBottom: '15px' }} />
+                        <h3>Specialty</h3>
+                        <input type="text" name="specialty" value={profileData.specialty} onChange={handleChange} placeholder="Specialty" required style={{ marginBottom: '15px' }} />
+                        <h3>Personal Identification Number</h3>
+                        <input type="text" name="idNumber" value={profileData.idNumber} onChange={handleChange} placeholder="ID Number" required style={{ marginBottom: '15px' }} />
+                        <h3>Birth Date</h3>
+                        <input type="date" name="dateBirth" value={profileData.dateBirth} onChange={handleChange} required style={{ marginBottom: '15px' }} />
+                        <h3>Gender</h3>
+                        <select name="gender" value={profileData.gender} onChange={handleChange} required style={{ marginBottom: '15px' }}>
+                            <option value="">Select Gender</option>
+                            <option value="Female">Female</option>
+                            <option value="Male">Male</option>
+                            <option value="Nonbinary">Non-binary</option>
+                            <option value="DeclineToState">Prefer not to say</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <h3>Contact Number</h3>
+                        <input type="text" name="contactNumber" value={profileData.contactNumber} onChange={handleChange} placeholder="Contact Number" required style={{ marginBottom: '15px' }} />
+                    </div>
+                    <div style={{ width: '48%' }}>
+                        <h2>Educational Background</h2>
+                        {profileData.education.map((edu, index) => (
+                            <div key={index} style={{ marginBottom: '15px' }}>
+                                <input type="text" name="institution" value={edu.institution} onChange={(e) => handleEducationChange(index, e)} placeholder="Institution" required style={{ marginBottom: '15px' }} />
+                                <input type="text" name="degree" value={edu.degree} onChange={(e) => handleEducationChange(index, e)} placeholder="Degree" required style={{ marginBottom: '15px' }} />
+                                <input type="text" name="graduation" value={edu.graduation} onChange={(e) => handleEducationChange(index, e)} placeholder="Year of Graduation" required  style={{ marginBottom: '15px' }}/>
+                            </div>
+                        ))}
+                        <button onClick={addEducation} style={{ marginBottom: '15px' }}>Add More Education</button>
+                        <h3>Biography</h3>
+                        <textarea name="biography" value={profileData.biography} onChange={handleChange} placeholder="Tells us more about yourself..." required style={{ marginBottom: '15px' }} />
+                        <h2>Profile Picture</h2>
+                        <input type="file" name="profilePicture" onChange={handleChange} style={{ marginBottom: '15px' }} />
+                        {profilePicturePreview && <img src={profilePicturePreview} alt="Profile Preview" style={{ width: '100%', height: 'auto', marginTop: '10px' }} />}
+                    </div>
                 </div>
-                <h2>Specialty</h2>
-                <input type="text" name="specialty" value={profileData.specialty} onChange={handleChange} placeholder="Specialty" aria-label="Specialty" className="profile-input" />
-                {errors.specialty && <div className="error">{errors.specialty}</div>}
-                <h2>ID Number</h2>
-                <input type="text" name="idNumber" value={profileData.idNumber} onChange={handleChange} placeholder="ID Number" aria-label="ID Number" className="profile-input" />
-                {errors.idNumber && <div className="error">{errors.idNumber}</div>}
-                <h2>Date of Birth</h2>
-                <input type="date" name="dateBirth" value={profileData.dateBirth} onChange={handleChange} placeholder="mm/dd/year" aria-label="Date of Birth" className="profile-input" />
-                {errors.dateBirth && <div className="error">{errors.dateBirth}</div>}
-                <h2>Gender</h2>
-                <select name="gender" value={profileData.gender} onChange={handleChange}>
-                    <option value="">Select an option</option>
-                    <option value="Female">Female</option>
-                    <option value="Male">Male</option>
-                    <option value="Nonbinary">Non-binary</option>
-                    <option value="DeclineToState">Prefer not to say</option>
-                    <option value="Other">Other</option>
-                </select>
-                {errors.gender && <div className="error">{errors.gender}</div>}
-                <h2>Language(s)</h2>
-                {profileData.languages.map((language, index) => (
-                    <div key={index}>
-                        <input type="text" value={language} onChange={(e) => handleArrayChange('languages', index, e.target.value)} placeholder="Language" aria-label="Language" className="profile-input" />
-                        <button type="button" onClick={() => removeArrayItem('languages', index)}>Remove</button>
-                        {errors.languages && <div className="error">{errors.languages}</div>}
-                    </div>
-                ))}
-                <button type="button" onClick={() => addArrayItem('languages')}>Add Language</button>
-                <h2>Location(s)</h2>
-                {profileData.locations.map((location, index) => (
-                    <div key={index}>
-                        <input type="text" value={location} onChange={(e) => handleArrayChange('locations', index, e.target.value)} placeholder="Location " aria-label="Location" className="profile-input" />
-                        <button type="button" onClick={() => removeArrayItem('locations', index)}>Remove</button>
-                    </div>
-                ))}
-                {errors.locations && <div className="error">{errors.locations}</div>}
-                <button type="button" onClick={() => addArrayItem('locations')}>Add Location</button>
-                <h2>Education</h2>
-                {profileData.education.map((edu, index) => (
-                    <div key={index}>
-                        <input type="text" name="institution" value={edu.institution} onChange={(e) => handleEducationChange(index, e)} placeholder="Institution" aria-label="Institution" className="profile-input" />
-                        <input type="text" name="degree" value={edu.degree} onChange={(e) => handleEducationChange(index, e)} placeholder="Degree" aria-label="Degree" className="profile-input" />
-                        <input type="text" name="graduation" value={edu.graduation} onChange={(e) => handleEducationChange(index, e)} placeholder="Year of Graduation" aria-label="Year of Graduation" className="profile-input" />
-                        <button type="button" onClick={() => removeEducation(index)}>Remove</button>
-                        {errors.education && <div className="error">{errors.education}</div>}
-                    </div>
-                ))}
-                <button type="button" onClick={addEducation}>Add More Education</button>
-                <h2>Contact Number</h2>
-                <input
-                    type="text"
-                    name="contactNumber"
-                    value={profileData.contactNumber}
-                    onChange={handleChange}
-                    placeholder="Contact Number"
-                    aria-label="Contact Number"
-                    className="profile-input"
-                />
-                {errors.contactNumber && <div className="error">{errors.contactNumber}</div>}
-                <h2>Biography</h2>
-                <textarea
-                    name="biography"
-                    value={profileData.biography}
-                    onChange={handleChange}
-                    placeholder="Write something about yourself..."
-                    aria-label="Biography"
-                    className="profile-input"
-                />
-                {errors.biography && <div className="error">{errors.biography}</div>}
-                <h2>Profile Picture</h2>
-                <input
-                    type="file"
-                    name="profilePicture"
-                    onChange={handleChange}
-                    aria-label="Profile Picture"
-                    className="profile-input"
-                />
-                <button type="submit">Submit Profile</button>
+                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
+                    <button type="button" onClick={() => navigate('/register')} style={{ padding: '10px 20px', backgroundColor: 'gray', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                        Cancel
+                    </button>
+                    <button type="submit" onClick={() => navigate('/login')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+                        Submit Profile
+                    </button>
+                </div>
             </form>
         </div>
     );
 }
-
 export default Profile;

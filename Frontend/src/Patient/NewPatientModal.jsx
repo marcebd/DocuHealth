@@ -1,43 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Row, Col, Table, Form, FormGroup, FormLabel } from 'react-bootstrap';
-import { UserContext, useUser, setPatientsTabs} from '../UserContext';
+import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
-
-const NewPatientModal = ({ onClose, onCreate}) => {
-  const { user } = useUser();
-  const [patients, setPatients] = useState([]);
-  const [patientsTabs] = useState([]);
+const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
-  const [lastName, setlastName] = useState('');
-  const [idNumber, setidNumber] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [idNumber, setIdNumber] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', date: '' }]);
-  const [conditions, setConditions] = useState([{ name: '', date: '' }]);
-  const [searchTerm, setSearchTerm] = useState('');
-  let patientsData;
+  const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', dateStart: '', dateEnd: '' }]);
+  const [conditions, setConditions] = useState([{ name: '', dateStart: '', dateEnd: '' }]);
+  const userId = JSON.parse(localStorage.getItem("userId"));
+  const [patientsInTabs, setPatientsInTabs] = useState([]);
+  const [patientsData, setPatientsData] = useState([]);
+  const [error, setError] = useState('');
+
   useEffect(() => {
-    const userId = user.id;
+    const storedPatients = localStorage.getItem('patientTabs');
+    if (storedPatients) {
+      setPatientsInTabs(JSON.parse(storedPatients));
+    } else {
+      setPatientsInTabs([]);
+    }
+  }, []);
+
+  useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch(`http://localhost:3000/users/${userId}/patients`, {
+        const response = await fetch(`http://localhost:3001/users/${userId}/patients`, {
           method: 'GET',
         });
         if (!response.ok) {
           console.error('Failed to fetch patients:', response);
-          setPatients([]);
         } else {
-          patientsData = await response.json();
-          setPatients(patientsData);
-          user.patients = patientsData;
+          const data = await response.json();
+          setPatientsData(data);
         }
       } catch (error) {
         console.error('Error fetching patients:', error);
-        setPatients([]);
       }
     }
     fetchData();
-  }, []);
+  }, [userId]);
 
   const handlePrescriptionChange = (index, event) => {
     const newPrescriptions = [...prescriptions];
@@ -57,16 +60,16 @@ const NewPatientModal = ({ onClose, onCreate}) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.instructions && p.date);
-    const areConditionsValid = conditions.every(c => c.name && c.date);
-
-    if (!arePrescriptionsValid || !areConditionsValid) {
-      console.error("All fields in prescriptions and conditions must be filled.");
+    if (!firstName || !lastName || !idNumber || !birthDate) {
+      setError("Required fields must be filled.");
       return;
     }
-
-    const userId = user.id;
+    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.dateStart);
+    const areConditionsValid = conditions.every(c => c.name && c.dateStart);
+    if (!arePrescriptionsValid || !areConditionsValid) {
+      setError("All fields in prescriptions and conditions must be filled.");
+      return;
+    }
     const patientData = {
       userId,
       firstName,
@@ -79,7 +82,7 @@ const NewPatientModal = ({ onClose, onCreate}) => {
     };
 
     try {
-      const response = await fetch('http://localhost:3000/patients', {
+      const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -88,47 +91,41 @@ const NewPatientModal = ({ onClose, onCreate}) => {
       });
       const responseData = await response.json();
       if (!response.ok) {
-        console.error('Failed to create patient:', responseData);
+        setError('Failed to create patient:', responseData);
       } else {
-        setPatients([...user.patients, patientsData]);
-        if(!user.patients){
-          user.patients = ([patientData]);
-        } else{
-          user.patients = ([...user.patients, patientData]);
-        }
-        if (!user.patientsTabs) {
-          user.patientsTabs= ([patientData]);
-        } else {
-          user.patientsTabs = ([...user.patientsTabs, patient]);
-        }
-        onCreate(firstName + " " + lastName);
+        const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
+        setPatientsInTabs(updatedPatientTabs);
+        localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
+        localStorage.setItem('viewingPatient', responseData.patient.id);
+        window.location.reload();
+        onCreate();
         onClose();
       }
     } catch (error) {
-      console.error("Error creating patient:", error);
+      setError("Error creating patient:", error);
     }
   };
 
   const handlePatientClick = (patient) => {
-    if (!user.patientsTabs) {
-      user.patientsTabs= ([patient]);
-    } else {
-      user.patientsTabs = ([...user.patientsTabs, patient]);
-    }
-    onCreate(patient.firstName + " " + patient.lastName);
+    const updatedPatientTabs = [...patientsInTabs, patient.id];
+    setPatientsInTabs(updatedPatientTabs);
+    localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
+    localStorage.setItem('viewingPatient', patient.id);
+    window.location.reload();
+    onCreate();
     onClose();
   };
-  console.log(user);
+
   return (
-    <Modal show={true} onHide={handlePatientClick}>
-      <Modal.Header>
-        <Modal.Title>Find Patient or Create One</Modal.Title>
+    <Modal show={true} onHide={onClose} centered style={{ display: 'flex', alignItems: 'center', width: '100vw' }}>
+      <Modal.Dialog style={{ margin: 0, width: '50vw', maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Modal.Header closeButton style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1%' }}>
+        <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Find or Create a New Patient</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Row>
-          <Col sm={6}>
+        <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: '0', justifyContent: 'space-evenly' }}>
+          <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
             <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
-            <Table striped bordered hover>
+            <Table striped bordered hover size="sm">
               <thead>
                 <tr>
                   <th>First Name</th>
@@ -137,65 +134,97 @@ const NewPatientModal = ({ onClose, onCreate}) => {
                 </tr>
               </thead>
               <tbody>
-                {patients.map((patient) => (
-                  <tr key={patient.id}>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.firstName}</td>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.middleName}</td>
-                    <td onClick={() => handlePatientClick(patient)}>{patient.lastName}</td>
+                {patientsData.map((patient) => (
+                  <tr key={patient.id} onClick={() => handlePatientClick(patient)}>
+                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.firstName}</td>
+                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.middleName}</td>
+                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.lastName}</td>
                   </tr>
                 ))}
               </tbody>
             </Table>
-          </Col>
-          <Col sm={6}>
+          </div>
+          <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
+          {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <Form onSubmit={handleSubmit}>
-              <FormGroup>
-                <label>First Name:</label>
-                <input type="text" value={firstName} onChange={(event) => setFirstName(event.target.value)} />
-              </FormGroup>
-              <FormGroup>
-                <label>Middle Name:</label>
-                <input type="text" value={middleName} onChange={(event) => setMiddleName(event.target.value)} />
-              </FormGroup>
-              <FormGroup>
-                <label>last Name:</label>
-                <input type="text" value={lastName} onChange={(event) => setlastName(event.target.value)} />
-              </FormGroup>
-              <FormGroup>
-                <label>iD Number:</label>
-                <input type="text" value={idNumber} onChange={(event) => setidNumber(event.target.value)} />
-              </FormGroup>
-              <FormGroup>
-                <label>Birth Date:</label>
-                <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
-              </FormGroup>
-              <FormGroup>
-                <label>Prescriptions:</label>
-                {prescriptions.map((prescription, index) => (
-                  <div key={index}>
-                    <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" />
-                    <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" />
-                    <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="instructions" />
-                    <input type="date" name="date" value={prescription.date} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Date" />
-                  </div>
-                ))}
-              </FormGroup>
-              <FormGroup>
-                <label>Conditions:</label>
-                {conditions.map((condition, index) => (
-                  <div key={index}>
-                    <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" />
-                    <input type="date" name="date" value={condition.date} onChange={(e) => handleConditionChange(index, e)} placeholder="Date" />
-                  </div>
-                ))}
-              </FormGroup>
-              <button type="submit">Create Patient</button>
-            </Form>
-          </Col>
-        </Row>
-      </Modal.Body>
-    </Modal>
-  );
-  };
 
-  export default NewPatientModal;
+              <FormGroup>
+                <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Middle Name</FormLabel>
+                <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="form-control" />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Last Name<span style={{color: 'red'}}>*</span></FormLabel>
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="form-control" />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>ID Number<span style={{color: 'red'}}>*</span></FormLabel>
+                <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="form-control" />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Birth Date<span style={{color: 'red'}}>*</span></FormLabel>
+                <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel><h3>Prescriptions:</h3></FormLabel>
+                {prescriptions.map((prescription, index) => (
+                  <div key={index} className="mb-2">
+                    <label>
+                      Name <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="name" value={prescription.name} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Name" className="form-control" required />
+                    </label>
+                    <label>
+                      Dose <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" className="form-control" required />
+                    </label>
+                    <label>
+                      Instructions
+                      <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Instructions" className="form-control" />
+                    </label>
+                    <label>
+                      Start Date <span style={{ color: 'red' }}>*</span>
+                      <input type="date" name="dateStart" value={prescription.dateStart} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Start Date" className="form-control" required />
+                    </label>
+                    <label>
+                      End Date
+                      <input type="date" name="dateEnd" value={prescription.dateEnd} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="End Date" className="form-control" />
+                    </label>
+                  </div>
+                ))}
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Conditions:</FormLabel>
+                {conditions.map((condition, index) => (
+                  <div key={index} className="mb-2">
+                    <label>
+                      Name <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" className="form-control" required />
+                    </label>
+                    <label>
+                      Start Date <span style={{ color: 'red' }}>*</span>
+                      <input type="date" name="dateStart" value={condition.dateStart} onChange={(e) => handleConditionChange(index, e)} placeholder="Start Date" className="form-control" required />
+                    </label>
+                    <label>
+                      End Date
+                      <input type="date" name="dateEnd" value={condition.dateEnd} onChange={(e) => handleConditionChange(index, e)} placeholder="End Date" className="form-control" />
+                    </label>
+                  </div>
+                ))}
+              </FormGroup>
+              <button type="submit" className="btn btn-primary">Create Patient</button>
+          </Form>
+        </div>
+      </Modal.Body>
+      <Modal.Footer style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'flex-end' }}>
+        <Button variant="secondary" onClick={onClose}>
+          Close
+        </Button>
+      </Modal.Footer>
+    </Modal.Dialog>
+  </Modal>
+);
+};
+export default NewPatientModal;

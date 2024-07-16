@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
@@ -7,7 +6,6 @@ function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { setUser } = useUser();
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
@@ -15,36 +13,34 @@ function Login() {
     setIsLoading(true);
     setError('');
     try {
+      const data = { email, password };
       const response = await fetch('http://localhost:3000/login', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
         },
-        body: new URLSearchParams({
-          email: email,
-          password: password
-        }),
+        body: JSON.stringify(data),
         credentials: 'include',
       });
-      const data = await response.json();
-      if (response.ok && data.success) {
-        setUser(data.user); // Update user context
-        localStorage.setItem('userData', JSON.stringify(data.user)); // Store user in local storage
-        navigate('/dashboard'); // Navigate to the dashboard
+      const jsonData = await response.json();
+      if (!response.ok) {
+        setError(jsonData.message || 'Failed to login'); 
       } else {
-        setError(data.message || 'Failed to login');
+        localStorage.setItem('userId', JSON.stringify(jsonData.userId));
+        localStorage.setItem('token', jsonData.token);
+        navigate('/dashboard');
       }
     } catch (error) {
-      setError('Network error');
-      console.error('Login error:', error);
+      setError('Network error or server is unreachable');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <div className='loginForm' style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', width: '100vw' }}>
       <form onSubmit={handleSubmit} aria-live="polite" style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
+        {error && <p style={{ color: 'red', margin: '10px 0' }}>{error}</p>}
         <h2 style={{ marginBottom: '20px' }}>Login</h2>
         <input
           type="email"
@@ -64,16 +60,17 @@ function Login() {
           aria-label="Password"
           style={{ width: '100%', padding: '10px', margin: '10px 0', border: 'none', borderBottom: '1px solid #ccc' }}
         />
-        <button type="submit" disabled={isLoading} style={{ cursor: isLoading ? 'wait' : 'pointer' }}>
-          {isLoading ? 'Logging in...' : 'Login'}
-        </button>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button type="submit" disabled={isLoading} style={{ cursor: isLoading ? 'wait' : 'pointer' }}>
+            {isLoading ? 'Logging in...' : 'Login'}
+          </button>
+        </div>
         <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
           Don't have an account?{' '}
           <a href="/register" style={{ color: '#337ab7', textDecoration: 'none' }}>
             Sign up
           </a>
         </p>
-        {error && <p style={{ color: 'red', margin: '10px 0' }}>{error}</p>}
       </form>
     </div>
   );

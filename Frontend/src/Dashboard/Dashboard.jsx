@@ -1,9 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
-import { useUser } from '../UserContext';
-import { useNavigate } from 'react-router-dom';
 import PatientTabs from './PatientTabs';
-import DashboardData from './DashboardData';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -16,32 +13,77 @@ const CustomHelmet = () => (
 );
 
 function Dashboard() {
-  const { user, setUser } = useUser(); // Use setUser to update the user state
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem('userData');
-    navigate('/login');
-  };
+  const userId = JSON.parse(localStorage.getItem("userId"));
+  let [userFirstName, setUserFirstName] = useState('');
+  let [userProfilePicture, setUserProfilePicture] = useState('');
+  const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
 
   useEffect(() => {
-    const retrievedUserData = localStorage.getItem('userData');
-    if (retrievedUserData) {
-      setUser(JSON.parse(retrievedUserData)); // Update the user state with the retrieved data
+    async function fetchData() {
+      try {
+        const response = await fetch(`http://localhost:3000/${userId}/dashboard/name/picture`, {
+          method: 'GET'
+        });
+        if (!response.ok) {
+          console.error('Failed to fetch user data in dashboard:', response);
+        } else {
+          const data = await response.json();
+          setUserFirstName(data.first_name);
+          const buffer = data.profile_picture.data;
+          const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
+          setUserProfilePicture(`data:image/jpeg;base64,${base64String}`);
+        }
+      } catch (error) {
+        console.error('Error fetching User Data in dashboard:', error);
+      }
     }
-  }, [setUser]); // Dependency array includes setUser to ensure it's available
+    fetchData();
+  }, [userId]);
+
   return (
-    <div>
+    <div id="wholePage">
       <HelmetProvider>
         <CustomHelmet />
       </HelmetProvider>
-      <h1>Hello, {user && user.profileData ? user.profileData.firstName : 'Guest'}</h1>
-      <img src={user && user.profileData ? user.profileData.profilePicture : 'default.jpg'} alt="Profile" />
-      <button onClick={handleLogout} aria-label="Logout from Dashboard">Logout</button>
-      <div>
-        <PatientTabs />
-        <DashboardData />
-      </div>
+      <header id='header' style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100vw',
+        height: '80px',
+        background: 'white',
+        padding: '0 20px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        position: 'fixed', 
+        top: 0,
+        left: 0,
+        right: 0
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img src={userProfilePicture || 'default.jpg'} alt="Profile" style={{
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            marginRight: '20px'
+          }} />
+          <h1 style={{ margin: '0' }}>Hello, {userFirstName}</h1>
+        </div>
+        <button aria-label="Logout from Dashboard" style={{
+          padding: '10px 20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 'auto',
+          height: '40px',
+          background: 'transparent',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          marginTop: '1%'
+        }}>Logout</button>
+      </header>
+      <main style={{ paddingTop: '2%', marginTop: '80px' }}>
+        <PatientTabs viewingPatientId={viewingPatientId} />
+      </main>
     </div>
   );
 }

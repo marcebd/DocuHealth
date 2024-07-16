@@ -1,6 +1,4 @@
-import './Register.css';
 import React, { useState } from 'react';
-import { useUser } from '../UserContext';
 import { useNavigate } from 'react-router-dom';
 
 function Register() {
@@ -11,23 +9,25 @@ function Register() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const { setUser } = useUser();
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
   const validateForm = () => {
-    if (!formData.email) {
+    const { email, password, password2 } = formData;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex for validation
+
+    if (!email) {
       setError('Email is required');
       return false;
     }
-    if (!formData.password) {
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return false;
+    }
+    if (!password) {
       setError('Password is required');
       return false;
     }
-    if (formData.password !== formData.password2) {
+    if (password !== password2) {
       setError('Passwords do not match');
       return false;
     }
@@ -38,98 +38,81 @@ function Register() {
     event.preventDefault();
     setIsLoading(true);
     setError('');
-
-    try {
-        const response = await fetch('http://localhost:3000/register', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams(formData)
-        });
-        const data = await response.json();
-        if (!response.ok) {
-            setError(data.message || 'Registration failed');
-            console.error('Registration failed:', data);
-        } else {
-            if (data.userId) {
-                // Construct the user object using the form data and userId from the server
-                const user = {
-                    id: data.userId,
-                    email: formData.email,
-                    password: formData.password, // Note: Storing passwords in local storage is not secure
-                };
-                setUser(user); // Update user context with the constructed user object
-                localStorage.setItem('userData', JSON.stringify(user)); // Store user in local storage
-                navigate('/profile'); // Navigate to the profile page
-            } else {
-                setError('Invalid user data received');
-            }
-        }
-    } catch (error) {
-        setError('Network error or registration failed');
-        console.error('Registration failed:', error);
-    } finally {
-        setIsLoading(false);
+    if (!validateForm()) {
+      setIsLoading(false);
+      return;
     }
-};
+    try {
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams(formData)
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.message || 'Registration failed');
+        console.error('Registration failed:', data);
+      } else {
+        if (data.userId) {
+          localStorage.setItem('userId', JSON.stringify(data.userId));
+          navigate('/profile');
+        } else {
+          setError('Invalid user data received');
+        }
+      }
+    } catch (error) {
+      setError('Network error or registration failed');
+      console.error('Registration failed:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <div className="register-container">
-      <form onSubmit={handleSubmit} aria-live="polite" className="register-form">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', backgroundColor: 'white' }}>
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '300px', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
         <h2>Create an Account</h2>
-        <label>
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Email"
-            required
-            aria-label="Email"
-            className="register-input"
-          />
-        </label>
-        <label>
-          Password:
-          <input
-            type="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="Password"
-            required
-            aria-label="Password"
-            className="register-input"
-          />
-        </label>
-        <label>
-          Confirm Password:
-          <input
-            type="password"
-            name="password2"
-            value={formData.password2}
-            onChange={handleChange}
-            placeholder="Confirm Password"
-            required
-            aria-label="Confirm Password"
-            className="register-input"
-          />
-        </label>
-        <button type="submit" disabled={isLoading} className="register-button">
-          {isLoading ? 'Creating...' : 'Create account'}
+        {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          placeholder="Email"
+          required
+          style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc' }}
+        />
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+          placeholder="Password"
+          required
+          style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc' }}
+        />
+        <input
+          type="password"
+          name="password2"
+          value={formData.password2}
+          onChange={(e) => setFormData({ ...formData, password2: e.target.value })}
+          placeholder="Confirm Password"
+          required
+          style={{ width: '100%', padding: '10px', margin: '10px 0', borderRadius: '5px', border: '1px solid #ccc' }}
+        />
+        <button type="submit" disabled={isLoading} style={{ width: '100%', padding: '10px', margin: '20px 0', backgroundColor: '#ffffff', color: '#333', border: '1px solid #ccc', borderRadius: '5px', cursor: 'pointer' }}>
+          {isLoading ? 'Creating...' : 'Create Account'}
         </button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <p>
-          Already have an account?{' '}
-          <a href="/login" className="register-link">
+        <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
+          Don't have an account?{' '}
+          <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
             Sign in
           </a>
         </p>
       </form>
     </div>
   );
-}
-
+};
 export default Register;
