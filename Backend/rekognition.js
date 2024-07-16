@@ -70,7 +70,7 @@ app.post('/index-patient-images/:userId', async (req, res) => {
                 console.error(`No valid picture found for patient ID ${patient.id}`);
                 continue;
             }
-            const imageBytes = patient.picture; // Directly use the Buffer
+            const imageBytes = patient.picture; 
             const indexCommand = new IndexFacesCommand({
                 CollectionId: collectionId,
                 Image: { Bytes: imageBytes },

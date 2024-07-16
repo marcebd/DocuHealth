@@ -37,8 +37,7 @@ const FacialRecognitionModal = ({ onClose, onSubmit }) => {
     const prepareFormData = (file) => {
         const formData = new FormData();
         formData.append('imgSrc', file);
-        // Append other form data here if necessary
-        onSubmit(formData);  // Pass the form data up for submission
+        onSubmit(formData);  
     };
 
     const deleteImage = () => {
