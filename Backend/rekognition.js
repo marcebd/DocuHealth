@@ -6,8 +6,10 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 const bodyParser = require('body-parser');
-const { RekognitionClient, CreateCollectionCommand, IndexFacesCommand, SearchFacesByImageCommand } = require('@aws-sdk/client-rekognition');
-
+const { RekognitionClient, IndexFacesCommand, SearchFacesByImageCommand } = require('@aws-sdk/client-rekognition');
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const app = express();
 const prisma = new PrismaClient();
 
@@ -99,15 +101,21 @@ app.post('/index-patient-images/:userId', async (req, res) => {
     }
 });
 
-app.post('/search-patient-by-image', async (req, res) => {
-    console.log("Received search request with image data");
-    if (!req.body.imageBytes) {
+function replacer(key, value) {
+    if (typeof value === 'bigint') {
+        return value.toString();
+    } else {
+        return value; 
+    }
+}
+
+app.post('/search-patient-by-image', upload.single('imgSrc'), async (req, res) => {
+    if (!req.file) {
         console.error("No image data provided in request");
-        return res.status(400).send("Image data is required.");
+        return res.status(400).json({ message: "Image data is required." });
     }
 
-    const { imageBytes } = req.body;
-    const buffer = Buffer.from(imageBytes, 'base64');
+    const buffer = req.file.buffer;
 
     const searchCommand = new SearchFacesByImageCommand({
         CollectionId: collectionId,
@@ -118,25 +126,23 @@ app.post('/search-patient-by-image', async (req, res) => {
 
     try {
         const searchResults = await rekognitionClient.send(searchCommand);
-        console.log("Search results received", searchResults);
-
         if (searchResults.FaceMatches.length > 0) {
             const faceMatch = searchResults.FaceMatches[0];
             const patientId = faceMatch.Face.ExternalImageId;
-            console.log(`Match found, patient ID: ${patientId}`);
-
             const patient = await prisma.patient.findUnique({
                 where: { id: parseInt(patientId) }
             });
-
-            res.json({ message: "Patient found", patient });
+            if (patient) {
+                const response = JSON.stringify({ message: "Patient found", patient }, replacer);
+                res.status(200).send(response);
+            } else {
+                res.status(404).json({ message: "Patient record not found" });
+            }
         } else {
-            console.log("No matching patient found");
             res.status(404).json({ message: "No matching patient found" });
         }
     } catch (error) {
-        console.error("Error searching for patient:", error);
-        res.status(500).send(error.message);
+        res.status(500).json({ message: "Error searching for patient", error: error.message });
     }
 });
 
