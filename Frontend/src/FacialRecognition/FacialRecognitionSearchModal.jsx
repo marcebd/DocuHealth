@@ -9,39 +9,51 @@ const FacialRecognitionSearchModal = ({ onClose }) => {
     const [error, setError] = useState(null);
     const [matches, setMatches] = useState([]);
 
-    const capture = () => {
+    const capture = async () => {
         const imageSrc = webcamRef.current.getScreenshot();
         if (imageSrc) {
             setError("Image Taken Correctly.");
             setImgSrc(imageSrc);
-            convertToBlob(imageSrc);
+            await createCollectionAndSearch(imageSrc);
         } else {
             setError("Error Taking Image, try again.");
         }
     };
 
-    const convertToBlob = (base64Image) => {
-        const parts = base64Image.split(';base64,');
-        const contentType = parts[0].split(':')[1];
-        const raw = window.atob(parts[1]);
-        const rawLength = raw.length;
-        const uInt8Array = new Uint8Array(rawLength);
+    const createCollectionAndSearch = async (imageSrc) => {
+        try {
+            const blob = await fetch(imageSrc).then(res => res.blob());
+            const file = new File([blob], "captured-image.jpeg", { type: 'image/jpeg' });
+            const indexResponse = await fetch(`http://localhost:3003/index-patient-images/${userId}`, { method: 'POST' });
+            if (!indexResponse.ok) {
+                const errorText = await indexResponse.text();
+                throw new Error(`Failed to index patient images: ${indexResponse.status} ${errorText}`);
+            }
+            const formData = new FormData();
+            formData.append('imgSrc', file);
 
-        for (let i = 0; i < rawLength; ++i) {
-            uInt8Array[i] = raw.charCodeAt(i);
+            const searchResponse = await fetch('http://localhost:3003/search-patient-by-image', {
+                method: 'POST',
+                body: formData
+            });
+            if (!searchResponse.ok) {
+                console.log("Couldn't post")
+                const errorText = await searchResponse.text();
+                throw new Error(`Failed to search for patient by image: ${searchResponse.status} ${errorText}`);
+            }
+
+            const searchData = await searchResponse.json();
+            if (searchData.patient) {
+                setMatches([searchData.patient]);
+                console.log("Matched found")
+            } else {
+                setError("No matching patient found.");
+            }
+        } catch (error) {
+            setError("Failed to process image.");
+            console.error("Error processing image:", error);
         }
-
-        const blob = new Blob([uInt8Array], { type: contentType });
-        const file = new File([blob], "captured-image.jpeg", { type: contentType });
-        prepareFormData(file);
     };
-
-    const prepareFormData = (file) => {
-        const formData = new FormData();
-        formData.append('imgSrc', file);
-        onSubmit(formData);  // Assuming onSubmit is a prop for handling the form submission
-    };
-
     const deleteImage = () => {
         setImgSrc(null);
         setError(null);
@@ -51,7 +63,7 @@ const FacialRecognitionSearchModal = ({ onClose }) => {
     return (
         <Modal show={true} onHide={onClose} centered size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>Stand in front of the camera and look forward</Modal.Title>
+                <Modal.Title>Patient: Stand in front of the camera and look forward</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div style={{ display: 'flex' }}>
@@ -78,6 +90,26 @@ const FacialRecognitionSearchModal = ({ onClose }) => {
                         )}
                     </div>
                 </div>
+                {matches.length > 0 && (
+                    <Table striped bordered hover size="sm">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {matches.map(match => (
+                                <tr key={match.id}>
+                                    <td>{match.id}</td>
+                                    <td>{match.name}</td>
+                                    <td><img src={match.image} alt="Match" style={{ width: '50px', height: '50px' }} /></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                )}
                 {error && <p style={{ color: 'red' }}>{error}</p>}
             </Modal.Body>
             <Modal.Footer>
@@ -89,9 +121,8 @@ const FacialRecognitionSearchModal = ({ onClose }) => {
                 <Button variant="secondary" onClick={onClose}>
                     Close
                 </Button>
-            </Modal.Footer>
-        </Modal>
-    );
+                </Modal.Footer>
+    </Modal>
+);
 };
-
 export default FacialRecognitionSearchModal;
