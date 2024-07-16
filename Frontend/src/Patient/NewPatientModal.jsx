@@ -3,6 +3,7 @@ import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstra
 import SearchBarPatient from './SearchBarPatient';
 import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
 import FacialRecognitionSearchButton from '../FacialRecognition/FacialRecognitionSearchButton';
+
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -16,7 +17,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-
+  //localStorage.removeItem("patientTabs");
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {
@@ -35,6 +36,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         if (!response.ok) {
           console.error('Failed to fetch patients:', response);
         } else {
+          console.log(response);
           const data = await response.json();
           setPatientsData(data);
         }
@@ -94,17 +96,19 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     try {
       const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
-        body: formData, 
+        body: formData,
       });
       const responseData = await response.json();
+      console.log("Response data", responseData);
       if (!response.ok) {
         setError(`Failed to create patient: ${responseData.message}`);
       } else {
-        const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
+        const updatedPatientTabs = [...patientsInTabs, responseData];
         setPatientsInTabs(updatedPatientTabs);
+        console.log("Response Data", responseData);
+        console.log("Updates patient tabs", updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
-        localStorage.setItem('viewingPatient', responseData.patient.id);
-        window.location.reload();
+        localStorage.setItem('viewingPatient', responseData);
         onCreate();
         onClose();
       }
@@ -114,13 +118,15 @@ const NewPatientModal = ({ onClose, onCreate }) => {
 };
 
   const handlePatientClick = (patient) => {
+    console.log("Handle patient click Patient", patient);
     const updatedPatientTabs = [...patientsInTabs, patient.id];
     setPatientsInTabs(updatedPatientTabs);
+    console.log("Handle patient click tabs", updatedPatientTabs);
     localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
     localStorage.setItem('viewingPatient', patient.id);
-    window.location.reload();
     onCreate();
     onClose();
+
   };
 
   return (
@@ -136,7 +142,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
               </div>
               <div style={{width: '20%'}} >
-                <FacialRecognitionSearchButton />
+                <FacialRecognitionSearchButton handlePatientClick={(handlePatientClick)}/>
               </div>
             </div>
             <Table striped bordered hover size="sm">

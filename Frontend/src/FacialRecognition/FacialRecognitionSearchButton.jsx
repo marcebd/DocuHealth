@@ -3,16 +3,18 @@ import FacialRecognitionSearchModal from './FacialRecognitionSearchModal';
 
 
 
-const FacialRecognitionSearchButton = ({  }) => {
+const FacialRecognitionSearchButton = ({ handlePatientClick }) => {
     const [hoveredButton, setHoveredButton] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleCreate = () => {
-    setIsModalOpen(true);
+        setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
-    setIsModalOpen(false);
+        setIsModalOpen(false);
     };
+
+
 
     const buttonStyle = {
     padding: '10px 20px',
@@ -46,7 +48,7 @@ const FacialRecognitionSearchButton = ({  }) => {
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         {isModalOpen && (
         <div style={modalStyle}>
-            <FacialRecognitionSearchModal onClose={handleCloseModal}/>
+            <FacialRecognitionSearchModal onClose={handleCloseModal} handlePatientClick={(handlePatientClick)}/>
         </div>
         )}
         <button

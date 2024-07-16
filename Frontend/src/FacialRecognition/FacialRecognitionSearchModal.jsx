@@ -2,12 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Modal, Button, Table } from 'react-bootstrap';
 import Webcam from 'react-webcam';
 
-const FacialRecognitionSearchModal = ({ onClose }) => {
+const FacialRecognitionSearchModal = ({ onClose, handlePatientClick }) => {
     const userId = JSON.parse(localStorage.getItem("userId"));
     const webcamRef = useRef(null);
     const [imgSrc, setImgSrc] = useState(null);
     const [error, setError] = useState(null);
-    const [matches, setMatches] = useState([]); 
+    const [matches, setMatches] = useState([]);
 
     const capture = async () => {
         const imageSrc = webcamRef.current.getScreenshot();
@@ -115,7 +115,7 @@ const FacialRecognitionSearchModal = ({ onClose }) => {
                         </thead>
                         <tbody>
                             {matches.map(match => (
-                                <tr key={match.id}>
+                                <tr key={match.id} onClick={() => handlePatientClick(match)}>
                                     <td>{match.id}</td>
                                     <td>{match.firstName} {match.middleName} {match.lastName}</td>
                                     <td>

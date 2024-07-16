@@ -73,10 +73,11 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
         conditions: { create: conditions }
       },
     });
-    const serializedPatient = JSON.stringify(newPatient, replacer);
+    const serializedPatient = JSON.stringify(newPatient.id, replacer);
     res.json(serializedPatient);
+    console.log("Serialized Patient", serializedPatient);
   } catch (error) {
-    console.error("Error creating patient:", error);
+    console.log("Failed");
     res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
 });
@@ -105,18 +106,36 @@ app.get("/users/:userId/patients", async (req, res) => {
     if (!patientIds || patientIds.length === 0) {
       return res.status(400).json({ message: "No patient IDs provided" });
     }
-    const patientsData = await Promise.all(patientIds.map(async (id) => {
-      id = parseInt(id);
-      const patient = await prisma.patient.findUnique({ where: { id } });
-      return {
-        id,
-        firstName: patient.firstName,
-        middleName: patient.middleName,
-        lastName: patient.lastName,
-      };
+    const cleanedPatientIds = patientIds.map(id => {
+      const cleanedId = id.replace(/^"|"$/g, '');
+      return BigInt(cleanedId);
+    }).filter(id => id !== null);
+    try {
+        const patientsData = await fetchPatientsData(cleanedPatientIds);
+        res.status(200).json(patientsData);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch patient data" });
+    }
+});
+
+async function fetchPatientsData(patientIds) {
+    const patients = await Promise.all(patientIds.map(async (id) => {
+        const patient = await prisma.patient.findUnique({
+            where: { id }
+        });
+        if (!patient) {
+            console.error("No patient found for ID:", id);
+            return null;
+        }
+        return {
+            id: patient.id.toString(),
+            firstName: patient.firstName,
+            middleName: patient.middleName,
+            lastName: patient.lastName
+        };
     }));
-    return res.json(patientsData);
-  });
+    return patients.filter(patient => patient !== null);
+}
 
 
   app.post("/img/:id", async (req, res) => {
