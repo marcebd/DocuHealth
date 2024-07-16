@@ -36,7 +36,6 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         if (!response.ok) {
           console.error('Failed to fetch patients:', response);
         } else {
-          console.log(response);
           const data = await response.json();
           setPatientsData(data);
         }
@@ -99,14 +98,11 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         body: formData,
       });
       const responseData = await response.json();
-      console.log("Response data", responseData);
       if (!response.ok) {
         setError(`Failed to create patient: ${responseData.message}`);
       } else {
         const updatedPatientTabs = [...patientsInTabs, responseData];
         setPatientsInTabs(updatedPatientTabs);
-        console.log("Response Data", responseData);
-        console.log("Updates patient tabs", updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
         localStorage.setItem('viewingPatient', responseData);
         onCreate();
@@ -118,10 +114,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
 };
 
   const handlePatientClick = (patient) => {
-    console.log("Handle patient click Patient", patient);
     const updatedPatientTabs = [...patientsInTabs, patient.id];
     setPatientsInTabs(updatedPatientTabs);
-    console.log("Handle patient click tabs", updatedPatientTabs);
     localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
     localStorage.setItem('viewingPatient', patient.id);
     onCreate();

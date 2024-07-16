@@ -55,7 +55,6 @@ const Prescriptions = () => {
         },
         body: JSON.stringify({ prescriptions: prescriptions.map(prescription => ({ ...prescription, patientId: viewingPatientId })) })
       });
-      console.log(prescriptions);
       if (response.ok) {
         setPrescriptions([{
           name: '',
