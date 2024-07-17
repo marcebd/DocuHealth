@@ -106,7 +106,7 @@ function Register() {
           {isLoading ? 'Creating...' : 'Create Account'}
         </button>
         <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
-          Don't have an account?{' '}
+          Already have an account?{' '}
           <a href="/login" style={{ color: '#007bff', textDecoration: 'none' }}>
             Sign in
           </a>
