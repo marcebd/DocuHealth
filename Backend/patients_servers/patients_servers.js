@@ -67,6 +67,7 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
         middleName: req.body.middleName,
         lastName: req.body.lastName,
         idNumber: req.body.idNumber,
+        email: req.body.email,
         birthDate: birthDate,
         picture: req.file ? req.file.buffer : null,
         prescriptions: { create: prescriptions },
