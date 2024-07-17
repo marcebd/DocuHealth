@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Email from "./email";
 
 function Scheduler() {
     const [appointmentTime, setAppointmentTime] = useState('');
@@ -27,14 +28,13 @@ function Scheduler() {
             advanceNumber,
             advanceUnit
         };
-        console.log(data);
         try {
             const response = await fetch(`http://localhost:3001/appointments/schedule/${patientId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data),  
+                body: JSON.stringify(data),
             });
             const scheduledAppointment = await response.json();
             setAppointment(scheduledAppointment);
@@ -42,7 +42,6 @@ function Scheduler() {
             setError(`${error.message}${error.error}`)
         }
     };
-    console.log(error);
     return (
         <div style={{ outline: '2px solid black', padding: '20px', margin: '20px' }}>
             <h2>Scheduler</h2>
@@ -108,6 +107,7 @@ function Scheduler() {
                 </div>
                 <button type="submit">Schedule Appointment</button>
             </form>
+            <Email appointment={appointment}/>
         </div>
     );
 }
