@@ -100,9 +100,6 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         body: formData,
       });
       const responseData = await response.json();
-      if (!response.ok) {
-        setError(`Failed to create patient: ${responseData.message}`);
-      } else {
         const updatedPatientTabs = [...patientsInTabs, responseData];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
@@ -110,9 +107,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         onCreate();
         onClose();
         window.location.reload();
-      }
     } catch (error) {
-      setError(`Error creating patient: ${error.message}`);
+      setError(`${error.message}${error.error}`);
     }
 };
 

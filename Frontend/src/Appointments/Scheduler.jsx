@@ -6,6 +6,9 @@ function Scheduler() {
     const [timeZoneConfirmed, setTimeZoneConfirmed] = useState(false);
     const [advanceNumber, setAdvanceNumber] = useState(1);
     const [advanceUnit, setAdvanceUnit] = useState('week');
+    const [error, setError] = useState('');
+    const [appointment, setAppointment]= useState([]);
+    const patientId = localStorage.getItem('viewingPatient');
 
     useEffect(() => {
         const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -13,17 +16,35 @@ function Scheduler() {
     }, []);
 
     const handleSubmit = async (event) => {
-        console.log(appointmentTime);
-        console.log(timeZone);
-        console.log(timeZoneConfirmed);
-        console.log(advanceNumber);
-        console.log(advanceNumber);
+        event.preventDefault();
+        if(!appointmentTime || !timeZone){
+            setError("Required fields must be filled.");
+            return;
+        }
+        const data = {
+            appointmentTime,
+            timeZone,
+            advanceNumber,
+            advanceUnit
+        };
+        console.log(data);
+        try{
+            const response = await fetch(`http://localhost:3001/appointments/schedule/${patientId}`, {
+                method: 'Post',
+                body: data,
+            });
+            const scheduledAppointment = await response.json();
+            setAppointment(scheduledAppointment);
+        }catch(error){
+            setError(`${error.message}${error.error}`)
+        }
     };
-
+    console.log(error);
     return (
         <div style={{ outline: '2px solid black', padding: '20px', margin: '20px' }}>
             <h2>Scheduler</h2>
             <form onSubmit={handleSubmit}>
+            {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
                 <div>
                     <label htmlFor="appointmentTime">Appointment Time:</label>
                     <input

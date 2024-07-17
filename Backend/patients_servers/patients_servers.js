@@ -162,6 +162,8 @@ async function fetchPatientsData(patientIds) {
   });
 
 app.post("/appointments/schedule/:patientId", async (req, res) =>{
+  console.log(req.body);
+  console.log(req.params.patientId)
   const patientId = parseInt(req.params.patientId);
   try {
     const scheduledAppointment = [];
@@ -169,11 +171,14 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
       where: {id: patientId},
       data: {
         appointmentTime: req.body.appointmentTime,
+        timeZone: req.body.timeZone
       }
     });
     if (!newAppointmentTime) {
+      console.log("no appointment time")
       return res.status(404).json({ message: "Couldn't Schedule appointment" });
     }
+    if(!req.body.advanceNumber || !req.body.advanceUnit){
       const newNotificationSettings = await prisma.notificationsettings.create ({
         data: {
           advanceNotification: req.body.advanceNotification,
@@ -181,14 +186,17 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
           patientId: patientId
         }
     });
-    if (!newNotificationSettings) {
-      return res.status(404).json({ message: "Couldn't Add Notification Settings" });
-    }
     scheduledAppointment.push({
       newAppointmentTime, newNotificationSettings
     });
-    res.status(201).json(scheduledAppointment);
+    }
+    scheduledAppointment.push({
+      newAppointmentTime
+    });
+    const serializedScheduledAppointment = JSON.stringify(scheduledAppointment, replacer);
+    res.status(201).json(serializedScheduledAppointment);
   } catch(error) {
+    console.log(error)
     res.status(500).json({message: "Internal server error", error: error});
   }
 });
