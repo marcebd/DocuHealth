@@ -107,6 +107,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         localStorage.setItem('viewingPatient', responseData);
         onCreate();
         onClose();
+        window.location.reload();
       }
     } catch (error) {
       setError(`Error creating patient: ${error.message}`);
@@ -120,7 +121,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     localStorage.setItem('viewingPatient', patient.id);
     onCreate();
     onClose();
-
+    window.location.reload();
   };
 
   return (
