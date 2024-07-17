@@ -76,7 +76,6 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
     });
     const serializedPatient = JSON.stringify(newPatient.id, replacer);
     res.json(serializedPatient);
-    console.log("Serialized Patient", serializedPatient);
   } catch (error) {
     console.log("Failed");
     res.status(500).json({ message: "Failed to create patient", error: error.message });

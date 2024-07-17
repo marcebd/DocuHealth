@@ -1,7 +1,9 @@
+import Scheduler from "./Scheduler";
+
 function Appointments() {
     return (
         <div>
-            Appointments
+            <Scheduler />
         </div>
     )
 }
