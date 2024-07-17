@@ -162,15 +162,14 @@ async function fetchPatientsData(patientIds) {
   });
 
 app.post("/appointments/schedule/:patientId", async (req, res) =>{
-  console.log(req.body);
-  console.log(req.params.patientId)
-  const patientId = parseInt(req.params.patientId);
+  const patientId = req.params.patientId;
+  const cleanedId = patientId.replace(/^"|"$/g, '');
   try {
     const scheduledAppointment = [];
     const newAppointmentTime = await prisma.patient.update({
-      where: {id: patientId},
+      where: {id: cleanedId},
       data: {
-        appointmentTime: req.body.appointmentTime,
+        appointmentTime: new Date(req.body.appointmentTime).toISOString(),
         timeZone: req.body.timeZone
       }
     });
@@ -181,9 +180,9 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
     if(!req.body.advanceNumber || !req.body.advanceUnit){
       const newNotificationSettings = await prisma.notificationsettings.create ({
         data: {
-          advanceNotification: req.body.advanceNotification,
-          frequency: req.body.frequency,
-          patientId: patientId
+          frequency: req.body.advanceUnit,
+          number: req.body.advanceNumber,
+          patientId: cleanedId
         }
     });
     scheduledAppointment.push({

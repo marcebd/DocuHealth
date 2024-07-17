@@ -28,14 +28,17 @@ function Scheduler() {
             advanceUnit
         };
         console.log(data);
-        try{
+        try {
             const response = await fetch(`http://localhost:3001/appointments/schedule/${patientId}`, {
-                method: 'Post',
-                body: data,
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),  
             });
             const scheduledAppointment = await response.json();
             setAppointment(scheduledAppointment);
-        }catch(error){
+        } catch (error) {
             setError(`${error.message}${error.error}`)
         }
     };
