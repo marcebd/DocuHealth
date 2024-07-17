@@ -111,7 +111,7 @@ app.post('/prescriptions', async (req, res) => {
 
     res.status(201).json(createdPrescriptions);
   } catch (error) {
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error", error: error });
   }
 });
 
@@ -179,7 +179,7 @@ app.post('/conditions', async (req, res) => {
 });
 
 app.get('/conditions/:patientId', async (req, res) => {
-  const patientId = req.params.patientId.replace(/"/g, ''); 
+  const patientId = req.params.patientId.replace(/"/g, '');
   try {
     const patientExists = await prisma.patient.findUnique({
       where: { id: BigInt(patientId) }

@@ -160,3 +160,35 @@ async function fetchPatientsData(patientIds) {
       res.status(500).json({ message: "Error Saving Patient's Picture, try again." });
     }
   });
+
+app.post("/appointments/schedule/:patientId", async (req, res) =>{
+  const patientId = parseInt(req.params.patientId);
+  try {
+    const scheduledAppointment = [];
+    const newAppointmentTime = await prisma.patient.update({
+      where: {id: patientId},
+      data: {
+        appointmentTime: req.body.appointmentTime,
+      }
+    });
+    if (!newAppointmentTime) {
+      return res.status(404).json({ message: "Couldn't Schedule appointment" });
+    }
+      const newNotificationSettings = await prisma.notificationsettings.create ({
+        data: {
+          advanceNotification: req.body.advanceNotification,
+          frequency: req.body.frequency,
+          patientId: patientId
+        }
+    });
+    if (!newNotificationSettings) {
+      return res.status(404).json({ message: "Couldn't Add Notification Settings" });
+    }
+    scheduledAppointment.push({
+      newAppointmentTime, newNotificationSettings
+    });
+    res.status(201).json(scheduledAppointment);
+  } catch(error) {
+    res.status(500).json({message: "Internal server error", error: error});
+  }
+});

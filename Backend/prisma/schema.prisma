@@ -62,7 +62,7 @@ model Patient {
 }
 
 model NotificationSettings {
- id        BigInt   @id @default(autoincrement())
+  id        BigInt   @id @default(autoincrement())
   advanceNotification String
   frequency           String
   patientId BigInt
