@@ -17,7 +17,7 @@ function Dashboard() {
   const userId = JSON.parse(localStorage.getItem("userId"));
   let [userFirstName, setUserFirstName] = useState('');
   let [userProfilePicture, setUserProfilePicture] = useState('');
-  const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
+  const [viewingPatientId] = useState(localStorage.getItem('viewingPatient'));
   const navigate = useNavigate();
 
   useEffect(() => {

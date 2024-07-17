@@ -17,7 +17,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-  //localStorage.removeItem("patientTabs");
+
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {
