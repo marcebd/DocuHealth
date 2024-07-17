@@ -49,22 +49,28 @@ const FacialRecognitionSearchModal = ({ onClose, handlePatientClick }) => {
             });
             if (!searchResponse.ok) {
                 const errorText = await searchResponse.text();
-                throw new Error(`Failed to search for patient by image: ${searchResponse.status} ${errorText}`);
-            }
+                const errorJson = JSON.parse(errorText);
+                let formattedError = "An error occurred during the search.";
+                if (errorJson.message && errorJson.error) {
+                    formattedError = `${errorJson.message}: ${errorJson.error}`;
+                } else if (errorJson.message) {
+                    formattedError = `${errorJson.message}`;
+                } else if (errorJson.error) {
+                    formattedError = `${errorJson.error}`;
+                }
+                throw new Error(formattedError);
+                }
 
             const response = await searchResponse.json();
-        if (response.patient) {
-            const formattedPatient = {
-                ...response.patient,
-                picture: `data:image/jpeg;base64,${bufferToBase64(response.patient.picture)}`
-            };
-            setMatches([formattedPatient]);
-        } else {
-            setError("No matching patient found.");
-        }
+            if (response.patient) {
+                const formattedPatient = {
+                    ...response.patient,
+                    picture: `data:image/jpeg;base64,${bufferToBase64(response.patient.picture)}`
+                };
+                setMatches([formattedPatient]);
+            }
         } catch (error) {
-            setError("Failed to process image.");
-            console.error("Error processing image:", error);
+            setError(error.message);
         }
     };
 
@@ -104,6 +110,7 @@ const FacialRecognitionSearchModal = ({ onClose, handlePatientClick }) => {
                         )}
                     </div>
                 </div>
+                {error && <p style={{ color: error === "Image Taken Correctly." ? 'green' : 'red' }}>{error}</p>}
                     {matches.length > 0 && (
                     <Table striped bordered hover size="sm">
                         <thead>
@@ -126,7 +133,6 @@ const FacialRecognitionSearchModal = ({ onClose, handlePatientClick }) => {
                         </tbody>
                     </Table>
                 )}
-                {error && <p style={{ color: 'red' }}>{error}</p>}
             </Modal.Body>
             <Modal.Footer>
                 {!imgSrc && (
