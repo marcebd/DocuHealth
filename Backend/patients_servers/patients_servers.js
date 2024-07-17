@@ -174,11 +174,10 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
       }
     });
     if (!newAppointmentTime) {
-      console.log("no appointment time")
       return res.status(404).json({ message: "Couldn't Schedule appointment" });
     }
-    if(!req.body.advanceNumber || !req.body.advanceUnit){
-      const newNotificationSettings = await prisma.notificationsettings.create ({
+    if(req.body.advanceNumber && req.body.advanceUnit){
+      const newNotificationSettings = await prisma.notificationSettings.create ({
         data: {
           frequency: req.body.advanceUnit,
           number: req.body.advanceNumber,
@@ -186,7 +185,7 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
         }
     });
     scheduledAppointment.push({
-      newAppointmentTime, newNotificationSettings
+      newNotificationSettings
     });
     }
     scheduledAppointment.push({
