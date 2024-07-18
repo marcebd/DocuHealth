@@ -22,6 +22,7 @@ function Scheduler() {
             setError("Required fields must be filled.");
             return;
         }
+        setError('');
         const data = {
             appointmentTime,
             timeZone,

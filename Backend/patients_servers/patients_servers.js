@@ -198,3 +198,19 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
     res.status(500).json({message: "Internal server error", error: error});
   }
 });
+
+app.get("/appointments/scheduled/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    const patients = await prisma.patient.findMany({ where: { userId: userId } });
+    const serializedScheduledAppointmentPatients = JSON.stringify(patients, replacer);
+    res.status(201).json(serializedScheduledAppointmentPatients);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({message: "Internal server error", error: error});
+  }
+});
