@@ -220,16 +220,26 @@ async function fetchPatientsData(patientIds) {
 app.get("/appointments/scheduled", async (req, res) => {
   try {
       const patients = await prisma.patient.findMany({
-          where: { appointmentTime: { not: null } },
+          where: { appointments: { some: {} } },
           select: {
             id: true,
             firstName: true,
             lastName: true,
-            appointmentTime: true,
-            notificationSettings: true,
             email: true,
-            timeZone: true
-        }
+            appointments: {
+              select: {
+                  id: true,
+                  appointmentTime: true,
+                  timeZone: true,
+                  notificationSettings: {
+                    select: {
+                      number: true,
+                      frequency: true,
+                    }
+                  }
+              }
+            }
+          }
       });
       const serializedPatients = JSON.stringify(patients, replacer);
       res.status(200).json(serializedPatients);
