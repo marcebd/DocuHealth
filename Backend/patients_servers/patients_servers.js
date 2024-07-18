@@ -206,7 +206,16 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
 app.get("/appointments/scheduled", async (req, res) => {
   try {
       const patients = await prisma.patient.findMany({
-          where: { appointmentTime: { not: null } }
+          where: { appointmentTime: { not: null } },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            appointmentTime: true,
+            notificationSettings: true,
+            email: true,
+            timeZone: true
+        }
       });
       const serializedPatients = JSON.stringify(patients, replacer);
       res.status(200).json(serializedPatients);
