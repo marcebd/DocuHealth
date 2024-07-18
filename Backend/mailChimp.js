@@ -45,9 +45,15 @@ async function handleScheduleEmails() {
 
             const notificationTime = moment.tz(appointmentTime, timeZone)
                 .subtract(notificationSettings.number, notificationSettings.frequency)
-                .toISOString();
+                .format('HH:mm');
 
-            console.log(`Scheduled to send an email to ${email} at ${notificationTime} for appointment at ${appointmentTime}`);
+            const currentTime = moment.tz(timeZone).format('HH:mm');
+
+            if (notificationTime === currentTime) {
+                await scheduleEmail(email, appointmentTime, timeZone, firstName, lastName);
+            } else {
+                console.log(`Not time to send email to ${email} for ${firstName} ${lastName}. Current time: ${currentTime}, Notification time: ${notificationTime}`);
+            }
         });
     } catch (error) {
         console.error('Failed to handle schedule emails:', error);
@@ -57,4 +63,4 @@ async function handleScheduleEmails() {
 // Run the scheduling check every minute
 setInterval(() => {
     handleScheduleEmails();
-}, 6000); 
+}, 6000);
