@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Email from "./email";
+import AppointmentConfirmation from './AppointmentConfirmation';
 
 function Scheduler() {
     const [appointmentTime, setAppointmentTime] = useState('');
@@ -108,7 +108,7 @@ function Scheduler() {
                 </div>
                 <button type="submit">Schedule Appointment</button>
             </form>
-            <Email appointment={appointment}/>
+            <AppointmentConfirmation appointment={appointment}/>
         </div>
     );
 }

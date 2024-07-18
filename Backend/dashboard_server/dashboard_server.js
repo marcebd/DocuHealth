@@ -1,12 +1,13 @@
-require("dotenv").config();
-const cors = require("cors");
-const { PrismaClient } = require('@prisma/client');
-const passport = require("passport");
-const session = require("express-session");
-const express = require('express');
-const flash = require("connect-flash");
+import { pool } from "../dbConfig.js";
+import cors from "cors";
+import express from "express";
+import { PrismaClient } from '@prisma/client';
+import passport from "passport";
+import session from "express-session";
+import flash from "connect-flash";
 const prisma = new PrismaClient();
-
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
 const app = express();
 // Middleware
 app.use(express.json());
@@ -136,8 +137,8 @@ app.get('/prescriptions/:patientId', async (req, res) => {
   }
 });
 
-app.listen(3004, () => {
-  console.log('Server running on port 3004');
+app.listen(3003, () => {
+  console.log('Server running on port 3003');
 });
 
 app.post('/conditions', async (req, res) => {

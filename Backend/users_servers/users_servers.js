@@ -1,19 +1,20 @@
-const { pool } = require("/Users/marcebd/Desktop/DocuHealth/Backend/dbConfig.js");
-const multer = require('multer');
+import { pool } from "../dbConfig.js";
+import { initialize } from "../passportConfig.js";
+import multer from 'multer';
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const bcrypt = require("bcrypt");
-const passport = require("passport");
-const session = require("express-session");
-const cors = require("cors");
-const flash = require("connect-flash");
-require("dotenv").config();
-const { PrismaClient } = require('@prisma/client');
+import bcrypt from "bcrypt";
+import passport from "passport";
+import session from "express-session";
+import cors from "cors";
+import express from "express";
+import flash from "connect-flash";
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
+import { PrismaClient } from '@prisma/client';
 const minPasswordLength = 6;
 const noErrors = 0;
-const { initialize } = require("../passportConfig");
 initialize(passport);
-const express = require('express');
 const prisma = new PrismaClient();
 
 

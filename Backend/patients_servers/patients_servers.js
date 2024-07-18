@@ -1,19 +1,22 @@
-const { pool } = require("/Users/marcebd/Desktop/DocuHealth/Backend/dbConfig.js");
-const multer = require('multer');
+import { pool } from "../dbConfig.js";
+import multer from 'multer';
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const passport = require("passport");
-const session = require("express-session");
-const cors = require("cors");
-const flash = require("connect-flash");
-require("dotenv").config();
-const { PrismaClient } = require('@prisma/client');
-const { initialize } = require("../passportConfig");
+import bcrypt from "bcrypt";
+import passport from "passport";
+import session from "express-session";
+import cors from "cors";
+import express from "express";
+import flash from "connect-flash";
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
+import { PrismaClient } from '@prisma/client';
+const minPasswordLength = 6;
+const noErrors = 0;
+import { initialize } from "../passportConfig.js";
 initialize(passport);
-const express = require('express');
 const prisma = new PrismaClient();
 const app = express();
-
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -199,18 +202,13 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
   }
 });
 
-app.get("/appointments/scheduled/:userId", async (req, res) => {
+app.get("/appointments/scheduled/", async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    const patients = await prisma.patient.findMany({ where: { userId: userId } });
+    const patients = await prisma.patient.findMany({ where: {appointmentTime: {not: null} } });
     const serializedScheduledAppointmentPatients = JSON.stringify(patients, replacer);
     res.status(201).json(serializedScheduledAppointmentPatients);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({message: "Internal server error", error: error});
+    console.error(error);
+    res.status(500).json({message: error.message, error: error.error});
   }
 });
