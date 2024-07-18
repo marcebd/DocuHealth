@@ -80,7 +80,6 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
     const serializedPatient = JSON.stringify(newPatient.id, replacer);
     res.json(serializedPatient);
   } catch (error) {
-    console.log("Failed");
     res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
 });
@@ -177,16 +176,18 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
       }
     });
     if (!newAppointmentTime) {
+      console.log("error");
       return res.status(404).json({ message: "Couldn't Schedule appointment" });
     }
     if(req.body.advanceNumber && req.body.advanceUnit){
-      const newNotificationSettings = await prisma.notificationSettings.create ({
+      const newNotificationSettings = await prisma.notificationSettings.update ({
+        where: {id: cleanedId},
         data: {
           frequency: req.body.advanceUnit,
           number: req.body.advanceNumber,
           patientId: cleanedId
         }
-    });
+        });
     scheduledAppointment.push({
       newNotificationSettings
     });
@@ -197,7 +198,7 @@ app.post("/appointments/schedule/:patientId", async (req, res) =>{
     const serializedScheduledAppointment = JSON.stringify(scheduledAppointment, replacer);
     res.status(201).json(serializedScheduledAppointment);
   } catch(error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({message: "Internal server error", error: error});
   }
 });

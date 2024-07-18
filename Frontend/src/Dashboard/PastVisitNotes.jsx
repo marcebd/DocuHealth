@@ -5,7 +5,6 @@ const PastVisitNotes = ({ patientId }) => {
   const [visitNotes, setVisitNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState('');
-  console.log(patientId);
   useEffect(() => {
     async function fetchData() {
       try {

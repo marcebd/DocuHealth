@@ -61,13 +61,11 @@ app.get("/:userId/dashboard/name/picture", async(req, res) => {
     try {
       const userId = req.params.userId;
       const userData = await prisma.user_data.findUnique({ where: { id: userId } });
-      console.log(userData);
       res.json({
         first_name: userData.first_name,
         profile_picture: userData.profile_picture,
       });
     } catch (error) {
-      console.log(error);
       res.status(401).json({ message: "Unauthorized, dashboard" });
     }
 
