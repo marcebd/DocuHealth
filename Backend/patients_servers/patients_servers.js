@@ -163,44 +163,58 @@ async function fetchPatientsData(patientIds) {
     }
   });
 
-app.post("/appointments/schedule/:patientId", async (req, res) =>{
-  const patientId = req.params.patientId;
-  const cleanedId = patientId.replace(/^"|"$/g, '');
-  try {
-    const scheduledAppointment = [];
-    const newAppointmentTime = await prisma.patient.update({
-      where: {id: cleanedId},
-      data: {
-        appointmentTime: new Date(req.body.appointmentTime).toISOString(),
-        timeZone: req.body.timeZone
-      }
-    });
-    if (!newAppointmentTime) {
-      console.log("error");
-      return res.status(404).json({ message: "Couldn't Schedule appointment" });
-    }
-    if(req.body.advanceNumber && req.body.advanceUnit){
-      const newNotificationSettings = await prisma.notificationSettings.update ({
-        where: {id: cleanedId},
-        data: {
-          frequency: req.body.advanceUnit,
-          number: req.body.advanceNumber,
-          patientId: cleanedId
-        }
+  app.post("/appointments/schedule/:patientId", async (req, res) => {
+    const patientId = parseInt(req.params.patientId);
+    try {
+        const newAppointment = await prisma.appointment.create({
+            data: {
+                appointmentTime: new Date(req.body.appointmentTime),
+                timeZone: req.body.timeZone,
+                patientId: patientId,
+            },
+            include: {
+                notificationSettings: true,
+            }
         });
-    scheduledAppointment.push({
-      newNotificationSettings
-    });
+        if (req.body.notificationSettings && Array.isArray(req.body.notificationSettings)) {
+            for (const setting of req.body.notificationSettings) {
+                await prisma.notificationSettings.create({
+                    data: {
+                        number: setting.number,
+                        frequency: setting.frequency,
+                        appointmentID: newAppointment.id,
+                    }
+                });
+            }
+        }
+        const patient = await prisma.patient.findUnique({
+            where: { id: patientId },
+            select: {
+                firstName: true,
+                lastName: true
+            }
+        });
+        const appointment = await prisma.appointment.findUnique({
+            where: {id: newAppointment.id},
+            select: {
+              id: true,
+              appointmentTime: true,
+              timeZone: true,
+              notificationSettings: true
+            }
+        });
+        const responseData = {
+            appointment: {
+                appointment,
+                patientName: `${patient.firstName} ${patient.lastName}`
+            }
+        };
+        const serializedResponse = JSON.stringify(responseData, replacer);
+        res.status(201).json(JSON.parse(serializedResponse));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error", error: error });
     }
-    scheduledAppointment.push({
-      newAppointmentTime
-    });
-    const serializedScheduledAppointment = JSON.stringify(scheduledAppointment, replacer);
-    res.status(201).json(serializedScheduledAppointment);
-  } catch(error) {
-    console.log(error);
-    res.status(500).json({message: "Internal server error", error: error});
-  }
 });
 
 app.get("/appointments/scheduled", async (req, res) => {

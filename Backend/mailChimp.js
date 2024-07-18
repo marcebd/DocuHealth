@@ -60,7 +60,7 @@ async function handleScheduleEmails() {
     }
 }
 
-// Run the scheduling check every minute
-setInterval(() => {
-    handleScheduleEmails();
-}, 6000);
+// // Run the scheduling check every minute
+// setInterval(() => {
+//     handleScheduleEmails();
+// }, 6000);

@@ -5,29 +5,38 @@ function Scheduler() {
     const [appointmentTime, setAppointmentTime] = useState('');
     const [timeZone, setTimeZone] = useState('');
     const [timeZoneConfirmed, setTimeZoneConfirmed] = useState(false);
-    const [advanceNumber, setAdvanceNumber] = useState(1);
-    const [advanceUnit, setAdvanceUnit] = useState('week');
+    const [notificationSettings, setNotificationSettings] = useState([{ number: 1, frequency: 'week' }]);
     const [error, setError] = useState('');
-    const [appointment, setAppointment]= useState([]);
+    const [appointment, setAppointment] = useState([]);
     const patientId = localStorage.getItem('viewingPatient');
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
         setTimeZone(userTimeZone);
     }, []);
 
+    const handleAddNotification = () => {
+        setNotificationSettings([...notificationSettings, { number: 1, frequency: 'week' }]);
+    };
+
+    const handleNotificationChange = (index, field, value) => {
+        const updatedSettings = [...notificationSettings];
+        updatedSettings[index][field] = value;
+        setNotificationSettings(updatedSettings);
+    };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if(!appointmentTime || !timeZone){
-            setError("Required fields must be filled.");
+        if (!appointmentTime || !timeZone || !timeZoneConfirmed) {
+            setError("Please confirm the time zone and fill all required fields.");
             return;
         }
         setError('');
         const data = {
             appointmentTime,
             timeZone,
-            advanceNumber,
-            advanceUnit
+            notificationSettings
         };
         try {
             const response = await fetch(`http://localhost:3001/appointments/schedule/${patientId}`, {
@@ -39,17 +48,21 @@ function Scheduler() {
             });
             const scheduledAppointment = await response.json();
             setAppointment(scheduledAppointment);
+            setShowModal(true)
         } catch (error) {
             setError(`${error.message}${error.error}`)
         }
+    };
+    const handleCloseModal = () => {
+        setShowModal(false);
     };
     return (
         <div style={{ outline: '2px solid black', padding: '20px', margin: '20px' }}>
             <h2>Scheduler</h2>
             <form onSubmit={handleSubmit}>
-            {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+                {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
                 <div>
-                    <label htmlFor="appointmentTime">Appointment Time:</label>
+                    <label htmlFor="appointmentTime">Appointment Time:<span style={{ color: 'red' }}>*</span></label>
                     <input
                         type="datetime-local"
                         id="appointmentTime"
@@ -58,7 +71,7 @@ function Scheduler() {
                     />
                 </div>
                 <div>
-                    <label>Time Zone: {timeZone}</label>
+                    <label>Time Zone:<span style={{ color: 'red' }}>*</span> {timeZone}</label>
                     {timeZoneConfirmed ? (
                         <span> - Confirmed</span>
                     ) : (
@@ -68,7 +81,7 @@ function Scheduler() {
                                 value={timeZone}
                                 onChange={e => {
                                     setTimeZone(e.target.value);
-                                    setTimeZoneConfirmed(true);
+                                    setTimeZoneConfirmed(false);
                                 }}
                                 style={{ marginLeft: '10px' }}
                             >
@@ -86,29 +99,40 @@ function Scheduler() {
                         </>
                     )}
                 </div>
-                <div>
-                    <label htmlFor="advanceNumber">Advance Notification:</label>
-                    <input
-                        type="number"
-                        id="advanceNumber"
-                        min="1"
-                        value={advanceNumber}
-                        onChange={e => setAdvanceNumber(parseInt(e.target.value))}
-                        style={{ width: '50px', marginRight: '10px' }}
-                    />
-                    <select
-                        id="advanceUnit"
-                        value={advanceUnit}
-                        onChange={e => setAdvanceUnit(e.target.value)}
-                    >
-                        <option value="week">week</option>
-                        <option value="day">day</option>
-                        <option value="hour">hour</option>
-                    </select>
-                </div>
+                {notificationSettings.map((setting, index) => (
+                    <div key={index}>
+                        <label htmlFor={`advanceNumber-${index}`}>Advance Notification:</label>
+                        <input
+                            type="number"
+                            id={`advanceNumber-${index}`}
+                            min="1"
+                            value={setting.number}
+                            onChange={e => handleNotificationChange(index, 'number', parseInt(e.target.value))}
+                            style={{ width: '50px', marginRight: '10px' }}
+                        />
+                        <select
+                            id={`advanceUnit-${index}`}
+                            value={setting.frequency}
+                            onChange={e => handleNotificationChange(index, 'frequency', e.target.value)}
+                        >
+                            <option value="minute">minute</option>
+                            <option value="hour">hour</option>
+                            <option value="day">day</option>
+                            <option value="week">week</option>
+                            <option value="month">month</option>
+                        </select>
+                    </div>
+                ))}
+                <button type="button" onClick={handleAddNotification}>Add Another Notification</button>
                 <button type="submit">Schedule Appointment</button>
             </form>
-            <AppointmentConfirmation appointment={appointment}/>
+            {showModal && (
+                <AppointmentConfirmation
+                    appointment={appointment}
+                    show={showModal}
+                    handleClose={handleCloseModal}
+                />
+            )}
         </div>
     );
 }

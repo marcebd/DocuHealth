@@ -1,27 +1,44 @@
+import React from 'react';
 import moment from 'moment-timezone';
-function AppointmentConfirmation({ appointment }) {
-    let cleanedAppointment = null;
-    if (appointment[0]) {
-        try {
-            cleanedAppointment = JSON.parse(appointment);
-        } catch (error) {
-            console.error("Error parsing appointment data:", error);
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
+
+function AppointmentConfirmation({ appointment, show, handleClose }) {
+    function formatMomentDate(dateString, timeZone) {
+        if (!dateString || !timeZone) {
+            return 'Invalid date or time zone';
         }
+        return moment(dateString).tz(timeZone).format('MMMM D, YYYY, h:mm:ss A [GMT]ZZ');
     }
-    function formatMomentDate(dateString) {
-        return moment(dateString).format('MMMM D, YYYY, h:mm:ss A [GMT]ZZ');
-    }
+
     return (
-        <div>
-            {cleanedAppointment && (
+        <Modal show={show} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Appointment Confirmation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <div></div>
+                <h4>Appointment Scheduled for {appointment.appointment.patientName}</h4>
+                <p>Date and Time: {formatMomentDate(appointment.appointment.appointment.appointmentTime, appointment.appointment.appointment.timeZone)}</p>
+                {appointment.appointment.appointment.notificationSettings && (
                 <div>
-                    <h4>Appointment Schedules for:</h4>
-                    <p>{cleanedAppointment[1].newAppointmentTime.firstName} {cleanedAppointment[1].newAppointmentTime.lastName}</p>
-                    <p>Date and Time: {formatMomentDate(cleanedAppointment[1].newAppointmentTime.appointmentTime)}</p>
-                    <p>Notification will be sent {cleanedAppointment[0].newNotificationSettings.number} {cleanedAppointment[0].newNotificationSettings.frequency} before the appointment</p>
+                    <p>Patient will be notified: </p>
+                    <ul>
+                        {appointment.appointment.appointment.notificationSettings.map((setting, index) => (
+                            <li key={index}>
+                                {setting.number} {setting.frequency} before the appointment
+                            </li>
+                        ))}
+                    </ul>
                 </div>
-            )}
-        </div>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Close
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 }
 
