@@ -57,15 +57,17 @@ app.get("/logout", (req, res) => {
   });
 });
 
-app.get("/:userId/dashboard/name/picture", checkNotAuthenticated, async(req, res) => {
+app.get("/:userId/dashboard/name/picture", async(req, res) => {
     try {
       const userId = req.params.userId;
-      const userData = await prisma.user_data.findUnique({ where: { user_id: userId } });
+      const userData = await prisma.user_data.findUnique({ where: { id: userId } });
+      console.log(userData);
       res.json({
         first_name: userData.first_name,
         profile_picture: userData.profile_picture,
       });
     } catch (error) {
+      console.log(error);
       res.status(401).json({ message: "Unauthorized, dashboard" });
     }
 
@@ -187,7 +189,7 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
     }
   } catch (error) {
     console.error('Error creating profile:', error);
-    res.status(500).json({ message: "Failed to create profile", error: error.message });
+    res.status(500).json({ message: error.message , error: error.error });
   }
 });
 

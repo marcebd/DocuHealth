@@ -4,6 +4,7 @@ import Notepad from "./Notepad";
 import PatientDetails from './PatientDetails';
 
 const PatientTabs = ({ viewingPatientId }) => {
+  console.log("Viewing patient id", viewingPatientId);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);

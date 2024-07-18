@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
 
 const PastConditions = ({ patientId }) => {
+  let parsedPatientId = JSON.parse(patientId);
   const [conditions, setConditions] = useState([]);
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -10,7 +11,7 @@ const PastConditions = ({ patientId }) => {
   useEffect(() => {
     const fetchConditions = async () => {
       try {
-        const response = await fetch(`http://localhost:3003/conditions/${patientId}`);
+        const response = await fetch(`http://localhost:3002/conditions/${parsedPatientId}`);
         if (response.ok) {
           const data = await response.json();
           setConditions(data);

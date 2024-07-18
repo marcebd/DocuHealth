@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 function Profile() {
     const userId = JSON.parse(localStorage.getItem("userId"));
     const navigate = useNavigate();
@@ -19,6 +20,8 @@ function Profile() {
         profilePicture: null
     });
     const [profilePicturePreview, setProfilePicturePreview] = useState('');
+    const [errors, setErrors] = useState({});
+
     const handleChange = (event) => {
         const { name, type, value, files } = event.target;
         if (type === 'file') {
@@ -35,6 +38,25 @@ function Profile() {
         }
     };
 
+    const handleArrayChange = (key, index, event) => {
+        const newValues = [...profileData[key]];
+        newValues[index] = event.target.value;
+        setProfileData({ ...profileData, [key]: newValues });
+    };
+
+    const addArrayItem = (key) => {
+        setProfileData(prevState => ({
+            ...prevState,
+            [key]: [...prevState[key], '']
+        }));
+    };
+
+    const removeArrayItem = (key, index) => {
+        const newValues = [...profileData[key]];
+        newValues.splice(index, 1);
+        setProfileData({ ...profileData, [key]: newValues });
+    };
+
     const handleEducationChange = (index, event) => {
         const { name, value } = event.target;
         const updatedEducation = profileData.education.map((edu, i) => {
@@ -48,71 +70,22 @@ function Profile() {
             education: updatedEducation
         }));
     };
-    const addEducation = () => {
-        setProfileData(prevState => ({
-            ...prevState,
-            education: [...prevState.education, { institution: '', degree: '', graduation: '' }]
-        }));
-    };
-    const removeEducation = (index) => {
-        setProfileData(prevState => ({
-            ...prevState,
-            education: prevState.education.filter((_, i) => i !== index)
-        }));
-    };
-
-    const handleArrayChange = (key, index, value) => {
-        const updatedArray = profileData[key].map((item, i) => {
-            if (i === index) {
-                return value;
-            }
-            return item;
-        });
-        setProfileData(prevState => ({
-            ...prevState,
-            [key]: updatedArray
-        }));
-    };
-
-    const addArrayItem = (key) => {
-        setProfileData(prevState => ({
-            ...prevState,
-            [key]: [...prevState[key], '']
-        }));
-    };
-
-    const removeArrayItem = (key, index) => {
-        setProfileData(prevState => ({
-            ...prevState,
-            [key]: prevState[key].filter((_, i) => i !== index)
-        }));
-    };
-
-    const [errors, setErrors] = useState({});
 
     const validateForm = () => {
         const newErrors = {};
-        // Validate required fields
-        if (!profileData.firstName) newErrors.firstName = 'First name is required';
-        if (!profileData.lastName) newErrors.lastName = 'Last name is required';
-        if (!profileData.specialty) newErrors.specialty = 'Specialty is required';
-        if (!profileData.idNumber) newErrors.idNumber = 'ID number is required';
-        if (!profileData.dateBirth) newErrors.dateBirth = 'Date of birth is required';
-        if (!profileData.gender) newErrors.gender = 'Gender is required';
-        if (!profileData.contactNumber) newErrors.contactNumber = 'Contact number is required';
-        if (!profileData.biography) newErrors.biography = 'Biography is required';
+        // Required fields validation
+        ['firstName', 'lastName', 'specialty', 'idNumber', 'dateBirth', 'gender', 'contactNumber', 'biography', 'profilePicture'].forEach(field => {
+            if (!profileData[field]) {
+                newErrors[field] = `${field} is required`;
+            }
+        });
 
-        // Validate arrays
+        // Arrays validation
         if (profileData.languages.some(lang => !lang)) newErrors.languages = 'All language fields must be filled';
         if (profileData.locations.some(loc => !loc)) newErrors.locations = 'All location fields must be filled';
         if (profileData.education.some(edu => !edu.institution || !edu.degree || !edu.graduation)) {
             newErrors.education = 'All fields in education must be filled';
-
-        //Validate real phone number
-        if(!isMobilePhone(profileData.contactNumber, 'en-US', {allow_international: true})){
-            newErrors.contactNumber = 'Invalid phone number';
         }
-    }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -143,74 +116,120 @@ function Profile() {
         try {
             const response = await fetch('http://localhost:3000/profile', {
                 method: 'POST',
-                body: formData,
+                body:                 formData
             });
-            const responseData = await response.json();
-
-            if (!response.ok) {
-                console.error('Failed to submit profile:', responseData);
-            } else {
+            const result = await response.json();
+            if (response.ok) {
                 navigate('/login');
+            } else {
+                setErrors('Failed to update profile. Please try again.' );
             }
         } catch (error) {
-            console.error('Network or other error:', error);
+            setErrors('Network error. Please try again later.');
         }
     };
+
     return (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: 'white' }}>
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '800px', padding: '30px', borderRadius: '10px', boxShadow: '0 6px 12px rgba(0,0,0,0.1)', backgroundColor: 'white' }}>
-                <h1>Create Profile</h1>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
-                    <div style={{ width: '48%' }}>
-                        <h2>Name</h2>
-                        <input type="text" name="firstName" value={profileData.firstName} onChange={handleChange} placeholder="First Name" required style={{ marginBottom: '15px' }} />
-                        <input type="text" name="middleName" value={profileData.middleName} onChange={handleChange} placeholder="Middle Name" style={{ marginBottom: '15px' }} />
-                        <input type="text" name="lastName" value={profileData.lastName} onChange={handleChange} placeholder="Last Name" required style={{ marginBottom: '15px' }} />
-                        <h3>Specialty</h3>
-                        <input type="text" name="specialty" value={profileData.specialty} onChange={handleChange} placeholder="Specialty" required style={{ marginBottom: '15px' }} />
-                        <h3>Personal Identification Number</h3>
-                        <input type="text" name="idNumber" value={profileData.idNumber} onChange={handleChange} placeholder="ID Number" required style={{ marginBottom: '15px' }} />
-                        <h3>Birth Date</h3>
-                        <input type="date" name="dateBirth" value={profileData.dateBirth} onChange={handleChange} required style={{ marginBottom: '15px' }} />
-                        <h3>Gender</h3>
-                        <select name="gender" value={profileData.gender} onChange={handleChange} required style={{ marginBottom: '15px' }}>
-                            <option value="">Select Gender</option>
-                            <option value="Female">Female</option>
-                            <option value="Male">Male</option>
-                            <option value="Nonbinary">Non-binary</option>
-                            <option value="DeclineToState">Prefer not to say</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <h3>Contact Number</h3>
-                        <input type="text" name="contactNumber" value={profileData.contactNumber} onChange={handleChange} placeholder="Contact Number" required style={{ marginBottom: '15px' }} />
+        <form onSubmit={handleSubmit} style={{ maxWidth: '600px', margin: '20px auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>First Name:<span style={{color: 'red'}}>*</span></label>
+                <input type="text" name="firstName" value={profileData.firstName} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                {errors.firstName && <p className="error" style={{ color: 'red' }}>{errors.firstName}</p>}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Middle Name (Optional):</label>
+                <input type="text" name="middleName" value={profileData.middleName} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Last Name:<span style={{color: 'red'}}>*</span></label>
+                <input type="text" name="lastName" value={profileData.lastName} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                {errors.lastName && <p className="error" style={{ color: 'red' }}>{errors.lastName}</p>}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Specialty:<span style={{color: 'red'}}>*</span></label>
+                <input type="text" name="specialty" value={profileData.specialty} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                {errors.specialty && <p className="error" style={{ color: 'red' }}>{errors.specialty}</p>}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>ID Number:<span style={{color: 'red'}}>*</span></label>
+                <input type="text" name="idNumber" value={profileData.idNumber} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                {errors.idNumber && <p className="error" style={{ color: 'red' }}>{errors.idNumber}</p>}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Date of Birth:<span style={{color: 'red'}}>*</span></label>
+                <input type="date" name="dateBirth" value={profileData.dateBirth} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }} />
+                {errors.dateBirth && <p className="error" style={{ color: 'red' }}>{errors.dateBirth}</p>}
+            </div>
+            <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', marginBottom: '5px' }}>Gender:<span style={{color: 'red'}}>*</span></label>
+                <select name="gender" value={profileData.gender} onChange={handleChange} style={{ width: '100%', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}>
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Nonbinary">Nonbinary</option>
+                <option value="DeclineToState">Decline to state</option>
+                <option value="Other">Other</option>
+                </select>
+                {errors.gender && <p className="error" style={{ color: 'red' }}>{errors.gender}</p>}
+            </div>
+            <div>
+                <label>Languages:<span style={{color: 'red'}}>*</span></label>
+                {profileData.languages.map((language, index) => (
+                    <div key={index}>
+                        <input type="text" value={language} onChange={(e) => handleArrayChange('languages', index, e)} />
+                        {index > 0 && (
+                            <button type="button" onClick={() => removeArrayItem('languages', index)}>Remove</button>
+                        )}
                     </div>
-                    <div style={{ width: '48%' }}>
-                        <h2>Educational Background</h2>
-                        {profileData.education.map((edu, index) => (
-                            <div key={index} style={{ marginBottom: '15px' }}>
-                                <input type="text" name="institution" value={edu.institution} onChange={(e) => handleEducationChange(index, e)} placeholder="Institution" required style={{ marginBottom: '15px' }} />
-                                <input type="text" name="degree" value={edu.degree} onChange={(e) => handleEducationChange(index, e)} placeholder="Degree" required style={{ marginBottom: '15px' }} />
-                                <input type="text" name="graduation" value={edu.graduation} onChange={(e) => handleEducationChange(index, e)} placeholder="Year of Graduation" required  style={{ marginBottom: '15px' }}/>
-                            </div>
-                        ))}
-                        <button onClick={addEducation} style={{ marginBottom: '15px' }}>Add More Education</button>
-                        <h3>Biography</h3>
-                        <textarea name="biography" value={profileData.biography} onChange={handleChange} placeholder="Tells us more about yourself..." required style={{ marginBottom: '15px' }} />
-                        <h2>Profile Picture</h2>
-                        <input type="file" name="profilePicture" onChange={handleChange} style={{ marginBottom: '15px' }} />
-                        {profilePicturePreview && <img src={profilePicturePreview} alt="Profile Preview" style={{ width: '100%', height: 'auto', marginTop: '10px' }} />}
+                ))}
+                <button type="button" onClick={() => addArrayItem('languages')}>Add Language</button>
+                {errors.languages && <p className="error" style={{ color: 'red' }}>{errors.languages}</p>}
+            </div>
+            <div>
+                <label>Locations:<span style={{color: 'red'}}>*</span></label>
+                {profileData.locations.map((location, index) => (
+                    <div key={index}>
+                        <input type="text" value={location} onChange={(e) => handleArrayChange('locations', index, e)} />
+                        {index > 0 && (
+                            <button type="button" onClick={() => removeArrayItem('locations', index)}>Remove</button>
+                        )}
                     </div>
-                </div>
-                <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'space-between' }}>
-                    <button type="button" onClick={() => navigate('/register')} style={{ padding: '10px 20px', backgroundColor: 'gray', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        Cancel
-                    </button>
-                    <button type="submit" onClick={() => navigate('/login')} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-                        Submit Profile
-                    </button>
-                </div>
-            </form>
-        </div>
+                ))}
+                <button type="button" onClick={() => addArrayItem('locations')}>Add Location</button>
+                {errors.locations && <p className="error" style={{ color: 'red' }}>{errors.locations}</p>}
+            </div>
+            <div>
+                <label>Contact Number:<span style={{color: 'red'}}>*</span></label>
+                <input type="text" name="contactNumber" value={profileData.contactNumber} onChange={handleChange} />
+                {errors.contactNumber && <p className="error" style={{ color: 'red' }}>{errors.contactNumber}</p>}
+            </div>
+            <div>
+                <label>Education:<span style={{color: 'red'}}>*</span></label>
+                {profileData.education.map((edu, index) => (
+                    <div key={index}>
+                        <input type="text" name="institution" value={edu.institution} placeholder="Institution" onChange={(e) => handleEducationChange(index, e)} />
+                        <input type="text" name="degree" value={edu.degree} placeholder="Degree" onChange={(e) => handleEducationChange(index, e)} />
+                        <input type="text" name="graduation" value={edu.graduation}                         placeholder="Graduation Year" onChange={(e) => handleEducationChange(index, e)} />
+                        {index > 0 && (
+                            <button type="button" onClick={() => removeEducationItem(index)}>Remove</button>
+                        )}
+                    </div>
+                ))}
+                <button type="button" onClick={() => addEducationItem()}>Add Education</button>
+                {errors.education && <p className="error" style={{ color: 'red' }}>{errors.education}</p>}
+                <h5>Biography<span style={{color: 'red'}}>*</span></h5>
+                <textarea name="biography" value={profileData.biography} onChange={handleChange} placeholder="Tells us more about yourself..." required style={{ marginBottom: '15px' }} />
+                {errors.biography && <p className="error" style={{ color: 'red' }}>{errors.biography}</p>}
+                <h5>Profile Picture<span style={{color: 'red'}}>*</span></h5>
+                <input type="file" name="profilePicture" onChange={handleChange} style={{ marginBottom: '15px' }} />
+                {profilePicturePreview && <img src={profilePicturePreview} alt="Profile Preview" style={{ width: '100%', height: 'auto', marginTop: '10px' }} />}
+
+            </div>
+            <div>
+                <button type="submit" >Submit Profile</button>
+            </div>
+        </form>
     );
 }
+
 export default Profile;
