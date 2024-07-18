@@ -10,7 +10,7 @@ const PastConditions = ({ patientId }) => {
   useEffect(() => {
     const fetchConditions = async () => {
       try {
-        const response = await fetch(`http://localhost:3004/conditions/${patientId}`);
+        const response = await fetch(`http://localhost:3003/conditions/${patientId}`);
         if (response.ok) {
           const data = await response.json();
           setConditions(data);

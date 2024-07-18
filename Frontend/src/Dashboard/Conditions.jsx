@@ -43,7 +43,7 @@ const Conditions = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:3004/conditions', {
+      const response = await fetch('http://localhost:3002/conditions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

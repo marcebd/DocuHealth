@@ -5,11 +5,11 @@ const PastVisitNotes = ({ patientId }) => {
   const [visitNotes, setVisitNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState('');
-
+  console.log(patientId);
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch(`http://localhost:3004/visitNotes/${patientId}`, {
+        const response = await fetch(`http://localhost:3002/visitNotes/${patientId}`, {
           method: 'GET',
         });
         if (!response.ok) {
