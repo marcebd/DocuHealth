@@ -137,8 +137,8 @@ app.get('/prescriptions/:patientId', async (req, res) => {
   }
 });
 
-app.listen(3003, () => {
-  console.log('Server running on port 3003');
+app.listen(3002, () => {
+  console.log('Server running on port 3002');
 });
 
 app.post('/conditions', async (req, res) => {

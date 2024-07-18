@@ -59,14 +59,14 @@ model Patient {
   visitNotes         VisitNote[]
   appointmentTime    DateTime?
   timeZone String?
-  notificationSettings NotificationSettings[]
+  notificationSettings NotificationSettings?
 }
 
 model NotificationSettings {
   id        BigInt   @id @default(autoincrement())
   number Int
   frequency           String
-  patientId BigInt
+  patientId BigInt  @unique
   patient   Patient  @relation(fields: [patientId], references: [id])
 }
 

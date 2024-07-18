@@ -16,8 +16,8 @@ initialize(passport);
 const prisma = new PrismaClient();
 const app = express();
 import { RekognitionClient } from "@aws-sdk/client-rekognition";
-app.listen(3004, () => {
-    console.log('Server running on port 3004');
+app.listen(3006, () => {
+    console.log('Server running on port 3006');
 });
 // Middleware
 app.use(bodyParser.json());
