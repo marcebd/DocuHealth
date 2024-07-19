@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const PatientSearchTable = ({ patientsData }) => {
+const PatientSearchTable = ({ patientsData, handlePatientClick }) => {
     const [sortedData, setSortedData] = useState([]);
 
     useEffect(() => {
@@ -37,7 +37,7 @@ const PatientSearchTable = ({ patientsData }) => {
                 </thead>
                 <tbody>
                     {sortedData.map((patient) => (
-                        <tr key={patient.id}>
+                        <tr key={patient.id} onClick={() => handlePatientClick(patient)}>
                             <td style={{ padding: '8px', border: '1px solid #ddd', maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.firstName}</td>
                             <td style={{ padding: '8px', border: '1px solid #ddd', maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.middleName}</td>
                             <td style={{ padding: '8px', border: '1px solid #ddd', maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.lastName}</td>

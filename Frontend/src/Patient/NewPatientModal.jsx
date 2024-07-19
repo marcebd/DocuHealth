@@ -140,7 +140,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               </div>
             </div>
             {patientsData[0] ? (
-              <PatientSearchTable patientsData={patientsData} />
+              <PatientSearchTable patientsData={patientsData} handlePatientClick={(handlePatientClick)} />
             ) : (
               <p>No patients found</p>
             )}
