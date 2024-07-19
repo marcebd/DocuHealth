@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
+import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -13,6 +14,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsInTabs, setPatientsInTabs] = useState([]);
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
+  const [imgSrc, setImgSrc] = useState('');
 
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
@@ -54,6 +56,10 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     setConditions(newConditions);
   };
 
+  const onImageCapture = (image) => {
+    setImgSrc(image);
+  };
+
   const handleSearch = (event) => {
     // Handle search logic here
   };
@@ -78,7 +84,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       idNumber,
       birthDate,
       prescriptions,
-      conditions
+      conditions,
+      imgSrc
     };
 
     try {
@@ -93,13 +100,13 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       if (!response.ok) {
         setError('Failed to create patient:', responseData);
       } else {
+        onCreate();
+        onClose();
         const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
         localStorage.setItem('viewingPatient', responseData.patient.id);
         window.location.reload();
-        onCreate();
-        onClose();
       }
     } catch (error) {
       setError("Error creating patient:", error);
@@ -147,7 +154,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
           {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <Form onSubmit={handleSubmit}>
-
+              <h3>Patient Data</h3>
               <FormGroup>
                 <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" />
@@ -169,7 +176,11 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-                <FormLabel><h3>Prescriptions:</h3></FormLabel>
+
+                <FacialRecognitionPatientButton onImageCapture={(onImageCapture)}/>
+              </FormGroup>
+              <FormGroup>
+                <FormLabel><h3>Prescriptions</h3></FormLabel>
                 {prescriptions.map((prescription, index) => (
                   <div key={index} className="mb-2">
                     <label>
@@ -196,7 +207,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 ))}
               </FormGroup>
               <FormGroup>
-                <FormLabel>Conditions:</FormLabel>
+                <FormLabel><h3>Conditions</h3></FormLabel>
                 {conditions.map((condition, index) => (
                   <div key={index} className="mb-2">
                     <label>
