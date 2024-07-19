@@ -19,6 +19,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
+  const [picture, setPicture] = useState('');
+
 
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
@@ -89,12 +91,16 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     formData.append('idNumber', idNumber);
     formData.append('email', email);
     formData.append('birthDate', birthDate);
-    if (imgSrc) {
-      formData.append('imgSrc', imgSrc);
+    if (imgSrc instanceof File) {
+      formData.append('imgSrc', imgSrc, imgSrc.name);
+    } else {
+      console.error('imgSrc is not a file');
     }
     formData.append('prescriptions', JSON.stringify(prescriptions));
     formData.append('conditions', JSON.stringify(conditions));
-
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
     try {
       const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
@@ -107,7 +113,6 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         localStorage.setItem('viewingPatient', responseData);
         onCreate();
         onClose();
-        window.location.reload();
     } catch (error) {
       setError(`${error.message}${error.error}`);
     }
