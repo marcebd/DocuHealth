@@ -50,7 +50,6 @@ app.listen(3001, () => {
 });
 
 app.post("/patients", upload.single('imgSrc'), async (req, res) => {
-  console.log(req.body);
   try {
     const birthDate = new Date(req.body.birthDate);
     const prescriptions = JSON.parse(req.body.prescriptions).map(prescription => ({
@@ -79,10 +78,8 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
       },
     });
     const serializedPatient = JSON.stringify(newPatient.id, replacer);
-    console.log(serializedPatient);
     res.json(serializedPatient);
   } catch (error) {
-    console.log(error);
     res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
 });

@@ -34,7 +34,7 @@ const FacialRecognitionSearchModal = ({ onClose, handlePatientClick }) => {
             const formData = new FormData();
             formData.append('imgSrc', file);
 
-            const indexResponse = await fetch(`http://localhost:3003/index-patient-images/${userId}`, {
+            const indexResponse = await fetch(`http://localhost:3006/index-patient-images/${userId}`, {
                 method: 'POST',
                 body: formData
             });
@@ -43,7 +43,7 @@ const FacialRecognitionSearchModal = ({ onClose, handlePatientClick }) => {
                 throw new Error(`Failed to index patient images: ${indexResponse.status} ${errorText}`);
             }
 
-            const searchResponse = await fetch('http://localhost:3003/search-patient-by-image', {
+            const searchResponse = await fetch('http://localhost:3006/search-patient-by-image', {
                 method: 'POST',
                 body: formData
             });
