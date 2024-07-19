@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
+import { Modal, Form, FormGroup, FormLabel, Button } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
 import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
 import FacialRecognitionSearchButton from '../FacialRecognition/FacialRecognitionSearchButton';
+import PatientSearchTable from './PatientSearchTable';
 
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
@@ -138,24 +139,11 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <FacialRecognitionSearchButton handlePatientClick={(handlePatientClick)}/>
               </div>
             </div>
-            <Table striped bordered hover size="sm">
-              <thead>
-                <tr>
-                  <th>First Name</th>
-                  <th>Middle Name</th>
-                  <th>Last Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {patientsData.map((patient) => (
-                  <tr key={patient.id} onClick={() => handlePatientClick(patient)}>
-                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.firstName}</td>
-                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.middleName}</td>
-                    <td style={{ maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{patient.lastName}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            {patientsData[0] ? (
+              <PatientSearchTable patientsData={patientsData} />
+            ) : (
+              <p>No patients found</p>
+            )}
           </div>
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
           {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
