@@ -50,6 +50,7 @@ model Patient {
   lastName      String
   idNumber      String
   birthDate     DateTime
+  phoneNumber
   email   String?
   picture Bytes?
   userId        BigInt
