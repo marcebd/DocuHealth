@@ -5,8 +5,8 @@ import Conditions from './Conditions';
 const PatientDetails = () => {
     return (
         <div id='patientDetails' style={{ width: '50%', height: '100%' }}>
-            <Prescriptions />
             <Conditions />
+            <Prescriptions />
         </div>
     );
 
