@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
 import PatientDetails from './PatientDetails';
@@ -8,7 +9,7 @@ const PatientTabs = ({ viewingPatientId }) => {
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
   const [hoveredButton, setHoveredButton] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
     if (storedPatients && storedPatients.length > 0) {
@@ -111,6 +112,10 @@ const PatientTabs = ({ viewingPatientId }) => {
     return `hsl(${hue}, 70%, 85%)`;
   };
 
+  const handleAppointmentClick = () => {
+    navigate('/appointments');
+  };
+
   return (
     <div>
       {isModalOpen && (
@@ -133,6 +138,19 @@ const PatientTabs = ({ viewingPatientId }) => {
           +
         </div>
       </div>
+      <button onClick={() => handleAppointmentClick()} aria-label="Appointments" style={{
+          padding: '10px 20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 'auto',
+          height: '40px',
+          background: 'transparent',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          marginTop: '1%',
+          marginLeft: '1%'
+        }}>Schedule an appointment for this patient</button>
       <div id='notesPrescriptions' style={{
           display: 'flex',
           flexDirection: 'row',
