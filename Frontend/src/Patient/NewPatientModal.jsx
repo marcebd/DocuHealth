@@ -12,15 +12,13 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [idNumber, setIdNumber] = useState('');
   const [email, setEmail] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', dateStart: '', dateEnd: '' }]);
-  const [conditions, setConditions] = useState([{ name: '', dateStart: '', dateEnd: '' }]);
+  const [prescriptions, setPrescriptions] = useState([]);
+  const [conditions, setConditions] = useState([]);
   const userId = JSON.parse(localStorage.getItem("userId"));
   const [patientsInTabs, setPatientsInTabs] = useState([]);
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-  const [picture, setPicture] = useState('');
-
 
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
@@ -38,13 +36,13 @@ const NewPatientModal = ({ onClose, onCreate }) => {
           method: 'GET',
         });
         if (!response.ok) {
-          console.error('Failed to fetch patients:', response);
-        } else {
-          const data = await response.json();
-          setPatientsData(data);
+          throw new Error('Failed to fetch patients');
         }
+        const data = await response.json();
+        setPatientsData(data);
       } catch (error) {
         console.error('Error fetching patients:', error);
+        setError('Error fetching patient data. Please try again later.');
       }
     }
     fetchData();
@@ -76,10 +74,14 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       setError("Required fields must be filled.");
       return;
     }
-    const arePrescriptionsValid = prescriptions.every(p => p.name && p.dose && p.dateStart);
-    const areConditionsValid = conditions.every(c => c.name && c.dateStart);
+    const arePrescriptionsPartiallyFilled = prescriptions.some(p => p.name || p.dose || p.dateStart);
+    const areConditionsPartiallyFilled = conditions.some(c => c.name || c.dateStart);
+
+    const arePrescriptionsValid = !arePrescriptionsPartiallyFilled || prescriptions.every(p => p.name && p.dose && p.dateStart);
+    const areConditionsValid = !areConditionsPartiallyFilled || conditions.every(c => c.name && c.dateStart);
+
     if (!arePrescriptionsValid || !areConditionsValid) {
-      setError("All fields in prescriptions and conditions must be filled.");
+      setError("All required fields in prescriptions and conditions must be filled.");
       return;
     }
 
@@ -93,70 +95,82 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     formData.append('birthDate', birthDate);
     if (imgSrc instanceof File) {
       formData.append('imgSrc', imgSrc, imgSrc.name);
-    } else {
-      console.error('imgSrc is not a file');
     }
     formData.append('prescriptions', JSON.stringify(prescriptions));
     formData.append('conditions', JSON.stringify(conditions));
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}: ${value}`);
-    }
     try {
       const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
         body: formData,
       });
+      if (!response.ok) {
+        throw new Error('Failed to create patient');
+      }
       const responseData = await response.json();
-        const updatedPatientTabs = [...patientsInTabs, responseData];
-        setPatientsInTabs(updatedPatientTabs);
-        localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
-        localStorage.setItem('viewingPatient', responseData);
-        onCreate();
-        onClose();
+      const updatedPatientTabs = [...patientsInTabs, responseData];
+      setPatientsInTabs(updatedPatientTabs);
+      localStorage.setItem('viewingPatient', JSON.parse(responseData));
+      localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
+      onCreate(responseData);
+      onClose();
+      window.location.reload();
     } catch (error) {
-      setError(`${error.message}${error.error}`);
+      console.error('Failed to create patient:', error);
+      setError(`Failed to create patient: ${error.message}`);
     }
-};
-
+  };
   const handlePatientClick = (patient) => {
     const updatedPatientTabs = [...patientsInTabs, patient.id];
     setPatientsInTabs(updatedPatientTabs);
     localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
-    localStorage.setItem('viewingPatient', patient.id);
-    onCreate();
+    localStorage.setItem('viewingPatient', JSON.parse(patient.id));
+    onCreate(patient);
     onClose();
     window.location.reload();
   };
-
+  const addPrescription = () => {
+    setPrescriptions([...prescriptions, { name: '', dose: '', instructions: '', dateStart: '', dateEnd: '' }]);
+  };
+  const removePrescription = (index) => {
+    const filteredPrescriptions = prescriptions.filter((_, i) => i !== index);
+    setPrescriptions(filteredPrescriptions);
+  };
+  const addCondition = () => {
+    setConditions([...conditions, { name: '', dateStart: '', dateEnd: '' }]);
+  };
+  const removeCondition = (index) => {
+    const filteredConditions = conditions.filter((_, i) => i !== index);
+    setConditions(filteredConditions);
+  };
   return (
     <Modal show={true} onHide={onClose} centered style={{ display: 'flex', alignItems: 'center', width: '100vw' }}>
       <Modal.Dialog style={{ margin: 0, width: '50vw', maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <Modal.Header closeButton style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1%' }}>
-        <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Find or Create a New Patient</Modal.Title>
-      </Modal.Header>
+        <Modal.Header closeButton style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1%' }}>
+          <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Find or Create a New Patient</Modal.Title>
+        </Modal.Header>
         <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: '0', justifyContent: 'space-evenly' }}>
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
             <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-            <div>
+              <div>
                 <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
               </div>
               <div style={{width: '20%'}} >
-                <FacialRecognitionSearchButton handlePatientClick={(handlePatientClick)}/>
+                <FacialRecognitionSearchButton handlePatientClick={handlePatientClick}/>
               </div>
             </div>
             {patientsData[0] ? (
-              <PatientSearchTable patientsData={patientsData} handlePatientClick={(handlePatientClick)} />
+              <PatientSearchTable patientsData={patientsData} handlePatientClick={handlePatientClick} />
             ) : (
               <p>No patients found</p>
             )}
           </div>
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
-          {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+            {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <Form onSubmit={handleSubmit}>
               <h3>Patient Data</h3>
               <FormGroup>
                 <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
-                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" />
+                <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" required />
               </FormGroup>
               <FormGroup>
                 <FormLabel>Middle Name</FormLabel>
@@ -164,19 +178,19 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               </FormGroup>
               <FormGroup>
                 <FormLabel>Last Name<span style={{color: 'red'}}>*</span></FormLabel>
-                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="form-control" />
+                <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} className="form-control" required />
               </FormGroup>
               <FormGroup>
                 <FormLabel>ID Number<span style={{color: 'red'}}>*</span></FormLabel>
-                <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="form-control" />
+                <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="form-control" required />
               </FormGroup>
               <FormGroup>
                 <FormLabel>Email<span style={{color: 'red'}}>*</span></FormLabel>
-                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="form-control" />
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="form-control" required />
               </FormGroup>
               <FormGroup>
                 <FormLabel>Birth Date<span style={{color: 'red'}}>*</span></FormLabel>
-                <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
+                <input type="date" value={birthDate} onChange={(e) =>setBirthDate(e.target.value)} className="form-control" required />
               </FormGroup>
               <FormGroup>
                 <FacialRecognitionPatientButton onImageCapture={(onImageCapture)}/>
@@ -194,50 +208,42 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                       <input type="text" name="dose" value={prescription.dose} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Dose" className="form-control" required />
                     </label>
                     <label>
-                      Instructions
-                      <input type="text" name="instructions" value={prescription.instructions} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Instructions" className="form-control" />
+                      Frequency <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="frequency" value={prescription.frequency} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Frequency" className="form-control" required />
                     </label>
-                    <label>
-                      Start Date <span style={{ color: 'red' }}>*</span>
-                      <input type="date" name="dateStart" value={prescription.dateStart} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="Start Date" className="form-control" required />
-                    </label>
-                    <label>
-                      End Date
-                      <input type="date" name="dateEnd" value={prescription.dateEnd} onChange={(e) => handlePrescriptionChange(index, e)} placeholder="End Date" className="form-control" />
-                    </label>
+                    <button type="button" onClick={() => removePrescription(index)} className="btn btn-danger">Remove</button>
                   </div>
                 ))}
+                <button type="button" onClick={addPrescription} className="btn btn-primary">Add Prescription</button>
               </FormGroup>
               <FormGroup>
                 <FormLabel><h3>Conditions</h3></FormLabel>
                 {conditions.map((condition, index) => (
                   <div key={index} className="mb-2">
                     <label>
-                      Name <span style={{ color: 'red' }}>*</span>
-                      <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Name" className="form-control" required />
+                      Condition Name <span style={{ color: 'red' }}>*</span>
+                      <input type="text" name="name" value={condition.name} onChange={(e) => handleConditionChange(index, e)} placeholder="Condition Name" className="form-control" required />
                     </label>
                     <label>
                       Start Date <span style={{ color: 'red' }}>*</span>
-                      <input type="date" name="dateStart" value={condition.dateStart} onChange={(e) => handleConditionChange(index, e)} placeholder="Start Date" className="form-control" required />
+                      <input type="date" name="dateStart" value={condition.dateStart} onChange={(e) => handleConditionChange(index, e)} className="form-control" required />
                     </label>
                     <label>
                       End Date
-                      <input type="date" name="dateEnd" value={condition.dateEnd} onChange={(e) => handleConditionChange(index, e)} placeholder="End Date" className="form-control" />
+                      <input type="date" name="dateEnd" value={condition.dateEnd} onChange={(e) => handleConditionChange(index, e)} className="form-control" />
                     </label>
+                    <button type="button" onClick={() => removeCondition(index)} className="btn btn-danger">Remove</button>
                   </div>
                 ))}
+                <button type="button" onClick={addCondition} className="btn btn-primary">Add Condition</button>
               </FormGroup>
-              <button type="submit" className="btn btn-primary">Create Patient</button>
-          </Form>
-        </div>
-      </Modal.Body>
-      <Modal.Footer style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'flex-end' }}>
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal.Dialog>
-  </Modal>
-);
+              <Button type="submit" className="btn btn-success">Save Patient</Button>
+            </Form>
+          </div>
+        </Modal.Body>
+      </Modal.Dialog>
+    </Modal>
+  );
 };
+
 export default NewPatientModal;
