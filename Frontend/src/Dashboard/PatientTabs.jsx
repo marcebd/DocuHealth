@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
 import PatientDetails from './PatientDetails';
+import AddNewPrescriptionButton from './AddNewPrescriptionButton';
 
 const PatientTabs = ({ viewingPatientId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -138,33 +139,46 @@ const PatientTabs = ({ viewingPatientId }) => {
           +
         </div>
       </div>
-      <button onClick={() => handleAppointmentClick()} aria-label="Appointments" style={{
-          padding: '10px 20px',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: 'auto',
-          height: '40px',
-          background: 'transparent',
-          border: '1px solid #ccc',
-          borderRadius: '5px',
-          marginTop: '1%',
-          marginLeft: '1%'
-        }}>Schedule an appointment for this patient</button>
-      <div id='notesPrescriptions' style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-          alignItems: 'flex-start',
-          border: '1px solid lightgrey',
-          borderRadius: '10px',
-          padding: '2%',
-          background: 'white',
-          marginTop: '-4px',
-          height: '150vh'
-      }}>
-          <Notepad />
-          <PatientDetails />
+      <div id='patientFolder' style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-evenly',
+            alignItems: 'flex-start',
+            border: '1px solid lightgrey',
+            borderRadius: '10px',
+            padding: '2%',
+            background: 'white',
+            marginTop: '-4px',
+            height: '150vh'
+        }}>
+          <div style={{display:'flex', alignItems:'center', justifyContent: 'space-evenly', padding: '1%', width:'100%'}}>
+          <button onClick={() => handleAppointmentClick()} aria-label="Appointments" style={{
+              color: 'black',
+              borderColor: '#ccc',
+              borderWidth: '1px',
+              borderStyle: 'solid',
+              boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
+            }}>Schedule an appointment for this patient</button>
+            <AddNewPrescriptionButton style={{
+
+            }}/>
+        </div>
+        <div id='notesPrescriptions' style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'flex-start',
+            border: '1px solid lightgrey',
+            borderRadius: '10px',
+            padding: '2%',
+            background: 'white',
+            marginTop: '-4px',
+            width:'100%',
+            height: '150vh'
+        }}>
+            <Notepad />
+            <PatientDetails />
+        </div>
       </div>
     </div>
   );
