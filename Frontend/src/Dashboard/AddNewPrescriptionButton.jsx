@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button} from 'react-bootstrap';
 import AddNewPrescriptionModal from './AddNewPrescriptionModal';
-
-const AddNewPrescriptionButton = () => {
+import './AddNewPrescriptionButton.css'
+const AddNewPrescriptionButton = ({ styles, className }) => {
     const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
     const [showModal, setShowModal] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
@@ -86,22 +86,11 @@ const AddNewPrescriptionButton = () => {
 
     return (
         <div style={{width: 'auto', height: 'auto', display:'flex', alignItems:'center'}}>
-            <Button onClick={() => setShowModal(true)} style={{
-                PaddingTop: '1%',
-                PaddingRight: '1%',
-                PaddingLeft: '1%',
-                backgroundColor: 'white',
-                color: 'black',
-                borderColor: '#ccc',
-                borderWidth: '1px',
-                borderStyle: 'solid',
-                boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
-            }}>
+            <Button onClick={() => setShowModal(true)} style={{fontWeight:'bold'}} className={className} stye={styles}>
                 Add New Prescription
             </Button>
         {showModal && (
             <div>
-                <button onClick={() => setShowModal(true)}>Open Modal</button>
                 <AddNewPrescriptionModal
                 showModal={showModal}
                 setShowModal={setShowModal}

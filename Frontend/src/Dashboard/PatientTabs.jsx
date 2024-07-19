@@ -4,6 +4,7 @@ import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
 import PatientDetails from './PatientDetails';
 import AddNewPrescriptionButton from './AddNewPrescriptionButton';
+import './AddNewPrescriptionButton.css'
 
 const PatientTabs = ({ viewingPatientId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,8 +94,17 @@ const PatientTabs = ({ viewingPatientId }) => {
     minWidth: '120px'
   });
 
+  const generateLightColor = (index) => {
+    const hue = index * 137;
+    return `hsl(${hue}, 70%, 85%)`;
+  };
+
+  const handleAppointmentClick = () => {
+    navigate('/appointments');
+  };
+
   const buttonStyle = {
-    cursor: 'pointer',
+    cursor: hoveredButton ? 'pointer' : 'default',
     padding: '10px 10px',
     marginRight: '5px',
     marginLeft: '5px',
@@ -106,16 +116,7 @@ const PatientTabs = ({ viewingPatientId }) => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-  };
-
-  const generateLightColor = (index) => {
-    const hue = index * 137;
-    return `hsl(${hue}, 70%, 85%)`;
-  };
-
-  const handleAppointmentClick = () => {
-    navigate('/appointments');
-  };
+    };
 
   return (
     <div>
@@ -152,16 +153,10 @@ const PatientTabs = ({ viewingPatientId }) => {
             height: '150vh'
         }}>
           <div style={{display:'flex', alignItems:'center', justifyContent: 'space-evenly', padding: '1%', width:'100%'}}>
-          <button onClick={() => handleAppointmentClick()} aria-label="Appointments" style={{
-              color: 'black',
-              borderColor: '#ccc',
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
-            }}>Schedule an appointment for this patient</button>
-            <AddNewPrescriptionButton style={{
-
-            }}/>
+          <button onClick={handleAppointmentClick}  className="addPrescriptionFolder">
+              Schedule an appointment for this patient
+          </button>
+          <AddNewPrescriptionButton onClick={handleAppointmentClick}  className="addPrescriptionFolder"/>
         </div>
         <div id='notesPrescriptions' style={{
             display: 'flex',
