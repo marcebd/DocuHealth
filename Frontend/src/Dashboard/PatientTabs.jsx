@@ -76,6 +76,8 @@ const PatientTabs = ({ viewingPatientId }) => {
     padding: '0',
     width: '100%',
     maxWidth: '100vw',
+    overflowX: 'auto',
+    flexWrap: 'nowrap',
   };
 
   const tabStyle = (patientId, index) => ({
@@ -91,7 +93,11 @@ const PatientTabs = ({ viewingPatientId }) => {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    minWidth: '120px'
+    minWidth: '100px',
+    maxWidth: '150px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   });
 
   const generateLightColor = (index) => {
@@ -101,6 +107,12 @@ const PatientTabs = ({ viewingPatientId }) => {
 
   const handleAppointmentClick = () => {
     navigate('/appointments');
+  };
+
+  const handleRemovePatient = (patientId) => {
+    const updatedPatients = patients.filter(patient => patient.id !== patientId);
+    setPatients(updatedPatients);
+    localStorage.setItem('patientTabs', JSON.stringify(updatedPatients.map(patient => patient.id)));
   };
 
   const buttonStyle = {
@@ -125,11 +137,33 @@ const PatientTabs = ({ viewingPatientId }) => {
       )}
       <div style={tabContainerStyle}>
         {tabCreated && patients.map((patient, index) => (
-          <div key={patient.id}
-              onClick={() => handlePatientClick(patient.id)}
-              style={tabStyle(patient.id, index)}>
+          <div key={patient.id} style={tabStyle(patient.id, index)}>
+          <span onClick={() => handlePatientClick(patient.id)} style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}>
             {patient.firstName} {patient.middleName || ''} {patient.lastName}
-          </div>
+          </span>
+          <button
+            onClick={() => handleRemovePatient(patient.id)}
+            style={{
+              border: 'none',
+              background: 'none',
+              cursor: 'pointer',
+              padding: '0',
+              margin: '0',
+              width: '16px',
+              height: '16px',
+              lineHeight: '16px',
+              textAlign: 'center',
+              fontSize: '14px',
+              display: 'inline-block',
+              color: 'inherit'
+            }}
+          >
+            X
+        </button>
+        </div>
         ))}
         <div
           onClick={handleCreate}
