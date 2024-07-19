@@ -4,13 +4,15 @@
   "main": "../backend/dashboard_server/dashboard_server.js",
   "scripts": {
     "start": "node ../dashboard_server/dashboard_server.js",
-    "dev:all": "nodemon ../Backend/dashboard_server/dashboard_server.jss & nodemon ../Backend/patients_servers/patients_servers.js & nodemon ../Backend/users_servers/users_servers.js"
+    "dev:all": "nodemon ../Backend/dashboard_server/dashboard_server.jss & nodemon ../Backend/patients_servers/patients_servers.js & nodemon ../Backend/users_servers/users_servers.js & nodemon ../Backend/rekognition.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@aws-sdk/client-rekognition": "^3.614.0",
+    "@aws-sdk/config-resolver": "^3.374.0",
     "@prisma/client": "^5.16.2",
     "aws-sdk": "^2.1659.0",
     "bcrypt": "^5.1.1",

@@ -48,14 +48,13 @@ const Prescriptions = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:3002/prescriptions', {
+      const response = await fetch('http://localhost:3004/prescriptions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ prescriptions: prescriptions.map(prescription => ({ ...prescription, patientId: viewingPatientId })) })
       });
-      console.log(prescriptions);
       if (response.ok) {
         setPrescriptions([{
           name: '',

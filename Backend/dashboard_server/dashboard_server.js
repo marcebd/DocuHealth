@@ -29,10 +29,10 @@ app.get("/", (req, res) => {
 });
 
 app.get('/visitNotes/:patientId', async (req, res) => {
-  const patientId = req.params.patientId;
+  const patientId = req.params.patientId.replace(/"/g, '');
   try {
     const patientExists = await prisma.patient.findUnique({
-      where: { id: parseInt(patientId) }
+      where: { id: BigInt(patientId) }
     });
     if (!patientExists) {
       return res.status(404).json({ message: "Patient not found" });
@@ -56,7 +56,7 @@ app.post('/visitNotes', async (req, res) => {
   }
   try {
     const patientExists = await prisma.patient.findUnique({
-      where: { id: parseInt(patientId) }
+      where: { id: BigInt(patientId) }
     });
 
     if (!patientExists) {
@@ -116,10 +116,10 @@ app.post('/prescriptions', async (req, res) => {
 });
 
 app.get('/prescriptions/:patientId', async (req, res) => {
-  const patientId = req.params.patientId;
+  const patientId = req.params.patientId.replace(/"/g, '');
   try {
     const patientExists = await prisma.patient.findUnique({
-      where: { id: parseInt(patientId) }
+      where: { id: BigInt(patientId) }
     });
     if (!patientExists) {
       return res.status(404).json({ message: "Patient not found" });
@@ -136,8 +136,8 @@ app.get('/prescriptions/:patientId', async (req, res) => {
   }
 });
 
-app.listen(3002, () => {
-  console.log('Server running on port 3002');
+app.listen(3004, () => {
+  console.log('Server running on port 3004');
 });
 
 app.post('/conditions', async (req, res) => {
@@ -154,7 +154,7 @@ app.post('/conditions', async (req, res) => {
         return res.status(400).json({ message: "Missing required fields" });
       }
       const patientExists = await prisma.patient.findUnique({
-        where: { id: parseInt(patientId) }
+        where: { id: BigInt(patientId) }
       });
 
       if (!patientExists) {
@@ -179,19 +179,19 @@ app.post('/conditions', async (req, res) => {
 });
 
 app.get('/conditions/:patientId', async (req, res) => {
-  const patientId = req.params.patientId;
+  const patientId = req.params.patientId.replace(/"/g, ''); 
   try {
     const patientExists = await prisma.patient.findUnique({
-      where: { id: parseInt(patientId) }
+      where: { id: BigInt(patientId) }
     });
     if (!patientExists) {
       return res.status(404).json({ message: "Patient not found" });
     }
-    const conditions = await prisma.condition.findMany({where: {patientId: patientId}});
+    const conditions = await prisma.condition.findMany({where: {patientId: BigInt(patientId)}});
     conditions.forEach(condition => {
       condition.patientId = condition.patientId.toString();
       condition.id = condition.id.toString();
-    })
+    });
     return res.json(conditions);
   } catch (err) {
     console.error(err);

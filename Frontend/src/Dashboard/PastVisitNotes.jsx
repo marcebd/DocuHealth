@@ -9,7 +9,7 @@ const PastVisitNotes = ({ patientId }) => {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch(`http://localhost:3002/visitNotes/${patientId}`, {
+        const response = await fetch(`http://localhost:3004/visitNotes/${patientId}`, {
           method: 'GET',
         });
         if (!response.ok) {

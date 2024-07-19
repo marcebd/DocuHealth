@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Form, FormGroup, FormLabel, Button, Table } from 'react-bootstrap';
 import SearchBarPatient from './SearchBarPatient';
 import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
+import FacialRecognitionSearchButton from '../FacialRecognition/FacialRecognitionSearchButton';
+
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -15,7 +17,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-
+  //localStorage.removeItem("patientTabs");
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {
@@ -76,51 +78,50 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       setError("All fields in prescriptions and conditions must be filled.");
       return;
     }
-    const patientData = {
-      userId,
-      firstName,
-      middleName,
-      lastName,
-      idNumber,
-      birthDate,
-      prescriptions,
-      conditions,
-      imgSrc
-    };
+
+    const formData = new FormData();
+    formData.append('userId', userId);
+    formData.append('firstName', firstName);
+    formData.append('middleName', middleName);
+    formData.append('lastName', lastName);
+    formData.append('idNumber', idNumber);
+    formData.append('birthDate', birthDate);
+    if (imgSrc) {
+      formData.append('imgSrc', imgSrc);
+    }
+    formData.append('prescriptions', JSON.stringify(prescriptions));
+    formData.append('conditions', JSON.stringify(conditions));
 
     try {
       const response = await fetch('http://localhost:3001/patients', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(patientData)
+        body: formData,
       });
       const responseData = await response.json();
       if (!response.ok) {
-        setError('Failed to create patient:', responseData);
+        setError(`Failed to create patient: ${responseData.message}`);
       } else {
-        onCreate();
-        onClose();
-        const updatedPatientTabs = [...patientsInTabs, responseData.patient.id];
+        const updatedPatientTabs = [...patientsInTabs, responseData];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
-        localStorage.setItem('viewingPatient', responseData.patient.id);
+        localStorage.setItem('viewingPatient', responseData);
+        onCreate();
+        onClose();
         window.location.reload();
       }
     } catch (error) {
-      setError("Error creating patient:", error);
+      setError(`Error creating patient: ${error.message}`);
     }
-  };
+};
 
   const handlePatientClick = (patient) => {
     const updatedPatientTabs = [...patientsInTabs, patient.id];
     setPatientsInTabs(updatedPatientTabs);
     localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
     localStorage.setItem('viewingPatient', patient.id);
-    window.location.reload();
     onCreate();
     onClose();
+    window.location.reload();
   };
 
   return (
@@ -131,7 +132,14 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       </Modal.Header>
         <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: '0', justifyContent: 'space-evenly' }}>
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
-            <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+            <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+            <div>
+                <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+              </div>
+              <div style={{width: '20%'}} >
+                <FacialRecognitionSearchButton handlePatientClick={(handlePatientClick)}/>
+              </div>
+            </div>
             <Table striped bordered hover size="sm">
               <thead>
                 <tr>
@@ -176,7 +184,6 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
-
                 <FacialRecognitionPatientButton onImageCapture={(onImageCapture)}/>
               </FormGroup>
               <FormGroup>

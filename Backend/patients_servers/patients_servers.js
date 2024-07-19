@@ -1,14 +1,18 @@
+const { pool } = require("/Users/marcebd/Desktop/DocuHealth/Backend/dbConfig.js");
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+const passport = require("passport");
+const session = require("express-session");
+const cors = require("cors");
+const flash = require("connect-flash");
 require("dotenv").config();
 const { PrismaClient } = require('@prisma/client');
+const { initialize } = require("../passportConfig");
+initialize(passport);
 const express = require('express');
 const prisma = new PrismaClient();
 const app = express();
-const cors = require("cors");
-const session = require("express-session");
-const flash = require("connect-flash");
-const passport = require("passport");
-const path = require('path');
-const fs = require('fs');
 
 // Middleware
 app.use(express.json());
@@ -42,58 +46,38 @@ app.listen(3001, () => {
   console.log('Server running on port 3001');
 });
 
-app.post("/patients", async (req, res) => {
-  const { userId, firstName, middleName, lastName, idNumber, birthDate, prescriptions, conditions, imgSrc } = req.body;
-  if (!userId) {
-    return res.status(400).json({ message: "userId is required" });
-  }
-
+app.post("/patients", upload.single('imgSrc'), async (req, res) => {
   try {
-    // Fetch the number of patients that specific user had
-    const patients = await prisma.patient.findMany({ where: { userId: userId } });
-    const numberOfPatients = patients.length;
+    const birthDate = new Date(req.body.birthDate);
+    const prescriptions = JSON.parse(req.body.prescriptions).map(prescription => ({
+      ...prescription,
+      dateStart: new Date(prescription.dateStart),
+      dateEnd: new Date(prescription.dateEnd)
+    }));
+    const conditions = JSON.parse(req.body.conditions).map(condition => ({
+      ...condition,
+      dateStart: new Date(condition.dateStart),
+      dateEnd: new Date(condition.dateEnd)
+    }));
 
-    // Process the image file
-    const imageData = imgSrc;
-    const buffer = Buffer.from(imageData, 'base64');
-
-    const filename = `patient-${numberOfPatients + 1}.jpg`;
-    const filepath = path.join(process.cwd(), 'public', 'images', filename);
-    fs.writeFileSync(filepath, buffer);
-
-    // Create a new patient record
-    const patient = await prisma.patient.create({
+    const newPatient = await prisma.patient.create({
       data: {
-        userId: parseInt(userId),
-        firstName,
-        middleName,
-        lastName,
-        idNumber,
-        birthDate: new Date(birthDate),
-        picture: buffer.toString('base64'),
-        prescriptions: {
-          create: prescriptions.map(prescription => ({
-            name: prescription.name,
-            dose: prescription.dose,
-            instructions: prescription.instructions,
-            dateStart: new Date(prescription.dateStart),
-            dateEnd: prescription.dateEnd ? new Date(prescription.dateEnd) : null
-          }))
-        },
-        conditions: {
-          create: conditions.map(condition => ({
-            name: condition.name,
-            dateStart: new Date(condition.dateStart),
-            dateEnd: condition.dateEnd ? new Date(condition.dateEnd) : null
-          }))
-        }
-      }
+        userId: parseInt(req.body.userId),
+        firstName: req.body.firstName,
+        middleName: req.body.middleName,
+        lastName: req.body.lastName,
+        idNumber: req.body.idNumber,
+        birthDate: birthDate,
+        picture: req.file ? req.file.buffer : null,
+        prescriptions: { create: prescriptions },
+        conditions: { create: conditions }
+      },
     });
-    const serializedPatient = JSON.stringify(patient, replacer);
-
-    res.status(201).json({ message: "Patient created successfully", serializedPatient });
+    const serializedPatient = JSON.stringify(newPatient.id, replacer);
+    res.json(serializedPatient);
+    console.log("Serialized Patient", serializedPatient);
   } catch (error) {
-    console.error("Error creating patient", error);
+    console.log("Failed");
     res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
 });
@@ -122,18 +106,36 @@ app.get("/users/:userId/patients", async (req, res) => {
     if (!patientIds || patientIds.length === 0) {
       return res.status(400).json({ message: "No patient IDs provided" });
     }
-    const patientsData = await Promise.all(patientIds.map(async (id) => {
-      id = parseInt(id);
-      const patient = await prisma.patient.findUnique({ where: { id } });
-      return {
-        id,
-        firstName: patient.firstName,
-        middleName: patient.middleName,
-        lastName: patient.lastName,
-      };
+    const cleanedPatientIds = patientIds.map(id => {
+      const cleanedId = id.replace(/^"|"$/g, '');
+      return BigInt(cleanedId);
+    }).filter(id => id !== null);
+    try {
+        const patientsData = await fetchPatientsData(cleanedPatientIds);
+        res.status(200).json(patientsData);
+    } catch (error) {
+        res.status(500).json({ message: "Failed to fetch patient data" });
+    }
+});
+
+async function fetchPatientsData(patientIds) {
+    const patients = await Promise.all(patientIds.map(async (id) => {
+        const patient = await prisma.patient.findUnique({
+            where: { id }
+        });
+        if (!patient) {
+            console.error("No patient found for ID:", id);
+            return null;
+        }
+        return {
+            id: patient.id.toString(),
+            firstName: patient.firstName,
+            middleName: patient.middleName,
+            lastName: patient.lastName
+        };
     }));
-    return res.json(patientsData);
-  });
+    return patients.filter(patient => patient !== null);
+}
 
 
   app.post("/img/:id", async (req, res) => {
@@ -156,24 +158,5 @@ app.get("/users/:userId/patients", async (req, res) => {
       res.status(201).json({message: 'Patient Picture Was Saved Successfully.'})
     } catch{
       res.status(500).json({ message: "Error Saving Patient's Picture, try again." });
-    }
-  });
-
-  app.delete("/img/:id", async (req, res) => {
-    const patientId = req.params.userId;
-    if (!patientId) {
-      return res.status(400).json({ message: "No patient IDs provided" });
-    }
-    try {
-      const patient = await prisma.patient.findUnique({ where: { id: patientId } });
-      if (!patient) {
-        return res.status(404).json({ message: "Patient not found" });
-      }
-      await prisma.picture.delete({
-        where: { patientId: parseInt(patientId) },
-      });
-      res.status(200).json({ message: "Patient Picture Was Deleted Successfully." })
-    } catch {
-      res.status(500).json({ message: "Error Deleting Patient's Picture, try again." });
     }
   });
