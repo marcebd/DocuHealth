@@ -3,7 +3,24 @@ import PastVisitNotes from './PastVisitNotes';
 
 const Notepad = () => {
   const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
-  const [note, setNote] = useState('');
+  const [note, setNote] = useState(
+`Weight:
+Temperature:
+Heart Rate:
+Blood Oxygen:
+Blood Pressure:
+
+Laboratory Data:
+
+Imaging Results:
+
+Patient's Reason For Visit:
+
+Observations:
+
+Assessment:
+
+Plan: `);
   const [visitDate, setVisitDate] = useState('');
   const [error, setError] = useState('');
   useEffect(() => {
@@ -16,6 +33,11 @@ const Notepad = () => {
 
     return () => clearInterval(intervalId);
   }, [viewingPatientId]);
+
+  useEffect(() => {
+    const currentDate = new Date();
+    setVisitDate(currentDate.toISOString().split('T')[0]);
+  }, []);
 
   const handleNoteChange = (event) => {
     setNote(event.target.value);
@@ -67,23 +89,7 @@ const Notepad = () => {
           <span style={{ fontSize: '1.2em' }}>Visit Date:</span>
           <input type="date" value={visitDate} onChange={(event) => { setVisitDate(event.target.value); setError(''); }} style={{ marginLeft: '10px' }} />
         </label>
-        <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }} defaultValue={`Weight:
-Temperature:
-Heart Rate:
-Blood Oxygen:
-Blood Pressure:
-
-Laboratory Data:
-
-Imaging Results:
-
-Patient's Reason For Visit:
-
-Observations:
-
-Assessment:
-
-Plan: `} />
+        <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }}  />
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
           <button type="submit" style={{fontWeight:'bold'}} >Save Note</button>
         </div>
