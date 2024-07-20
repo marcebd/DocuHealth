@@ -67,7 +67,23 @@ const Notepad = () => {
           <span style={{ fontSize: '1.2em' }}>Visit Date:</span>
           <input type="date" value={visitDate} onChange={(event) => { setVisitDate(event.target.value); setError(''); }} style={{ marginLeft: '10px' }} />
         </label>
-        <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }} />
+        <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }} defaultValue={`Weight:
+Temperature:
+Heart Rate:
+Blood Oxygen:
+Blood Pressure:
+
+Laboratory Data:
+
+Imaging Results:
+
+Patient's Reason For Visit:
+
+Observations:
+
+Assessment:
+
+Plan: `} />
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
           <button type="submit" style={{fontWeight:'bold'}} >Save Note</button>
         </div>
