@@ -6,6 +6,7 @@ const PastVisitNotes = ({ patientId }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState('');
   const [updatedNote, setUpdatedNote] = useState('');
+  const [error, setError] = useState('');  // State to hold error message
 
   useEffect(() => {
     async function fetchData() {
@@ -15,12 +16,14 @@ const PastVisitNotes = ({ patientId }) => {
         });
         if (!response.ok) {
           console.error('Failed to fetch visit notes:', response);
+          setError('Failed to fetch visit notes.');
         } else {
           const data = await response.json();
           setVisitNotes(data);
         }
       } catch (error) {
         console.error('Error fetching visit notes:', error);
+        setError('An error occurred while fetching visit notes.');
       }
     }
     fetchData();
@@ -29,10 +32,12 @@ const PastVisitNotes = ({ patientId }) => {
   const openModal = (note) => {
     setSelectedNote(note);
     setShowModal(true);
+    setError('');  // Clear any existing errors when opening the modal
   };
 
   const closeModal = () => {
     setShowModal(false);
+    setError('');  // Clear errors on modal close
   };
 
   const handleSubmit = async () => {
@@ -49,6 +54,7 @@ const PastVisitNotes = ({ patientId }) => {
 
       if (!response.ok) {
         const responseData = await response.json();
+        console.error('Failed to update note:', responseData);
         setError('Failed to save the updated note. Please try again.');
         return;
       }
@@ -56,12 +62,9 @@ const PastVisitNotes = ({ patientId }) => {
       closeModal();
       window.location.reload();
     } catch (error) {
+      console.error("Error updating note:", error);
       setError(`An error occurred while saving the updated note: ${error}`);
     }
-  };
-
-  const setError = (error) => {
-    console.log(error);
   };
 
   return (
@@ -91,7 +94,7 @@ const PastVisitNotes = ({ patientId }) => {
           <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any notes.</p>
         )}
 
-<Modal show={showModal} onHide={closeModal} centered>
+        <Modal show={showModal} onHide={closeModal} centered>
           <Modal.Dialog style={{
             width: '70vw',
             height: '20vh',
@@ -109,6 +112,7 @@ const PastVisitNotes = ({ patientId }) => {
               backgroundColor: 'white',
               flexGrow: 1,
             }}>
+              {error && <p style={{ color: 'red' }}>{error}</p>}
               {selectedNote && (
                 <>
                   <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
@@ -117,18 +121,17 @@ const PastVisitNotes = ({ patientId }) => {
                     <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
                   </div>
                 </>
-              )}
-            </Modal.Body>
-            <Modal.Footer style={{ width: '100%', borderTop: '1px solid #dee2e6' }}>
-              <Button variant="secondary" onClick={handleSubmit}>
-                Submit
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal>
+                )}
+                </Modal.Body>
+                <Modal.Footer style={{ width: '100%', borderTop: '1px solid #dee2e6' }}>
+                  <Button variant="secondary" onClick={handleSubmit}>
+                  Submit
+                  </Button>
+                </Modal.Footer>
+            </Modal.Dialog>
+          </Modal>
       </div>
     </div>
-  );
-};
-
-export default PastVisitNotes;
+                );
+                };
+                export default PastVisitNotes;
