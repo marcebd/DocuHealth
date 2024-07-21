@@ -35,8 +35,14 @@ const PastConditions = ({ patientId }) => {
     setShowModal(false);
   };
 
-  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
+  const handleSubmit = () => {
+    // Save the updated condition to a variable called updatedComponent
+    const updatedComponent = selectedCondition;
+    // Do something with the updated component, e.g. send it to the server
+  };
 
+  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
+  console.log(selectedCondition);
   return (
     <>
       <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
@@ -45,7 +51,8 @@ const PastConditions = ({ patientId }) => {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Date</th>
+                <th>Date Start</th>
+                <th>Date End</th>
               </tr>
             </thead>
             <tbody>
@@ -53,6 +60,7 @@ const PastConditions = ({ patientId }) => {
                 <tr key={condition.id} onClick={() => handleRowClick(condition)}>
                   <td>{condition.name}</td>
                   <td>{new Date(condition.dateStart).toLocaleDateString()}</td>
+                  <td>{new Date(condition.dateEnd).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -67,16 +75,17 @@ const PastConditions = ({ patientId }) => {
           <Modal.Title>Condition Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedCondition && (
-            <>
-              <p><strong>Name:</strong> {selectedCondition.name}</p>
-              <p><strong>Date:</strong> {new Date(selectedCondition.date).toLocaleDateString()}</p>
-            </>
-          )}
-        </Modal.Body>
+        {selectedCondition && (
+          <>
+            <p><strong>Name:</strong> <input type="text" name="idNumber" defaultValue={selectedCondition.name} onChange={(e) => setUpdatedConditionName(e.target.value)}/></p>
+            <p><strong>Date Start:</strong> <input type="date" name="dateStart" defaultValue={selectedCondition.dateStart.slice(0, 10)} onChange={(e) => setUpdatedConditionDateStart(e.target.value)}/></p>
+            <p><strong>Date End:</strong> <input type="date" name="dateEnd" defaultValue={selectedCondition.dateEnd.slice(0, 10)} onChange={(e) => setUpdatedConditionDateEnd(e.target.value)}/></p>
+          </>
+        )}
+      </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
+          <Button variant="secondary" onClick={handleSubmit}>
+            Submit
           </Button>
         </Modal.Footer>
       </Modal>
