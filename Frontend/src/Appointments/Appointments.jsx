@@ -3,9 +3,9 @@ import Scheduler from "./Scheduler";
 
 function Appointments() {
     return (
-        <div>
-            <Scheduler />
+        <div style={{display:'flex', flexDirection: 'row'}}>
             <Calendar/>
+            <Scheduler />
         </div>
     )
 }

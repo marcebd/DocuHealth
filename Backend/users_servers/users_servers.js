@@ -27,7 +27,7 @@ app.listen(3000, () => {
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5174',
+    origin: 'http://localhost:5175',
     credentials: true,
 }));
 app.use(express.urlencoded({ extended: false }));

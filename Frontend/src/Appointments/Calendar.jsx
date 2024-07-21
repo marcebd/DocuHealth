@@ -3,17 +3,20 @@ import CalendarReact from 'react-calendar';
 import axios from 'axios';
 import moment from 'moment';
 import 'react-calendar/dist/Calendar.css';
+import DayView from './DayView';
+import WeekView from './WeekView';
 
 function Calendar() {
     const [date, setDate] = useState(new Date());
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const userId = JSON.parse(localStorage.getItem('userId')); 
+    const [view, setView] = useState('month');
+    const userId = JSON.parse(localStorage.getItem('userId'));
 
     useEffect(() => {
         fetchAppointments();
-    }, [date]);
+    }, [date, view]);
 
     const fetchAppointments = async () => {
         setLoading(true);
@@ -26,13 +29,11 @@ function Calendar() {
                     ...appointment,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    email: user.email
+                    email: user.email,
+                    time: moment(appointment.appointmentTime)
                 }))
             );
-            const filteredAppointments = allAppointments.filter(appointment =>
-                moment(appointment.appointmentTime).isSame(date, 'day')
-            );
-            setAppointments(filteredAppointments);
+            setAppointments(allAppointments);
             setLoading(false);
         } catch (error) {
             console.error('Failed to fetch appointments:', error);
@@ -45,6 +46,20 @@ function Calendar() {
         setDate(newDate);
     };
 
+    const handleViewChange = (event) => {
+        setView(event.target.value);
+    };
+
+    const renderCalendar = () => {
+        if (view === 'month') {
+            return <CalendarReact onChange={onChange} value={date} />;
+        } else if (view === 'day') {
+            return <DayView appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))} date={date} style={{width: '65%', maxHeight: '100%'}} />;
+        } else if (view === 'week') {
+            return <WeekView appointments={appointments.filter(app => moment(app.time).isSame(date, 'isoWeek'))} date={date} />;
+        }
+    };
+
     return (
         <div style={{
             display: 'flex',
@@ -52,40 +67,25 @@ function Calendar() {
             alignItems: 'center',
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            width: '45%',
-            maxHeight: '80vh',
+            width: '70%',
+            maxHeight: '90vh',
             overflow: 'auto',
-            padding: '20px',
+            padding:'20px',
             margin: '20px auto',
             borderRadius: '8px',
             border: '1px solid #ccc',
             boxSizing: 'border-box'
         }}>
-            <CalendarReact
-                onChange={onChange}
-                value={date}
-                className="react-calendar"
-            />
-            {loading && <p>Loading appointments...</p>}
+        <select value={view} onChange={handleViewChange} style={{ marginBottom: '20px' }}>
+            <option value="month">Month</option>
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+        </select>
+        {renderCalendar()}
+        {loading &&
+            <p>Loading appointments...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {!loading && !error && (
-                <div>
-                    <h2>Appointments on {moment(date).format('MMMM Do YYYY')}</h2>
-                    {appointments.length > 0 ? (
-                        <ul>
-                            {appointments.map((appointment, index) => (
-                                <li key={index}>
-                                    {moment(appointment.appointmentTime).format('h:mm A')} - {appointment.firstName} {appointment.lastName} ({appointment.email})
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No appointments for this day.</p>
-                    )}
-                </div>
-            )}
         </div>
     );
 }
-
 export default Calendar;
