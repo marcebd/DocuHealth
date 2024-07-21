@@ -1,9 +1,9 @@
 import React from 'react';
 import moment from 'moment';
 
-const DayView = ({ appointments, date }) => {
+const DayView = ({ appointments, date, setDate }) => {
     if (!appointments) {
-        return <div>Loading appointments...</div>; // Or any other placeholder
+        return <div>Loading appointments...</div>;
     }
 
     const hours = Array.from({ length: 24 }, (_, i) => ({
@@ -19,8 +19,6 @@ const DayView = ({ appointments, date }) => {
     hours.forEach(hour => {
         hour.appointments.sort((a, b) => moment(a.time).minute() - moment(b.time).minute());
     });
-
-    // Group appointments by exact start time within each hour
     const groupAppointmentsByTime = (appointments) => {
         const groups = {};
         appointments.forEach(appointment => {
@@ -32,10 +30,22 @@ const DayView = ({ appointments, date }) => {
         });
         return Object.values(groups);
     };
+    const navigateDay = (direction) => {
+        const newDate = moment(date).add(direction, 'days');
+        setDate(newDate.toDate());
+    };
 
     return (
-        <div style={{ width: '100%', overflowX: 'auto', padding: '10px' }}>
-            <h2 style={{ textAlign: 'center' }}>{moment(date).format('dddd, MMMM Do YYYY')}</h2>
+        <div style={{ width: '70%', overflowX: 'auto', padding: '10px', maxWidth: '70vw' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <button onClick={() => navigateDay(-1)} style={{ marginRight: '20px' }}>&lt; Previous</button>
+                <div style={{display:'flex'}}>
+                <h3 style={{ width: '100%', textAlign: 'center' }}>
+                    {moment(date).format('dddd, MMMM Do YYYY')}
+                </h3>
+                </div>
+                <button onClick={() => navigateDay(1)} style={{ marginLeft: '20px' }}> &gt; Next</button>
+            </div>
             {hours.map((hour, index) => (
                 <div key={index} style={{ minHeight: '15vh', position: 'relative', border: '1px solid #ddd', padding: '5px' }}>
                     <strong>{moment({ hour: hour.hour }).format('ha')}</strong>

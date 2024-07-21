@@ -54,7 +54,7 @@ function Calendar() {
         if (view === 'month') {
             return <CalendarReact onChange={onChange} value={date} />;
         } else if (view === 'day') {
-            return <DayView appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))} date={date} style={{width: '65%', maxHeight: '100%'}} />;
+            return <DayView appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))} date={date} setDate={setDate} />;
         } else if (view === 'week') {
             return <WeekView appointments={appointments.filter(app => moment(app.time).isSame(date, 'isoWeek'))} date={date} />;
         }
