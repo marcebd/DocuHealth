@@ -137,7 +137,7 @@ function Scheduler() {
                     min="1"
                     value={setting.number}
                     onChange={e => handleNotificationChange(index, 'number', parseInt(e.target.value))}
-                    style={{ width: '50px', marginRight: '10px', backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', width: '20%'}}
+                    style={{ marginRight: '10px', backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', width: '20%'}}
                     />
                     <select
                         id={`advanceUnit-${index}`}

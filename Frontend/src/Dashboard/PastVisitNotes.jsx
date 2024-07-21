@@ -100,7 +100,6 @@ const PastVisitNotes = ({ patientId }) => {
             flexDirection: 'column',
             justifyContent: 'space-between',
             margin: '0',
-            justifyContent: 'center'
           }}>
             <Modal.Header closeButton style={{ width: '100%', borderBottom: '1px solid #dee2e6' }}>
               <Modal.Title>Note Details</Modal.Title>

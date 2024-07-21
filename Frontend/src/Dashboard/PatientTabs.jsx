@@ -76,8 +76,6 @@ const PatientTabs = ({ viewingPatientId }) => {
     padding: '0',
     width: '100%',
     maxWidth: '100vw',
-    overflowX: 'auto',
-    flexWrap: 'nowrap',
   };
 
   const tabStyle = (patientId, index) => ({
