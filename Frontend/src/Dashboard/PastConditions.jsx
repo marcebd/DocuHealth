@@ -41,7 +41,7 @@ const PastConditions = ({ patientId }) => {
 
   const handleSubmit = async () => {
     const updatedCondition = {
-      name: updatedConditionName,
+      name: updatedConditionName ? updatedConditionName: selectedCondition.name,
       dateStart: updatedConditionDateStart ? updatedConditionDateStart : selectedCondition.dateStart.slice(0, 10),
       dateEnd: updatedConditionDateEnd ? updatedConditionDateEnd : selectedCondition.dateEnd.slice(0, 10)
     };

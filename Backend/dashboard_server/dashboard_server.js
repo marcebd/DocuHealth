@@ -253,7 +253,41 @@ app.post('/conditions/update/:conditionId', async (req, res) => {
     };
     return res.json(responseObj);
   } catch (error) {
-    return res.status(500).json({ message: 'Error updating condition' });
+    return res.status(500).json({ message: error.message, error: error.error});
+  }
+});
+
+app.post('/prescriptions/update/:prescriptionId', async (req, res) => {
+  const { prescriptionId } = req.params;
+  const { prescription } = req.body;
+  try {
+    const prescriptionExists = await prisma.prescription.findUnique({
+      where: { id: BigInt(prescriptionId) }
+    });
+
+    if (!prescriptionExists) {
+      return res.status(404).json({ message: "Prescription not found" });
+    }
+
+    const updatedPrescription = await prisma.prescription.update({
+      where: { id: BigInt(prescriptionId) },
+      data: {
+        name: prescription.name,
+        dose: prescription.dose,
+        instructions: prescription.instructions,
+        dateStart: new Date(prescription.dateStart),
+        dateEnd: new Date(prescription.dateEnd)
+      }
+    });
+
+    const responseObj = {
+      ...updatedPrescription,
+      id: updatedPrescription.id.toString(),
+      patientId: updatedPrescription.patientId.toString()
+    };
+    return res.json(responseObj);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error: error.error });
   }
 });
 
