@@ -35,9 +35,33 @@ const PastVisitNotes = ({ patientId }) => {
     setShowModal(false);
   };
 
-  const handleSubmit = () => {
-    setUpdatedNote(selectedNote.notes);
-    closeModal();
+  const handleSubmit = async () => {
+    try {
+      const notesData = { notes: updatedNote };
+
+      const response = await fetch(`http://localhost:3002/visitNotes/update/${selectedNote.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(notesData)
+      });
+
+      if (!response.ok) {
+        const responseData = await response.json();
+        setError('Failed to save the updated note. Please try again.');
+        return;
+      }
+      setUpdatedNote('');
+      closeModal();
+      window.location.reload();
+    } catch (error) {
+      setError(`An error occurred while saving the updated note: ${error}`);
+    }
+  };
+
+  const setError = (error) => {
+    console.log(error);
   };
 
   return (
@@ -67,7 +91,7 @@ const PastVisitNotes = ({ patientId }) => {
           <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any notes.</p>
         )}
 
-        <Modal show={showModal} onHide={closeModal} centered>
+<Modal show={showModal} onHide={closeModal} centered>
           <Modal.Dialog style={{
             width: '70vw',
             height: '20vh',
@@ -90,7 +114,7 @@ const PastVisitNotes = ({ patientId }) => {
                   <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
                   <p><strong>Note:</strong></p>
                   <div style={{display:'flex', justifyContent: 'center'}}>
-                  <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
+                    <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
                   </div>
                 </>
               )}

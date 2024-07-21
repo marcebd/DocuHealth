@@ -200,6 +200,35 @@ app.get('/conditions/:patientId', async (req, res) => {
   }
 });
 
+app.post('/visitNotes/update/:visitId', async (req, res) => {
+  const { visitId } = req.params;
+  const { notes } = req.body;
+  try {
+    const noteExists = await prisma.visitNote.findUnique({
+      where: { id: BigInt(visitId) }
+    });
+
+    if (!noteExists) {
+      console.log("Note not found");
+      return res.status(404).json({ message: "Visit Note not found" });
+    }
+
+    const updatedVisitNote = await prisma.visitNote.update({
+      where: { id: BigInt(visitId) },
+      data: { notes: notes }
+    });
+
+    const responseObj = {
+      ...updatedVisitNote,
+      id: updatedVisitNote.id.toString(),
+      patientId: updatedVisitNote.patientId.toString()
+    };
+    return res.json(responseObj);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating note' });
+  }
+});
+
 /*********  Helper Functions *********/
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
