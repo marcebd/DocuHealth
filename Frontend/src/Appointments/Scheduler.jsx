@@ -65,23 +65,44 @@ function Scheduler() {
     };
 
     return (
-        <div style={{ outline: '2px solid black', padding: '20px', margin: '20px', backgroundColor: 'white' }}>
-        <h2 style={{ color: 'black' }}>Scheduler</h2>
-        <form onSubmit={handleSubmit}>
+        <div style={{
+            outline: 'none',
+            padding: '20px',
+            margin: '20px auto',
+            backgroundColor: 'white',
+            width: '45%',
+            maxHeight: '50vh',
+            overflowY: 'auto',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+            borderRadius: '8px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+        }}>
+        <h2 style={{
+            color: 'black',
+            textAlign: 'center',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+            padding: '10px',
+            borderRadius: '5px'
+        }}>
+        Scheduler
+        </h2>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <div>
-            <label htmlFor="appointmentTime" style={{ color: 'black' }}>Appointment Time:<span style={{ color: 'red' }}>*</span></label>
+            <label htmlFor="appointmentTime" style={{ color: 'black', marginBottom: '5px' }}>Appointment Time:<span style={{ color: 'red' }}>*</span></label>
             <input
                 type="datetime-local"
                 id="appointmentTime"
                 value={appointmentTime}
                 onChange={e => setAppointmentTime(e.target.value)}
-                style={{ backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', padding: '10px' }}
+                style={{ backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', padding: '10px', width: 'auto', marginLeft:'2%' }}
             />
             </div>
             <div>
-            <label style={{ color: 'black' }}>Time Zone:<span style={{ color: 'red' }}>*</span> {timeZone}</label>
-            <p onClick={() => setShowTimeZoneDropdown(true)} style={{color: 'blue'}}>This is not the patient's timezone.</p>
+            <label style={{ color: 'black', marginBottom: '5px' }}>Time Zone:<span style={{ color: 'red' }}>*</span> {timeZone}</label>
+            <p onClick={() => setShowTimeZoneDropdown(true)} style={{color: 'red', cursor: 'pointer', marginBottom: '5px'}}>This is not the patient's timezone.</p>
             {showTimeZoneDropdown && (
                 <select
                 value={timeZone}
@@ -89,7 +110,7 @@ function Scheduler() {
                     setTimeZone(e.target.value);
                     setShowTimeZoneDropdown(false);
                 }}
-                style={{ marginLeft: '10px', backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', padding: '10px' }}
+                style={{ marginLeft: '10px', backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', padding: '10px', width: 'calc(100% - 10px)' }}
                 >
                 {Object.keys(moment.tz.names()).map((key) => (
                     <option key={key} value={moment.tz.names()[key]}>{moment.tz.names()[key]}</option>
@@ -101,45 +122,105 @@ function Scheduler() {
             {timeZoneConfirmed ? (
                 <p>Time Zone Confirmed</p>
             ) : (
-                <button type="button" onClick={handleConfirmTimeZone}>Confirm Time Zone</button>
+                <div style={{display:'flex', justifyContent: 'space-around'}}>
+                <button type="button" onClick={handleConfirmTimeZone} style={{ backgroundColor: 'lightgrey', color: 'black', border: 'none', borderRadius: '5px', padding: '10px' }}>Confirm Time Zone</button>
+                </div>
             )}
             </div>
             {notificationSettings.map((setting, index) => (
-            <div key={index}>
-                            <label htmlFor={`advanceNumber-${index}`} style={{ color: 'black' }}>Advance Notification:</label>
-                <input
-                type="number"
-                id={`advanceNumber-${index}`}
-                min="1"
-                value={setting.number}
-                onChange={e => handleNotificationChange(index, 'number', parseInt(e.target.value))}
-                style={{ width: '50px', marginRight: '10px', backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px'}}
-                />
-                <select
-                id={`advanceUnit-${index}`}
-                value={setting.frequency}
-                onChange={e => handleNotificationChange(index, 'frequency', e.target.value)}
-                style={{ backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', padding: '10px' }}
-                >
-                <option value="minute">minute</option>
-                <option value="hour">hour</option>
-                <option value="day">day</option>
-                <option value="week">week</option>
-                <option value="month">month</option>
-                </select>
+            <div key={index} style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
+                <label htmlFor={`advanceNumber-${index}`} style={{ color: 'black' }}>Advance Notification:</label>
+                <div style={{display:'flex', justifyContent: 'flex-start'}}>
+                    <input
+                    type="number"
+                    id={`advanceNumber-${index}`}
+                    min="1"
+                    value={setting.number}
+                    onChange={e => handleNotificationChange(index, 'number', parseInt(e.target.value))}
+                    style={{ width: '50px', marginRight: '10px', backgroundColor: 'white', border: '1px solid lightgrey', borderRadius: '5px', width: '20%'}}
+                    />
+                    <select
+                        id={`advanceUnit-${index}`}
+                        value={setting.frequency}
+                        onChange={e => handleNotificationChange(index, 'frequency', e.target.value)}
+                        style={{
+                            backgroundColor: 'white',
+                            border: '1px solid lightgrey',
+                            borderRadius: '5px',
+                            padding: '10px',
+                            width: '50%'
+                        }}
+                        >
+                        <option value="minute">minute</option>
+                        <option value="hour">hour</option>
+                        <option value="day">day</option>
+                        <option value="week">week</option>
+                        <option value="month">month</option>
+                    </select>
+                </div>
             </div>
             ))}
-            <button type="button" onClick={handleAddNotification} style={{ backgroundColor: 'lightgrey', color: 'black', border: 'none', borderRadius: '5px', padding: '10px' }}>Add Another Notification</button>
-            <button type="submit" style={{ backgroundColor: 'lightgrey', color: 'black', border: 'none', borderRadius: '5px', padding: '10px' }}>Schedule Appointment</button>
-        </form>
-        {showModal && (
-            <AppointmentConfirmation
-            appointment={appointment}
-            show={showModal}
-            handleClose={handleCloseModal}
-            />
-        )}
-        </div>
+            <button
+            type="button"
+            onClick={handleAddNotification}
+            style={{
+                backgroundColor: 'white',
+                color: 'black',
+                border: 'none',
+                borderRadius: '5px',
+                padding: '10px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: 'pointer'
+            }}
+            onMouseOver={e => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.cursor = 'pointer';
+            }}
+            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+            Add Another Notification
+            </button>
+            <button
+            type="submit"
+            style={{
+                backgroundColor: 'white',
+                color: 'black',
+                border: 'none',
+                borderRadius: '5px',
+                padding: '10px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: 'pointer'
+            }}
+            onMouseOver={e => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.cursor = 'pointer';
+            }}
+            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+            >
+            Schedule Appointment
+            </button>
+            </form>
+            {showModal && (
+                <AppointmentConfirmation
+                appointment={appointment}
+                show={showModal}
+                handleClose={handleCloseModal}
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: 'white',
+                    padding: '20px',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                    zIndex: 1000
+                }}
+                />
+            )}
+            </div>
     );
 }
 
