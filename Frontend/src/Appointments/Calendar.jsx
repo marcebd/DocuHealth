@@ -52,7 +52,7 @@ function Calendar() {
 
     const renderCalendar = () => {
         if (view === 'month') {
-            return <CalendarReact onChange={onChange} value={date} />;
+            return <CalendarReact onChange={onChange} value={date} style={{width: '100%'}}/>;
         } else if (view === 'day') {
             return <DayView appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))} date={date} setDate={setDate} />;
         } else if (view === 'week') {
@@ -67,7 +67,8 @@ function Calendar() {
             alignItems: 'center',
             backgroundColor: '#fff',
             boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            width: '70%',
+            maxWidth: '45%',
+            width: '45%',
             maxHeight: '90vh',
             overflow: 'auto',
             padding:'20px',
