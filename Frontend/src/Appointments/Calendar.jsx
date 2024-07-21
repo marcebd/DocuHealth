@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CalendarReact from 'react-calendar';
+import axios from 'axios';
 import moment from 'moment';
 import 'react-calendar/dist/Calendar.css';
 
@@ -8,6 +9,7 @@ function Calendar() {
     const [appointments, setAppointments] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const userId = JSON.parse(localStorage.getItem('userId')); 
 
     useEffect(() => {
         fetchAppointments();
@@ -17,11 +19,26 @@ function Calendar() {
         setLoading(true);
         setError(null);
         try {
-
+            const response = await axios.get(`http://localhost:3001/appointments/scheduled/${userId}`);
+            const users = JSON.parse(response.data);
+            const allAppointments = users.flatMap(user =>
+                user.appointments.map(appointment => ({
+                    ...appointment,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email
+                }))
+            );
+            const filteredAppointments = allAppointments.filter(appointment =>
+                moment(appointment.appointmentTime).isSame(date, 'day')
+            );
+            setAppointments(filteredAppointments);
+            setLoading(false);
         } catch (error) {
-            
+            console.error('Failed to fetch appointments:', error);
+            setError('Failed to fetch appointments. Please try again later.');
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const onChange = newDate => {
@@ -58,7 +75,7 @@ function Calendar() {
                         <ul>
                             {appointments.map((appointment, index) => (
                                 <li key={index}>
-                                    {moment(appointment.time).format('h:mm A')} - {appointment.title}
+                                    {moment(appointment.appointmentTime).format('h:mm A')} - {appointment.firstName} {appointment.lastName} ({appointment.email})
                                 </li>
                             ))}
                         </ul>
