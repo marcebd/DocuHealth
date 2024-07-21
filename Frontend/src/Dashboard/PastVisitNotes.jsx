@@ -54,7 +54,6 @@ const PastVisitNotes = ({ patientId }) => {
 
       if (!response.ok) {
         const responseData = await response.json();
-        console.error('Failed to update note:', responseData);
         setError('Failed to save the updated note. Please try again.');
         return;
       }
@@ -62,7 +61,6 @@ const PastVisitNotes = ({ patientId }) => {
       closeModal();
       window.location.reload();
     } catch (error) {
-      console.error("Error updating note:", error);
       setError(`An error occurred while saving the updated note: ${error}`);
     }
   };
@@ -132,6 +130,6 @@ const PastVisitNotes = ({ patientId }) => {
           </Modal>
       </div>
     </div>
-                );
-                };
-                export default PastVisitNotes;
+  );
+};
+export default PastVisitNotes;

@@ -7,6 +7,10 @@ const PastConditions = ({ patientId }) => {
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const tableRef = useRef(null);
+  const [updatedConditionName, setUpdatedConditionName] = useState('');
+  const [updatedConditionDateStart, setUpdatedConditionDateStart] = useState('');
+  const [updatedConditionDateEnd, setUpdatedConditionDateEnd] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchConditions = async () => {
@@ -35,14 +39,37 @@ const PastConditions = ({ patientId }) => {
     setShowModal(false);
   };
 
-  const handleSubmit = () => {
-    // Save the updated condition to a variable called updatedComponent
-    const updatedComponent = selectedCondition;
-    // Do something with the updated component, e.g. send it to the server
+  const handleSubmit = async () => {
+    const updatedCondition = {
+      name: updatedConditionName,
+      dateStart: updatedConditionDateStart ? updatedConditionDateStart : selectedCondition.dateStart.slice(0, 10),
+      dateEnd: updatedConditionDateEnd ? updatedConditionDateEnd : selectedCondition.dateEnd.slice(0, 10)
+    };
+    const condition = {condition: updatedCondition};
+
+    try{
+      const response = await fetch(`http://localhost:3002/conditions/update/${selectedCondition.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(condition)
+      });
+      if (!response.ok) {
+        const responseData = await response.json();
+        console.error('Failed to update condition:', responseData);
+        setError('Failed to save the updated condition. Please try again.');
+        return;
+      }
+      setShowModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating condition:", error);
+      setError(`An error occurred while saving the updated condition: ${error}`);
+    }
   };
 
   const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
-  console.log(selectedCondition);
   return (
     <>
       <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
@@ -75,6 +102,7 @@ const PastConditions = ({ patientId }) => {
           <Modal.Title>Condition Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         {selectedCondition && (
           <>
             <p><strong>Name:</strong> <input type="text" name="idNumber" defaultValue={selectedCondition.name} onChange={(e) => setUpdatedConditionName(e.target.value)}/></p>

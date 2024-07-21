@@ -229,6 +229,34 @@ app.post('/visitNotes/update/:visitId', async (req, res) => {
   }
 });
 
+app.post('/conditions/update/:conditionId', async (req, res) => {
+  const { conditionId } = req.params;
+  const { condition } = req.body;
+  try {
+    const conditionExisits = await prisma.condition.findUnique({
+      where: { id: BigInt(conditionId) }
+    });
+
+    if (!conditionExisits) {
+      return res.status(404).json({ message: "Condition not found" });
+    }
+
+    const updatedCondition = await prisma.condition.update({
+      where: { id: BigInt(conditionId) },
+      data: { name: condition.name, dateStart: new Date(condition.dateStart), dateEnd: new Date(condition.dateEnd) }
+    });
+
+    const responseObj = {
+      ...updatedCondition,
+      id: updatedCondition.id.toString(),
+      patientId: updatedCondition.patientId.toString()
+    };
+    return res.json(responseObj);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating condition' });
+  }
+});
+
 /*********  Helper Functions *********/
 function checkAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
