@@ -5,6 +5,8 @@ const PastVisitNotes = ({ patientId }) => {
   const [visitNotes, setVisitNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState('');
+  const [updatedNote, setUpdatedNote] = useState('');
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -31,6 +33,11 @@ const PastVisitNotes = ({ patientId }) => {
 
   const closeModal = () => {
     setShowModal(false);
+  };
+
+  const handleSubmit = () => {
+    setUpdatedNote(selectedNote.notes);
+    closeModal();
   };
 
   return (
@@ -63,11 +70,12 @@ const PastVisitNotes = ({ patientId }) => {
         <Modal show={showModal} onHide={closeModal} centered>
           <Modal.Dialog style={{
             width: '70vw',
-            height: '50vh',
+            height: '20vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            margin: '0'
+            margin: '0',
+            justifyContent: 'center'
           }}>
             <Modal.Header closeButton style={{ width: '100%', borderBottom: '1px solid #dee2e6' }}>
               <Modal.Title>Note Details</Modal.Title>
@@ -80,13 +88,16 @@ const PastVisitNotes = ({ patientId }) => {
               {selectedNote && (
                 <>
                   <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
-                  <p><strong>Note:</strong> {selectedNote.notes || 'No content available'}</p>
+                  <p><strong>Note:</strong></p>
+                  <div style={{display:'flex', justifyContent: 'center'}}>
+                  <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
+                  </div>
                 </>
               )}
             </Modal.Body>
             <Modal.Footer style={{ width: '100%', borderTop: '1px solid #dee2e6' }}>
-              <Button variant="secondary" onClick={closeModal}>
-                Close
+              <Button variant="secondary" onClick={handleSubmit}>
+                Submit
               </Button>
             </Modal.Footer>
           </Modal.Dialog>
