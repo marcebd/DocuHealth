@@ -36,7 +36,7 @@ function Appointments() {
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 width: '100%',
-                height: '10vh',
+                height: '80px',
                 background: '#f5f5f5',
                 padding: '0 20px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
@@ -62,7 +62,7 @@ function Appointments() {
                 </button>
             </header>
             </div>
-            <div style={{display:'flex', flexDirection: 'row', marginTop: '1%', maxHeight: '85vh', width:'100%', marginLeft: '2%', marginRight:'2%'}}>
+            <div style={{display:'flex', flexDirection: 'row', marginTop: '1%', maxHeight: '85vh', width:'95%', marginLeft: '2%', marginRight:'2%'}}>
                 <Calendar />
                 <Scheduler />
             </div>
