@@ -58,7 +58,7 @@ const WeekView = ({ appointments, startDate, endDate, setDate, setView }) => {
                     const appointmentsForHour = getAppointmentsForHour(dayIndex, hour);
                     const overflowY = appointmentsForHour.length > 3 ? 'auto' : 'hidden';
                     return (
-                        <div key={hour} style={{ width: '14vw', minHeight: '15vh', maxHeight: '15vh', position: 'relative', border: '1px solid #ccc', padding: '10px', margin: '5px 0', overflowY }}>
+                        <div key={hour} style={{ width: '14vw', minHeight: '15vh', maxHeight: '15vh', position: 'relative', border: '1px solid #ccc', padding: '10px', margin: '5px 0', overflowY: 'auto' }}>
                             <strong>{moment({ hour }).format('h A')}</strong>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                 {groupAppointmentsByTime(appointmentsForHour).map(([timeKey, group], idx) => {
@@ -97,34 +97,34 @@ const WeekView = ({ appointments, startDate, endDate, setDate, setView }) => {
                                                     justifyContent: 'center'
                                                     }}>
                                                     +{group.length - 1} more
-                                                    </div>
-                                                    )}
-                                                    </div>
-                                                    );
-                                                    })}
-                                                    </div>
-                                                    </div>
-                                                    );
-                                                    })}
-                                                    </div>
-                                                    );
-                                                    });
-                                                    const navigateWeek = (direction) => {
-                                                        const newStartDate = moment(startDate).add(direction, 'weeks').startOf('week');
-                                                        const newEndDate = moment(newStartDate).endOf('week');
-                                                        setDate({ startDate: newStartDate.toDate(), endDate: newEndDate.toDate() });
-                                                    };
-                                                    return (
-                                                        <div style={{ display: 'flex', flexDirection: 'column', width: '100%', maxWidth: '100%' }}>
-                                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
-                                                                <button onClick={() => navigateWeek(-1)}>Previous Week</button>
-                                                                <h2 onClick={navigateToMonthView} style={{ cursor: 'pointer' }}>{moment(startDate).format('MMMM Do')} - {moment(endDate).format('MMMM Do')}</h2>
-                                                                <button onClick={() => navigateWeek(1)}>Next Week</button>
-                                                            </div>
-                                                            <div style={{ display: 'flex', overflowX: 'auto', maxWidth: '100%' }}>
-                                                                {columns}
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                    };
-                                                    export default WeekView;
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        );
+    });
+    const navigateWeek = (direction) => {
+        const newStartDate = moment(startDate).add(direction, 'weeks').startOf('week');
+        const newEndDate = moment(newStartDate).endOf('week');
+        setDate({ startDate: newStartDate.toDate(), endDate: newEndDate.toDate() });
+    };
+    return (
+        <div className='weekView'style={{ width: '95%', height: '95%', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px' }}>
+                <button onClick={() => navigateWeek(-1)}>Previous Week</button>
+                <h2 onClick={navigateToMonthView} style={{ cursor: 'pointer' }}>{moment(startDate).format('MMMM Do')} - {moment(endDate).format('MMMM Do')}</h2>
+                <button onClick={() => navigateWeek(1)}>Next Week</button>
+            </div>
+            <div style={{ display: 'flex', overflowX: 'auto', maxWidth: '100%' }}>
+                {columns}
+            </div>
+        </div>
+    );
+};
+export default WeekView;

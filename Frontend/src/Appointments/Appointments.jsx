@@ -62,7 +62,7 @@ function Appointments() {
                 </button>
             </header>
             </div>
-            <div style={{display:'flex', flexDirection: 'row', marginTop: '1%', maxHeight: '85vh'}}>
+            <div style={{display:'flex', flexDirection: 'row', marginTop: '1%', maxHeight: '85vh', width:'100%', marginLeft: '2%', marginRight:'2%'}}>
                 <Calendar />
                 <Scheduler />
             </div>
