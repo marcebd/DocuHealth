@@ -34,7 +34,6 @@ async function fetchAppointments() {
 }
 
 async function scheduleEmail(email, appointmentTime, timeZone, firstName, lastName) {
-    console.log(`Email will be sent to ${email} for ${firstName} ${lastName} at ${appointmentTime} ${timeZone}`);
     try {
         const request = mailjet
             .post("send", {'version': 'v3.1'})
@@ -57,10 +56,8 @@ async function scheduleEmail(email, appointmentTime, timeZone, firstName, lastNa
                 ]
             });
         const result = await request;
-        console.log(result.body);
         return true;  // Return true on successful email send
     } catch (error) {
-        console.error('Failed to create or send campaign:', error);
         return false;  // Return false on failure
     }
 }
@@ -77,30 +74,23 @@ async function handleScheduleEmails() {
             const { firstName, lastName, email } = patient;
             patient.appointments.forEach(async (appointment) => {
                 const { appointmentTime, timeZone, notificationSettings } = appointment;
-
                 if (!email || !timeZone) {
                     console.log(`Skipping appointment for ${firstName} ${lastName} due to missing email or timeZone.`);
                     return;
                 }
-
                 notificationSettings.forEach(async (setting) => {
-                    // Calculate the notification time by subtracting the specified number of units (days, weeks, etc.)
-                    // from the appointment time based on the frequency specified in the setting
+                    // Calculate the notification time by subtracting the specified time (e.g., days, weeks) from the appointment time
                     const notificationTime = moment.tz(appointmentTime, timeZone)
                         .subtract(setting.number, setting.frequency)
                         .format('YYYY-MM-DD HH:mm');
-                    // Get the current time in the same format and timezone as the appointment
                     const currentTime = moment.tz(timeZone).format('YYYY-MM-DD HH:mm');
-                    // Create a unique identifier for this particular notification using the appointment ID and the setting details
-                    // This ID will help in tracking whether this notification has already been sent
-                    const notificationId = `${appointment.id}-${setting.number}-${setting.frequency}`;
-                    // Check if the calculated notification time matches the current time and if this notification has not been sent yet
-                    if (notificationTime === currentTime && !sentNotifications[notificationId]) {
-                        const emailSent = await scheduleEmail(email, appointmentTime, timeZone, firstName, lastName);
-                        // If the email was successfully sent, mark this notification as sent in the sentNotifications object
-                        // This prevents the same notification from being sent multiple times
-                        if (emailSent) {
-                            sentNotifications[notificationId] = true;
+                    if (notificationTime === currentTime) {
+                        const notificationId = `${appointment.id}-${setting.number}-${setting.frequency}-${notificationTime}`;
+                        if (!sentNotifications[notificationId]) {
+                            const emailSent = await scheduleEmail(email, appointmentTime, timeZone, firstName, lastName);
+                            if (emailSent) {
+                                sentNotifications[notificationId] = true;
+                            }
                         }
                     }
                 });
@@ -113,4 +103,4 @@ async function handleScheduleEmails() {
 
 setInterval(() => {
     handleScheduleEmails();
-}, 60000);  // Run the scheduling check every minute
+}, 600);  // Run the scheduling check every minute

@@ -84,7 +84,7 @@ const WeekView = ({ appointments, startDate, endDate, setDate, setView }) => {
                                                     <div>{appointment.firstName} {appointment.lastName}</div>
                                                     <div>{appointment.email}</div>
                                                 </div>
-                                            ))};
+                                            ))}
                                             {group.length > 1 && !isExpanded && (
                                                 <div onClick={() => toggleGroup(dayIndex, hour, timeKey)} style={{
                                                     cursor: 'pointer',
