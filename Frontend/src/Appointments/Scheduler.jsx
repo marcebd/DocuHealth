@@ -86,7 +86,7 @@ function Scheduler() {
             padding: '10px',
             borderRadius: '5px'
         }}>
-        Scheduler
+        Schedule an Appointment
         </h2>
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
@@ -159,7 +159,7 @@ function Scheduler() {
                     </select>
                 </div>
             </div>
-            ))}
+        ))}
             <button
             type="button"
             onClick={handleAddNotification}
@@ -220,7 +220,7 @@ function Scheduler() {
                 }}
                 />
             )}
-            </div>
+        </div>
     );
 }
 

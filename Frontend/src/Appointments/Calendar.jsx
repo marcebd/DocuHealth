@@ -5,7 +5,7 @@ import moment from 'moment';
 import 'react-calendar/dist/Calendar.css';
 import DayView from './DayView';
 import WeekView from './WeekView';
-import './ReactCalendar.css'
+import './ReactCalendar.css';
 
 function Calendar() {
     const [date, setDate] = useState(new Date());
@@ -45,19 +45,49 @@ function Calendar() {
 
     const onChange = newDate => {
         setDate(newDate);
+        setView('week');
     };
 
     const handleViewChange = (event) => {
         setView(event.target.value);
     };
 
+    const countAppointmentsForDay = (date) => {
+        return appointments.filter(app => moment(app.time).isSame(date, 'day')).length;
+    };
+
     const renderCalendar = () => {
+        const startOfWeek = moment(date).startOf('isoWeek').toDate();
+        const endOfWeek = moment(date).endOf('isoWeek').toDate();
+
         if (view === 'month') {
-            return <CalendarReact onChange={onChange} value={date}/>;
+            return (
+                <CalendarReact
+                    onChange={onChange}
+                    value={date}
+                    tileContent={({ date, view }) => {
+                        if (view === 'month') {
+                            const count = countAppointmentsForDay(date);
+                            return count > 0 ? <div style={{ fontSize: '0.8em', textAlign: 'center', marginTop: '5px' }}>{count} appointments</div> : null;
+                        }
+                    }}
+                />
+            );
         } else if (view === 'day') {
-            return <DayView appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))} date={date} setDate={setDate} />;
+            return <DayView
+                appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))}
+                date={date}
+                setDate={setDate}
+                setView={setView}
+            />;
         } else if (view === 'week') {
-            return <WeekView appointments={appointments.filter(app => moment(app.time).isSame(date, 'isoWeek'))} date={date} />;
+            return <WeekView
+                appointments={appointments.filter(app => moment(app.time).isSame(date, 'isoWeek'))}
+                startDate={startOfWeek}
+                endDate={endOfWeek}
+                setDate={setDate}
+                setView={setView}
+            />;
         }
     };
 
@@ -79,16 +109,16 @@ function Calendar() {
             boxSizing: 'border-box',
             minWidth: '45vw'
         }}>
-        <select value={view} onChange={handleViewChange} style={{ marginBottom: '20px' }}>
-            <option value="month">Month</option>
-            <option value="day">Day</option>
-            <option value="week">Week</option>
-        </select>
-        {renderCalendar()}
-        {loading &&
-            <p>Loading appointments...</p>}
+            <select value={view} onChange={handleViewChange} style={{ marginBottom: '20px' }}>
+                <option value="month">Month</option>
+                <option value="day">Day</option>
+                <option value="week">Week</option>
+            </select>
+            {renderCalendar()}
+            {loading && <p>Loading appointments...</p>}
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
     );
 }
+
 export default Calendar;
