@@ -56,7 +56,7 @@ function Calendar() {
         const startOfWeek = moment(date).startOf('isoWeek').toDate();
         const endOfWeek = moment(date).endOf('isoWeek').toDate();
 
-        const viewStyle = { width: '100%' }; // Style object to control width
+        const viewStyle = { width: '100%' }; 
 
         if (view === 'month') {
             return (
