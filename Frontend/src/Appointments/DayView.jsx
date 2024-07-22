@@ -36,7 +36,7 @@ const DayView = ({ appointments, date, setDate }) => {
     };
 
     return (
-        <div style={{ width: '70%', overflowX: 'auto', padding: '10px', maxWidth: '70vw' }}>
+        <div style={{ width: '100%', overflowX: 'auto', padding: '10px', maxWidth: '45vw' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                 <button onClick={() => navigateDay(-1)} style={{ marginRight: '20px' }}>&lt; Previous</button>
                 <div style={{display:'flex'}}>

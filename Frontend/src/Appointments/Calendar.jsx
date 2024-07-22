@@ -5,6 +5,7 @@ import moment from 'moment';
 import 'react-calendar/dist/Calendar.css';
 import DayView from './DayView';
 import WeekView from './WeekView';
+import './ReactCalendar.css'
 
 function Calendar() {
     const [date, setDate] = useState(new Date());
@@ -52,7 +53,7 @@ function Calendar() {
 
     const renderCalendar = () => {
         if (view === 'month') {
-            return <CalendarReact onChange={onChange} value={date} style={{width: '100%'}}/>;
+            return <CalendarReact onChange={onChange} value={date}/>;
         } else if (view === 'day') {
             return <DayView appointments={appointments.filter(app => moment(app.time).isSame(date, 'day'))} date={date} setDate={setDate} />;
         } else if (view === 'week') {
@@ -66,16 +67,17 @@ function Calendar() {
             flexDirection: 'column',
             alignItems: 'center',
             backgroundColor: '#fff',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            maxWidth: '45%',
-            width: '45%',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            maxWidth: '45vw',
+            width: '45vw',
             maxHeight: '90vh',
             overflow: 'auto',
             padding:'20px',
             margin: '20px auto',
             borderRadius: '8px',
             border: '1px solid #ccc',
-            boxSizing: 'border-box'
+            boxSizing: 'border-box',
+            minWidth: '45vw'
         }}>
         <select value={view} onChange={handleViewChange} style={{ marginBottom: '20px' }}>
             <option value="month">Month</option>
