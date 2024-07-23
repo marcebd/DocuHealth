@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import ContentLoader from 'react-content-loader';
-
+import './Modals.css'
 const PastVisitNotes = ({ patientId }) => {
   const [visitNotes, setVisitNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -114,28 +114,22 @@ const PastVisitNotes = ({ patientId }) => {
 
       <Modal show={showModal} onHide={closeModal} centered>
         <Modal.Dialog style={{
-          width: '70vw',
-          height: '20vh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          margin: '0',
+          margin: '0'
         }}>
-          <Modal.Header closeButton style={{ width: '100%', borderBottom: '1px solid #dee2e6' }}>
-            <Modal.Title>Note Details</Modal.Title>
+          <Modal.Header closeButton style={{borderBottom: '1px solid #dee2e6' }}>
+            <Modal.Title >Note Details</Modal.Title>
           </Modal.Header>
-          <Modal.Body style={{
-            overflowY: 'auto',
-            backgroundColor: 'white',
-            flexGrow: 1,
-          }}>
+          <Modal.Body >
             {error && <p style={{ color: 'red' }}>{error}</p>}
             {selectedNote && (
               <>
                 <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
                 <p><strong>Note:</strong></p>
-                <div style={{display:'flex', justifyContent: 'center'}}>
-                  <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
+                <div style={{display:'flex', justifyContent: 'center', width: '100%'}}>
+                  <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'25vw'}}/>
                 </div>
               </>
             )}

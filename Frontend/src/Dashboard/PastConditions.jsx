@@ -116,7 +116,7 @@ const PastConditions = ({ patientId }) => {
         )}
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Condition Details</Modal.Title>
         </Modal.Header>
