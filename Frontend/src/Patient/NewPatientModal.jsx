@@ -80,7 +80,7 @@ console.log(patientsData);
           patient.email.toLowerCase().includes(searchQuery)
         );
       });
-      setPatientsData(filteredPatients); 
+      setPatientsData(filteredPatients);
     }
   };
 
@@ -175,7 +175,7 @@ console.log(patientsData);
               </div>
             </div>
             {patientsData[0] ? (
-              <PatientSearchTable patientsData={patientsData} handlePatientClick={handlePatientClick} />
+              <PatientSearchTable patientsData={patientsData} handlePatientClick={handlePatientClick}/>
             ) : (
               <p>No patients found</p>
             )}

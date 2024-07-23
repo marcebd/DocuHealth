@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange }) => {
+const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange, style }) => {
     const [sortedData, setSortedData] = useState([]);
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange
     };
 
     return (
-        <div>
+        <div style={style}>
             <label htmlFor="sortSelect">Sort by {sortKey}:</label>
             <select id="sortSelect" onChange={onSortChange} defaultValue={sortDirection}>
                 <option value="asc">Ascending</option>
