@@ -13,6 +13,7 @@ const PatientTabs = ({ viewingPatientId }) => {
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [hoveredButton, setHoveredButton] = useState(false);
 
   useEffect(() => {
     const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
@@ -120,19 +121,19 @@ const PatientTabs = ({ viewingPatientId }) => {
   };
 
   const buttonStyle = {
-    cursor: 'pointer',
+    cursor: hoveredButton ? 'pointer' : 'default',
     padding: '10px 10px',
     marginRight: '5px',
     marginLeft: '5px',
     borderRadius: '10px 10px 10px 10px',
-    backgroundColor: 'lightgrey',
+    backgroundColor: hoveredButton ? 'lightgrey' : 'transparent',
     border: 'none',
     flex: '0',
     textAlign: 'center',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-  };
+    };
 
   const PatientTabLoader = () => (
     <ContentLoader
