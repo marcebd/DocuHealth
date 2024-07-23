@@ -4,18 +4,22 @@ import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
 import PatientDetails from './PatientDetails';
 import AddNewPrescriptionButton from './AddNewPrescriptionButton';
-import './AddNewPrescriptionButton.css'
+import './AddNewPrescriptionButton.css';
+import ContentLoader from 'react-content-loader';
 
 const PatientTabs = ({ viewingPatientId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
-  const [hoveredButton, setHoveredButton] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+
   useEffect(() => {
     const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
     if (storedPatients && storedPatients.length > 0) {
       fetchData(storedPatients);
+    } else {
+      setIsLoading(false);
     }
   }, [isModalOpen]);
 
@@ -45,9 +49,11 @@ const PatientTabs = ({ viewingPatientId }) => {
           return uniquePatients;
         });
         handleTabCreate();
+        setIsLoading(false);
       }
     } catch (error) {
       console.error('Error fetching patients', error);
+      setIsLoading(false);
     }
   }
 
@@ -114,19 +120,32 @@ const PatientTabs = ({ viewingPatientId }) => {
   };
 
   const buttonStyle = {
-    cursor: hoveredButton ? 'pointer' : 'default',
+    cursor: 'pointer',
     padding: '10px 10px',
     marginRight: '5px',
     marginLeft: '5px',
     borderRadius: '10px 10px 10px 10px',
-    backgroundColor: hoveredButton ? 'lightgrey' : 'transparent',
+    backgroundColor: 'lightgrey',
     border: 'none',
     flex: '0',
     textAlign: 'center',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-    };
+  };
+
+  const PatientTabLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={150}
+      height={40}
+      viewBox="0 0 150 40"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <rect x="0" y="0" rx="10" ry="10" width="150" height="40" />
+    </ContentLoader>
+  );
 
   return (
     <div>
@@ -134,35 +153,39 @@ const PatientTabs = ({ viewingPatientId }) => {
         <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
       )}
       <div style={tabContainerStyle}>
-        {tabCreated && patients.map((patient, index) => (
-          <div key={patient.id} style={tabStyle(patient.id, index)}>
-          <span onClick={() => handlePatientClick(patient.id)} style={{
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}>
-            {patient.firstName} {patient.middleName || ''} {patient.lastName}
-          </span>
-          <button
-            onClick={() => handleRemovePatient(patient.id)}
-            style={{
-              border: 'none',
-              background: 'none',
-              cursor: 'pointer',
-              padding: '0',
-              margin: '0',
-              width: '16px',
-              height: '16px',
-              lineHeight: '16px',
-              textAlign: 'center',
-              fontSize: '14px',
-              display: 'inline-block',
-              color: 'inherit'
-            }}
-          >
-            X
-        </button>
-        </div>
-        ))}
+        {isLoading ? (
+          Array.from({ length: 5 }, (_, index) => <PatientTabLoader key={index} />)
+        ) : (
+          patients.map((patient, index) => (
+            <div key={patient.id} style={tabStyle(patient.id, index)}>
+              <span onClick={() => handlePatientClick(patient.id)} style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}>
+                {patient.firstName} {patient.middleName || ''} {patient.lastName}
+              </span>
+              <button
+                onClick={() => handleRemovePatient(patient.id)}
+                style={{
+                  border: 'none',
+                  background: 'none',
+                  cursor: 'pointer',
+                  padding: '0',
+                  margin: '0',
+                  width: '16px',
+                  height: '16px',
+                  lineHeight: '16px',
+                  textAlign: 'center',
+                  fontSize: '14px',
+                  display: 'inline-block',
+                  color: 'inherit'
+                }}
+              >
+                X
+              </button>
+            </div>
+          ))
+        )}
         <div
           onClick={handleCreate}
           onMouseEnter={() => setHoveredButton(true)}
@@ -210,4 +233,5 @@ const PatientTabs = ({ viewingPatientId }) => {
     </div>
   );
 };
+
 export default PatientTabs;

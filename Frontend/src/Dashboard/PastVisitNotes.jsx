@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import ContentLoader from 'react-content-loader';
 
 const PastVisitNotes = ({ patientId }) => {
   const [visitNotes, setVisitNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [selectedNote, setSelectedNote] = useState('');
   const [updatedNote, setUpdatedNote] = useState('');
-  const [error, setError] = useState('');  // State to hold error message
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -20,10 +22,12 @@ const PastVisitNotes = ({ patientId }) => {
         } else {
           const data = await response.json();
           setVisitNotes(data);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error fetching visit notes:', error);
         setError('An error occurred while fetching visit notes.');
+        setIsLoading(false);
       }
     }
     fetchData();
@@ -32,12 +36,12 @@ const PastVisitNotes = ({ patientId }) => {
   const openModal = (note) => {
     setSelectedNote(note);
     setShowModal(true);
-    setError('');  // Clear any existing errors when opening the modal
+    setError('');
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setError('');  // Clear errors on modal close
+    setError('');
   };
 
   const handleSubmit = async () => {
@@ -65,6 +69,20 @@ const PastVisitNotes = ({ patientId }) => {
     }
   };
 
+  const NoteLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={400}
+      height={60}
+      viewBox="0 0 400 60"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <rect x="0" y="0" rx="3" ry="3" width="400" height="20" />
+      <rect x="0" y="30" rx="3" ry="3" width="380" height="20" />
+    </ContentLoader>
+  );
+
   return (
     <div>
       <h1>Past Visit Notes</h1>
@@ -77,7 +95,9 @@ const PastVisitNotes = ({ patientId }) => {
         height: '50vh',
         overflowY: 'auto'
       }}>
-        {visitNotes.length > 0 ? (
+        {isLoading ? (
+          Array.from({ length: 5 }, (_, index) => <NoteLoader key={index} />)
+        ) : visitNotes.length > 0 ? (
           visitNotes.map((note, index) => (
             <div key={note.id} onClick={() => openModal(note)} style={{
               cursor: 'pointer',
@@ -92,43 +112,44 @@ const PastVisitNotes = ({ patientId }) => {
           <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any notes.</p>
         )}
 
-        <Modal show={showModal} onHide={closeModal} centered>
-          <Modal.Dialog style={{
-            width: '70vw',
-            height: '20vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            margin: '0',
+      <Modal show={showModal} onHide={closeModal} centered>
+        <Modal.Dialog style={{
+          width: '70vw',
+          height: '20vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          margin: '0',
+        }}>
+          <Modal.Header closeButton style={{ width: '100%', borderBottom: '1px solid #dee2e6' }}>
+            <Modal.Title>Note Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body style={{
+            overflowY: 'auto',
+            backgroundColor: 'white',
+            flexGrow: 1,
           }}>
-            <Modal.Header closeButton style={{ width: '100%', borderBottom: '1px solid #dee2e6' }}>
-              <Modal.Title>Note Details</Modal.Title>
-            </Modal.Header>
-            <Modal.Body style={{
-              overflowY: 'auto',
-              backgroundColor: 'white',
-              flexGrow: 1,
-            }}>
-              {error && <p style={{ color: 'red' }}>{error}</p>}
-              {selectedNote && (
-                <>
-                  <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
-                  <p><strong>Note:</strong></p>
-                  <div style={{display:'flex', justifyContent: 'center'}}>
-                    <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
-                  </div>
-                </>
-                )}
-                </Modal.Body>
-                <Modal.Footer style={{ width: '100%', borderTop: '1px solid #dee2e6' }}>
-                  <Button variant="secondary" onClick={handleSubmit}>
-                  Submit
-                  </Button>
-                </Modal.Footer>
-            </Modal.Dialog>
-          </Modal>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {selectedNote && (
+              <>
+                <p><strong>Date:</strong> {new Date(selectedNote.date).toLocaleDateString()}</p>
+                <p><strong>Note:</strong></p>
+                <div style={{display:'flex', justifyContent: 'center'}}>
+                  <textarea defaultValue={selectedNote.notes} onChange={(e) => setUpdatedNote(e.target.value)} style={{height:'60vh', width:'95%'}}/>
+                </div>
+              </>
+            )}
+          </Modal.Body>
+          <Modal.Footer style={{ width: '100%', borderTop: '1px solid #dee2e6' }}>
+            <Button variant="secondary" onClick={handleSubmit}>
+              Submit
+            </Button>
+          </Modal.Footer>
+        </Modal.Dialog>
+      </Modal>
       </div>
-    </div>
-  );
+  </div>
+);
 };
+
 export default PastVisitNotes;

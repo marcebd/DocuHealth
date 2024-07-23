@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import PatientTabs from './PatientTabs';
+import ContentLoader from 'react-content-loader';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -17,7 +18,7 @@ function Dashboard() {
   let [userFirstName, setUserFirstName] = useState('');
   let [userProfilePicture, setUserProfilePicture] = useState('');
   const [viewingPatientId] = useState(localStorage.getItem('viewingPatient'));
-
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
@@ -33,6 +34,7 @@ function Dashboard() {
           const buffer = data.profile_picture.data;
           const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
           setUserProfilePicture(`data:image/jpeg;base64,${base64String}`);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error fetching User Data in dashboard:', error);
@@ -40,6 +42,32 @@ function Dashboard() {
     }
     fetchData();
   }, [userId]);
+
+  const ProfileLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={60}
+      height={60}
+      viewBox="0 0 60 60"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <circle cx="30" cy="30" r="30" />
+    </ContentLoader>
+  );
+
+  const NameLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={160}
+      height={20}
+      viewBox="0 0 160 20"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <rect x="0" y="0" rx="4" ry="4" width="160" height="20" />
+    </ContentLoader>
+  );
 
   return (
     <div id="wholePage">
@@ -61,13 +89,13 @@ function Dashboard() {
         right: 0
       }}>
         <div style={{ display: 'flex', alignItems: 'center' }}>
-          <img src={userProfilePicture || 'default.jpg'} alt="Profile" style={{
+          {isLoading ? <ProfileLoader /> : <img src={userProfilePicture || 'default.jpg'} alt="Profile" style={{
             width: '60px',
             height: '60px',
             borderRadius: '50%',
             marginRight: '20px'
-          }} />
-          <h1 style={{ margin: '0' }}>Hello, {userFirstName}</h1>
+          }} />}
+          <h1 style={{ margin: '0' }}>{isLoading ? <NameLoader /> : `Hello, ${userFirstName}`}</h1>
         </div>
         <button aria-label="Logout from Dashboard" style={{
           padding: '10px 20px',
@@ -88,5 +116,4 @@ function Dashboard() {
     </div>
   );
 }
-
 export default Dashboard;
