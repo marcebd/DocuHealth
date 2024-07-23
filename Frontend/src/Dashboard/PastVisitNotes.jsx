@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import ContentLoader from 'react-content-loader';
-import './Modals.css'
+
 const PastVisitNotes = ({ patientId }) => {
   const [visitNotes, setVisitNotes] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -17,7 +17,6 @@ const PastVisitNotes = ({ patientId }) => {
           method: 'GET',
         });
         if (!response.ok) {
-          console.error('Failed to fetch visit notes:', response);
           setError('Failed to fetch visit notes.');
         } else {
           const data = await response.json();
@@ -25,7 +24,6 @@ const PastVisitNotes = ({ patientId }) => {
           setIsLoading(false);
         }
       } catch (error) {
-        console.error('Error fetching visit notes:', error);
         setError('An error occurred while fetching visit notes.');
         setIsLoading(false);
       }

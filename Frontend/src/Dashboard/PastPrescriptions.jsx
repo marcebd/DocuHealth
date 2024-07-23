@@ -31,11 +31,11 @@ const PastPrescriptions = () => {
           setPrescriptions(data);
           setIsLoading(false);
         } else {
-          console.error('Failed to fetch prescriptions');
+          setError('Failed to fetch prescriptions');
           setIsLoading(false);
         }
       } catch (error) {
-        console.error('Error fetching prescriptions:', error);
+        setError('Error fetching prescriptions:', error);
         setIsLoading(false);
       }
     };
@@ -46,6 +46,37 @@ const PastPrescriptions = () => {
   const handleRowClick = (prescription) => {
     setSelectedPrescription(prescription);
     setShowModal(true);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const updatedPrescription = {
+        id: selectedPrescription.id,
+        name: selectedPrescription.name,
+        dose: selectedPrescription.dose,
+        instructions: selectedPrescription.instructions,
+        dateStart: new Date(selectedPrescription.dateStart),
+        dateEnd: new Date(selectedPrescription.dateEnd)
+      };
+      const prescription = {prescription: updatedPrescription};
+      const response = await fetch(`http://localhost:3002/prescriptions/update/${selectedPrescription.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(prescription)
+      });
+      if (!response.ok) {
+        const responseData = await response.json();
+        setError('Failed to save the updated prescription. Please try again.', responseData);
+        return;
+      }
+      setSelectedPrescription(null);
+      setShowModal(false);
+      window.location.reload();
+    } catch (error) {
+      setError(`An error occurred while saving the updated prescription: ${error}`);
+    }
   };
 
   const PrescriptionLoader = () => (
@@ -86,7 +117,7 @@ const PastPrescriptions = () => {
         <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any prescriptions.</p>
       )}
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+<Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Prescription Details</Modal.Title>
         </Modal.Header>
@@ -94,14 +125,36 @@ const PastPrescriptions = () => {
           {error && <p style={{ color: 'red' }}>{error}</p>}
           {selectedPrescription && (
             <>
-              <p><strong>Name:</strong> {selectedPrescription.name}</p>
-              <p><strong>Dose:</strong> {selectedPrescription.dose}</p>
+              <label>
+                Name:
+                <input type="text" value={selectedPrescription.name} onChange={(e) => setSelectedPrescription({ ...selectedPrescription, name: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Dose:
+                <input type="text" value={selectedPrescription.dose} onChange={(e) => setSelectedPrescription({ ...selectedPrescription, dose: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Instructions:
+                <textarea value={selectedPrescription.instructions} onChange={(e) => setSelectedPrescription({ ...selectedPrescription, instructions: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Date Start:
+                <input type="date" defaultValue={selectedPrescription.dateStart.slice(0, 10)}  onChange={(e) => setSelectedPrescription({ ...selectedPrescription, dateStart: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Date End:
+                <input type="date" defaultValue={selectedPrescription.dateEnd.slice(0, 10)}  onChange={(e) => setSelectedPrescription({ ...selectedPrescription, dateEnd: e.target.value })} />
+              </label>
             </>
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="primary" onClick={() => setShowModal(false)}>
-            Close
+          <Button variant="primary" onClick={handleSubmit}>
+            Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
