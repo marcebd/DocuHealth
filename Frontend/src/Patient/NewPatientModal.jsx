@@ -20,7 +20,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [fetchedPatients, setFetchedPatients] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-console.log(patientsData);
+
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {

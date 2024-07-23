@@ -6,19 +6,22 @@ import PatientDetails from './PatientDetails';
 import AddNewPrescriptionButton from './AddNewPrescriptionButton';
 import './AddNewPrescriptionButton.css';
 import ContentLoader from 'react-content-loader';
+import DashboardHome from './DashboardHome/DashboardHome';
 
-const PatientTabs = ({ viewingPatientId }) => {
+const PatientTabs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [viewingPatientId, setViewingPatientId] = useState(null);
   const navigate = useNavigate();
   const [hoveredButton, setHoveredButton] = useState(false);
 
   useEffect(() => {
     const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
+    const storedViewingPatient = localStorage.getItem('viewingPatient');
     if (storedPatients && storedPatients.length > 0) {
       fetchData(storedPatients);
+      setViewingPatientId(storedViewingPatient);
     } else {
       setIsLoading(false);
     }
@@ -49,14 +52,13 @@ const PatientTabs = ({ viewingPatientId }) => {
           }, []);
           return uniquePatients;
         });
-        handleTabCreate();
         setIsLoading(false);
       }
     } catch (error) {
       console.error('Error fetching patients', error);
       setIsLoading(false);
     }
-  }
+  };
 
   const handleCreate = () => {
     setIsModalOpen(true);
@@ -66,14 +68,24 @@ const PatientTabs = ({ viewingPatientId }) => {
     setIsModalOpen(false);
   };
 
-  const handleTabCreate = () => {
-    setTabCreated(true);
+  const handlePatientClick = (patientId) => {
+    if (patientId !== viewingPatientId) {
+      setViewingPatientId(patientId);
+      localStorage.setItem('viewingPatient', patientId);
+    }
   };
 
-  const handlePatientClick = (patientId) => {
-    localStorage.setItem('viewingPatient', patientId);
-    window.location.reload();
-  };
+  const handleRemovePatient = (patientId) => {
+    const updatedPatients = patients.filter(patient => patient.id !== patientId);
+    setPatients(updatedPatients);
+    localStorage.setItem('patientTabs', JSON.stringify(updatedPatients.map(patient => patient.id)));
+    if (patientId === viewingPatientId) {
+        const index = patients.findIndex(patient => patient.id === patientId);
+        const newViewingPatientId = (index > 0) ? patients[index - 1].id : (updatedPatients.length > 0 ? updatedPatients[0].id : null);
+        setViewingPatientId(newViewingPatientId);
+        localStorage.setItem('viewingPatient', newViewingPatientId);
+    }
+};
 
   const tabContainerStyle = {
     display: 'flex',
@@ -91,8 +103,8 @@ const PatientTabs = ({ viewingPatientId }) => {
     marginRight: '5px',
     marginLeft: '5px',
     borderRadius: '10px 10px 0 0',
-    boxShadow: patientId.toString() === viewingPatientId.toString() ? '0 4px 0 0 white inset, 0 2px 5px rgba(0, 0, 0, 0.3)' : 'none',
-    backgroundColor: patientId.toString() === viewingPatientId.toString() ? 'white' : generateLightColor(index),
+    boxShadow: patientId.toString() === viewingPatientId ? '0 4px 0 0 white inset, 0 2px 5px rgba(0, 0, 0, 0.3)' : 'none',
+    backgroundColor: patientId.toString() === viewingPatientId ? 'white' : `hsl(${index * 137}, 70%, 85%)`,
     flex: '0 1 auto',
     textAlign: 'center',
     whiteSpace: 'nowrap',
@@ -105,23 +117,8 @@ const PatientTabs = ({ viewingPatientId }) => {
     alignItems: 'center',
   });
 
-  const generateLightColor = (index) => {
-    const hue = index * 137;
-    return `hsl(${hue}, 70%, 85%)`;
-  };
-
-  const handleAppointmentClick = () => {
-    navigate('/appointments');
-  };
-
-  const handleRemovePatient = (patientId) => {
-    const updatedPatients = patients.filter(patient => patient.id !== patientId);
-    setPatients(updatedPatients);
-    localStorage.setItem('patientTabs', JSON.stringify(updatedPatients.map(patient => patient.id)));
-  };
-
   const buttonStyle = {
-    cursor: hoveredButton ? 'pointer' : 'default',
+    cursor: hoveredButton,
     padding: '10px 10px',
     marginRight: '5px',
     marginLeft: '5px',
@@ -133,7 +130,7 @@ const PatientTabs = ({ viewingPatientId }) => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-    };
+  };
 
   const PatientTabLoader = () => (
     <ContentLoader
@@ -151,7 +148,7 @@ const PatientTabs = ({ viewingPatientId }) => {
   return (
     <div>
       {isModalOpen && (
-        <NewPatientModal onCreate={handleTabCreate} onClose={handleCloseModal} />
+        <NewPatientModal onCreate={handleCloseModal} onClose={handleCloseModal} />
       )}
       <div style={tabContainerStyle}>
         {isLoading ? (
@@ -196,25 +193,28 @@ const PatientTabs = ({ viewingPatientId }) => {
           +
         </div>
       </div>
-      <div id='patientFolder' style={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-evenly',
-            alignItems: 'flex-start',
-            border: '1px solid lightgrey',
-            borderRadius: '10px',
-            padding: '2%',
-            background: 'white',
-            marginTop: '-4px',
-            height: '150vh'
+      {viewingPatientId === null ? (
+        <DashboardHome />
+      ) : (
+        <div id='patientFolder' style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-evenly',
+          alignItems: 'flex-start',
+          border: '1px solid lightgrey',
+          borderRadius: '10px',
+          padding: '2%',
+          background: 'white',
+          marginTop: '-4px',
+          height: '150vh'
         }}>
           <div style={{display:'flex', alignItems:'center', justifyContent: 'space-evenly', padding: '1%', width:'100%'}}>
-          <button onClick={handleAppointmentClick}  className="addPrescriptionFolder">
+            <button onClick={() => navigate('/appointments')} className="addPrescriptionFolder">
               Schedule an appointment for this patient
-          </button>
-          <AddNewPrescriptionButton onClick={handleAppointmentClick}  className="addPrescriptionFolder"/>
-        </div>
-        <div id='notesPrescriptions' style={{
+            </button>
+            <AddNewPrescriptionButton onClick={() => navigate('/prescriptions')} className="addPrescriptionFolder"/>
+          </div>
+          <div id='notesPrescriptions' style={{
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-evenly',
@@ -226,11 +226,12 @@ const PatientTabs = ({ viewingPatientId }) => {
             marginTop: '-4px',
             width:'100%',
             height: '150vh'
-        }}>
+          }}>
             <Notepad />
             <PatientDetails />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

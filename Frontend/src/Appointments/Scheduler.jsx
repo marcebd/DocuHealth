@@ -2,14 +2,13 @@ import React, { useState, useEffect } from 'react';
 import AppointmentConfirmation from './AppointmentConfirmation';
 import moment from 'moment';
 
-function Scheduler() {
+function Scheduler({patientId}) {
     const [appointmentTime, setAppointmentTime] = useState('');
     const [timeZone, setTimeZone] = useState('');
     const [timeZoneConfirmed, setTimeZoneConfirmed] = useState(false);
     const [notificationSettings, setNotificationSettings] = useState([{ number: 1, frequency: 'week' }]);
     const [error, setError] = useState('');
     const [appointment, setAppointment] = useState([]);
-    const patientId = localStorage.getItem('viewingPatient');
     const [showModal, setShowModal] = useState(false);
     const [showTimeZoneDropdown, setShowTimeZoneDropdown] = useState(false);
 

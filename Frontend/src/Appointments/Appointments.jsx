@@ -66,7 +66,7 @@ function Appointments() {
             <div style={{display:'flex', flexDirection: 'row', marginTop: '1%', maxHeight: '85vh', width:'95%', marginLeft: '2%', marginRight:'2%'}}>
                 <Calendar />
                 <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginLeft: '2%'}}>
-                    <Scheduler />
+                    <Scheduler patientId={localStorage.getItem('viewingPatient')}/>
                     <TodaysAppointments />
                 </div>
             </div>
