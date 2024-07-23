@@ -36,7 +36,7 @@ const Notepad = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:4/visitNotes', {
+      const response = await fetch('http://localhost:3002/visitNotes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

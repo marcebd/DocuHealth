@@ -1,19 +1,22 @@
-const { pool } = require("/Users/marcebd/Desktop/DocuHealth/Backend/dbConfig.js");
-const multer = require('multer');
+import { pool } from "../dbConfig.js";
+import multer from 'multer';
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const passport = require("passport");
-const session = require("express-session");
-const cors = require("cors");
-const flash = require("connect-flash");
-require("dotenv").config();
-const { PrismaClient } = require('@prisma/client');
-const { initialize } = require("../passportConfig");
+import bcrypt from "bcrypt";
+import passport from "passport";
+import session from "express-session";
+import cors from "cors";
+import express from "express";
+import flash from "connect-flash";
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
+import { PrismaClient } from '@prisma/client';
+const minPasswordLength = 6;
+const noErrors = 0;
+import { initialize } from "../passportConfig.js";
 initialize(passport);
-const express = require('express');
 const prisma = new PrismaClient();
 const app = express();
-
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -67,6 +70,7 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
         middleName: req.body.middleName,
         lastName: req.body.lastName,
         idNumber: req.body.idNumber,
+        email: req.body.email,
         birthDate: birthDate,
         picture: req.file ? req.file.buffer : null,
         prescriptions: { create: prescriptions },
@@ -75,9 +79,7 @@ app.post("/patients", upload.single('imgSrc'), async (req, res) => {
     });
     const serializedPatient = JSON.stringify(newPatient.id, replacer);
     res.json(serializedPatient);
-    console.log("Serialized Patient", serializedPatient);
   } catch (error) {
-    console.log("Failed");
     res.status(500).json({ message: "Failed to create patient", error: error.message });
   }
 });
@@ -160,3 +162,89 @@ async function fetchPatientsData(patientIds) {
       res.status(500).json({ message: "Error Saving Patient's Picture, try again." });
     }
   });
+
+  app.post("/appointments/schedule/:patientId", async (req, res) => {
+    const patientId = parseInt(req.params.patientId);
+    try {
+        const newAppointment = await prisma.appointment.create({
+            data: {
+                appointmentTime: new Date(req.body.appointmentTime),
+                timeZone: req.body.timeZone,
+                patientId: patientId,
+            },
+            include: {
+                notificationSettings: true,
+            }
+        });
+        if (req.body.notificationSettings && Array.isArray(req.body.notificationSettings)) {
+            for (const setting of req.body.notificationSettings) {
+                await prisma.notificationSettings.create({
+                    data: {
+                        number: setting.number,
+                        frequency: setting.frequency,
+                        appointmentID: newAppointment.id,
+                    }
+                });
+            }
+        }
+        const patient = await prisma.patient.findUnique({
+            where: { id: patientId },
+            select: {
+                firstName: true,
+                lastName: true
+            }
+        });
+        const appointment = await prisma.appointment.findUnique({
+            where: {id: newAppointment.id},
+            select: {
+              id: true,
+              appointmentTime: true,
+              timeZone: true,
+              notificationSettings: true
+            }
+        });
+        const responseData = {
+            appointment: {
+                appointment,
+                patientName: `${patient.firstName} ${patient.lastName}`
+            }
+        };
+        const serializedResponse = JSON.stringify(responseData, replacer);
+        res.status(201).json(JSON.parse(serializedResponse));
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error", error: error });
+    }
+});
+
+app.get("/appointments/scheduled", async (req, res) => {
+  try {
+      const patients = await prisma.patient.findMany({
+          where: { appointments: { some: {} } },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            appointments: {
+              select: {
+                  id: true,
+                  appointmentTime: true,
+                  timeZone: true,
+                  notificationSettings: {
+                    select: {
+                      number: true,
+                      frequency: true,
+                    }
+                  }
+              }
+            }
+          }
+      });
+      const serializedPatients = JSON.stringify(patients, replacer);
+      res.status(200).json(serializedPatients);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message, error: error });
+  }
+});

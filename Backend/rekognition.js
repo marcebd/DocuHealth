@@ -1,18 +1,24 @@
-require("dotenv").config();
-const { PrismaClient } = require('@prisma/client');
-const express = require('express');
-const cors = require("cors");
-const session = require("express-session");
-const flash = require("connect-flash");
-const passport = require("passport");
-const bodyParser = require('body-parser');
-const { RekognitionClient, IndexFacesCommand, SearchFacesByImageCommand } = require('@aws-sdk/client-rekognition');
-const multer = require('multer');
+import multer from 'multer';
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-const app = express();
+import passport from "passport";
+import session from "express-session";
+import cors from "cors";
+import express from "express";
+import flash from "connect-flash";
+import { pool } from "./dbConfig.js";
+import { config as dotenvConfig } from 'dotenv';
+dotenvConfig();
+import { PrismaClient } from '@prisma/client';
+import { initialize } from "./passportConfig.js";
+import bodyParser from 'body-parser';
+initialize(passport);
 const prisma = new PrismaClient();
-
+const app = express();
+import { RekognitionClient } from "@aws-sdk/client-rekognition";
+app.listen(3006, () => {
+    console.log('Server running on port 3006');
+});
 // Middleware
 app.use(bodyParser.json());
 app.use(express.json());
@@ -100,14 +106,6 @@ app.post('/index-patient-images/:userId', async (req, res) => {
         res.status(500).json({ message: "Error processing request", error: error.message });
     }
 });
-
-function replacer(key, value) {
-    if (typeof value === 'bigint') {
-        return value.toString();
-    } else {
-        return value; 
-    }
-}
 
 app.post('/search-patient-by-image', upload.single('imgSrc'), async (req, res) => {
     if (!req.file) {

@@ -5,6 +5,7 @@ import Home from './Home';
 import Login from './User-Authentication/Login';
 import Register from './User-Authentication/Register';
 import Profile from './User-Authentication/Profile';
+import Appointments from './Appointments/Appointments';
 
 function App() {
   const bodyStyle = {
@@ -17,6 +18,7 @@ function App() {
       <Router>
         <div id='app' style={bodyStyle}>
           <Routes>
+          <Route path="/appointments" element={<Appointments />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />

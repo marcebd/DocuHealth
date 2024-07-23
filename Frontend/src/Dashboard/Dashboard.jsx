@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import PatientTabs from './PatientTabs';
+import { useNavigate } from 'react-router-dom';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -16,7 +17,8 @@ function Dashboard() {
   const userId = JSON.parse(localStorage.getItem("userId"));
   let [userFirstName, setUserFirstName] = useState('');
   let [userProfilePicture, setUserProfilePicture] = useState('');
-  const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
+  const [viewingPatientId] = useState(localStorage.getItem('viewingPatient'));
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -40,6 +42,10 @@ function Dashboard() {
     fetchData();
   }, [userId]);
 
+  const handleAppointmentClick = () => {
+    navigate('/appointments');
+  };
+
   return (
     <div id="wholePage">
       <HelmetProvider>
@@ -54,7 +60,7 @@ function Dashboard() {
         background: 'white',
         padding: '0 20px',
         boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-        position: 'fixed', 
+        position: 'fixed',
         top: 0,
         left: 0,
         right: 0
@@ -68,6 +74,18 @@ function Dashboard() {
           }} />
           <h1 style={{ margin: '0' }}>Hello, {userFirstName}</h1>
         </div>
+        <button onClick={() => handleAppointmentClick()} aria-label="Appointments" style={{
+          padding: '10px 20px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: 'auto',
+          height: '40px',
+          background: 'transparent',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+          marginTop: '1%'
+        }}>Appointments</button>
         <button aria-label="Logout from Dashboard" style={{
           padding: '10px 20px',
           display: 'flex',

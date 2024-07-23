@@ -9,6 +9,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
   const [idNumber, setIdNumber] = useState('');
+  const [email, setEmail] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [prescriptions, setPrescriptions] = useState([{ name: '', dose: '', instructions: '', dateStart: '', dateEnd: '' }]);
   const [conditions, setConditions] = useState([{ name: '', dateStart: '', dateEnd: '' }]);
@@ -17,7 +18,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const [patientsData, setPatientsData] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-  //localStorage.removeItem("patientTabs");
+
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {
@@ -85,6 +86,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     formData.append('middleName', middleName);
     formData.append('lastName', lastName);
     formData.append('idNumber', idNumber);
+    formData.append('email', email);
     formData.append('birthDate', birthDate);
     if (imgSrc) {
       formData.append('imgSrc', imgSrc);
@@ -98,9 +100,6 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         body: formData,
       });
       const responseData = await response.json();
-      if (!response.ok) {
-        setError(`Failed to create patient: ${responseData.message}`);
-      } else {
         const updatedPatientTabs = [...patientsInTabs, responseData];
         setPatientsInTabs(updatedPatientTabs);
         localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
@@ -108,9 +107,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         onCreate();
         onClose();
         window.location.reload();
-      }
     } catch (error) {
-      setError(`Error creating patient: ${error.message}`);
+      setError(`${error.message}${error.error}`);
     }
 };
 
@@ -178,6 +176,10 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               <FormGroup>
                 <FormLabel>ID Number<span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="form-control" />
+              </FormGroup>
+              <FormGroup>
+                <FormLabel>Email<span style={{color: 'red'}}>*</span></FormLabel>
+                <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="form-control" />
               </FormGroup>
               <FormGroup>
                 <FormLabel>Birth Date<span style={{color: 'red'}}>*</span></FormLabel>
