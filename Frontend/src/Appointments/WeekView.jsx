@@ -12,10 +12,8 @@ const WeekView = ({ appointments, startDate, endDate, setDate, setView }) => {
 
     const toggleGroup = (hour, timeKey) => {
         const key = `${hour}-${timeKey}`;
-        console.log("Toggling group with key:", key);  // Debug output
         setExpandedGroups(prev => {
             const newState = { ...prev, [key]: !prev[key] };
-            console.log("New expandedGroups state:", newState);  // Debug output
             return newState;
         });
     };

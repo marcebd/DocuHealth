@@ -45,7 +45,6 @@ app.get('/visitNotes/:patientId', async (req, res) => {
     })
     return res.json(visitNotes);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -132,7 +131,6 @@ app.get('/prescriptions/:patientId', async (req, res) => {
     })
     return res.json(prescriptions);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -174,8 +172,7 @@ app.post('/conditions', async (req, res) => {
     }
     res.status(201).json(createdCondition);
   } catch (error) {
-    console.error('Failed to create condition:', error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Failed to create condition:", eror: error.error });
   }
 });
 
@@ -195,7 +192,6 @@ app.get('/conditions/:patientId', async (req, res) => {
     });
     return res.json(conditions);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -209,7 +205,6 @@ app.post('/visitNotes/update/:visitId', async (req, res) => {
     });
 
     if (!noteExists) {
-      console.log("Note not found");
       return res.status(404).json({ message: "Visit Note not found" });
     }
 

@@ -98,7 +98,6 @@ app.get("/users/:userId/patients", async (req, res) => {
       });
       return res.json(patients);
     } catch (err) {
-      console.error(err);
       res.status(500).json({ message: "Internal Server Error" });
     }
   });
@@ -212,7 +211,6 @@ async function fetchPatientsData(patientIds) {
         const serializedResponse = JSON.stringify(responseData, replacer);
         res.status(201).json(JSON.parse(serializedResponse));
     } catch (error) {
-        console.error(error);
         res.status(500).json({ message: "Internal server error", error: error });
     }
 });
@@ -244,7 +242,6 @@ app.get("/appointments/scheduled", async (req, res) => {
       const serializedPatients = JSON.stringify(patients, replacer);
       res.status(200).json(serializedPatients);
   } catch (error) {
-      console.error(error);
       res.status(500).json({ message: error.message, error: error });
   }
 });
@@ -279,7 +276,6 @@ app.get("/appointments/scheduled/:userId", async (req, res) => {
       const serializedPatients = JSON.stringify(patients, replacer);
       res.status(200).json(serializedPatients);
   } catch (error) {
-      console.error(error);
       res.status(500).json({ message: error.message, error: error });
   }
 });
