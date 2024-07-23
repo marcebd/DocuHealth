@@ -24,16 +24,42 @@ const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange
                 <option value="desc">Descending</option>
             </select>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
-                <div style={{ display: 'flex', backgroundColor: '#f2f2f2', padding: '8px', border: '1px solid #ddd' }}>
-                    {columns.map(column => (
-                        <span key={column.key} style={{ flex: 1 }}>{column.header}</span>
+                <div style={{
+                    display: 'flex',
+                    backgroundColor: '#f2f2f2',
+                    padding: '8px',
+                    border: '1px solid #ddd',
+                    minWidth: '100%'
+                }}>
+                    {columns.map((column, index) => (
+                        <span key={column.key} style={{
+                            flex: 1,
+                            minWidth: '5%',
+                            borderRight: index !== columns.length - 1 ? '1px solid #f0f0f0' : 'none',
+                            textAlign: 'center'
+                        }}>
+                            {column.header}
+                        </span>
                     ))}
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {sortedData.map((item) => (
-                        <div key={item.id} onClick={() => onRowClick(item)} style={{ display: 'flex', padding: '8px', border: '1px solid #ddd' }}>
-                            {columns.map(column => (
-                                <span key={column.key} style={{ flex: 1, maxWidth: '100px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div key={item.id} onClick={() => onRowClick(item)} style={{
+                            display: 'flex',
+                            padding: '8px',
+                            border: '1px solid #ddd',
+                            minWidth: '100%'
+                        }}>
+                            {columns.map((column, index) => (
+                                <span key={column.key} style={{
+                                    flex: 1,
+                                    minWidth: '5%',
+                                    borderRight: index !== columns.length - 1 ? '1px solid #f0f0f0' : 'none',
+                                    textAlign: 'center',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
+                                }}>
                                     {item[column.key]}
                                 </span>
                             ))}

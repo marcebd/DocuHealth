@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from "./Calendar";
 import Scheduler from "./Scheduler";
+import TodaysAppointments from './TodaysAppointments';
 
 function Appointments() {
     const [userFirstName, setUserFirstName] = useState('');
@@ -64,7 +65,10 @@ function Appointments() {
             </div>
             <div style={{display:'flex', flexDirection: 'row', marginTop: '1%', maxHeight: '85vh', width:'95%', marginLeft: '2%', marginRight:'2%'}}>
                 <Calendar />
-                <Scheduler />
+                <div style={{display: 'flex', flexDirection: 'column', width: '100%', marginLeft: '2%'}}>
+                    <Scheduler />
+                    <TodaysAppointments />
+                </div>
             </div>
         </div>
     );
