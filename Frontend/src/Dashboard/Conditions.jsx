@@ -79,7 +79,8 @@ const Conditions = () => {
           borderColor: '#ccc',
           borderWidth: '1px',
           borderStyle: 'solid',
-          boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)'
+          boxShadow: '0px 2px 5px rgba(0, 0, 0, 0.1)',
+          fontWeight: 'bold'
         }}>
           Add New Condition
         </Button>

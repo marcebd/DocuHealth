@@ -15,7 +15,7 @@ import bodyParser from 'body-parser';
 initialize(passport);
 const prisma = new PrismaClient();
 const app = express();
-import { RekognitionClient } from "@aws-sdk/client-rekognition";
+import { RekognitionClient, IndexFacesCommand, SearchFacesByImageCommand } from "@aws-sdk/client-rekognition";
 app.listen(3006, () => {
     console.log('Server running on port 3006');
 });

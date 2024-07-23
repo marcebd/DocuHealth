@@ -69,7 +69,7 @@ const Notepad = () => {
         </label>
         <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }} />
         <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-          <button type="submit">Save Note</button>
+          <button type="submit" style={{fontWeight:'bold'}} >Save Note</button>
         </div>
       </form>
       <PastVisitNotes patientId={viewingPatientId} />

@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NewPatientModal from '../Patient/NewPatientModal';
 import Notepad from "./Notepad";
 import PatientDetails from './PatientDetails';
+import AddNewPrescriptionButton from './AddNewPrescriptionButton';
+import './AddNewPrescriptionButton.css'
 
 const PatientTabs = ({ viewingPatientId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tabCreated, setTabCreated] = useState(false);
   const [patients, setPatients] = useState([]);
   const [hoveredButton, setHoveredButton] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const storedPatients = JSON.parse(localStorage.getItem('patientTabs'));
     if (storedPatients && storedPatients.length > 0) {
@@ -91,8 +94,17 @@ const PatientTabs = ({ viewingPatientId }) => {
     minWidth: '120px'
   });
 
+  const generateLightColor = (index) => {
+    const hue = index * 137;
+    return `hsl(${hue}, 70%, 85%)`;
+  };
+
+  const handleAppointmentClick = () => {
+    navigate('/appointments');
+  };
+
   const buttonStyle = {
-    cursor: 'pointer',
+    cursor: hoveredButton ? 'pointer' : 'default',
     padding: '10px 10px',
     marginRight: '5px',
     marginLeft: '5px',
@@ -104,12 +116,7 @@ const PatientTabs = ({ viewingPatientId }) => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
-  };
-
-  const generateLightColor = (index) => {
-    const hue = index * 137;
-    return `hsl(${hue}, 70%, 85%)`;
-  };
+    };
 
   return (
     <div>
@@ -133,20 +140,40 @@ const PatientTabs = ({ viewingPatientId }) => {
           +
         </div>
       </div>
-      <div id='notesPrescriptions' style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-evenly',
-          alignItems: 'flex-start',
-          border: '1px solid lightgrey',
-          borderRadius: '10px',
-          padding: '2%',
-          background: 'white',
-          marginTop: '-4px',
-          height: '150vh'
-      }}>
-          <Notepad />
-          <PatientDetails />
+      <div id='patientFolder' style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-evenly',
+            alignItems: 'flex-start',
+            border: '1px solid lightgrey',
+            borderRadius: '10px',
+            padding: '2%',
+            background: 'white',
+            marginTop: '-4px',
+            height: '150vh'
+        }}>
+          <div style={{display:'flex', alignItems:'center', justifyContent: 'space-evenly', padding: '1%', width:'100%'}}>
+          <button onClick={handleAppointmentClick}  className="addPrescriptionFolder">
+              Schedule an appointment for this patient
+          </button>
+          <AddNewPrescriptionButton onClick={handleAppointmentClick}  className="addPrescriptionFolder"/>
+        </div>
+        <div id='notesPrescriptions' style={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-evenly',
+            alignItems: 'flex-start',
+            border: '1px solid lightgrey',
+            borderRadius: '10px',
+            padding: '2%',
+            background: 'white',
+            marginTop: '-4px',
+            width:'100%',
+            height: '150vh'
+        }}>
+            <Notepad />
+            <PatientDetails />
+        </div>
       </div>
     </div>
   );
