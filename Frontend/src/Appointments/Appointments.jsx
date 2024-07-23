@@ -6,9 +6,9 @@ import TodaysAppointments from './TodaysAppointments';
 function Appointments() {
     const [userFirstName, setUserFirstName] = useState('');
     const [userProfilePicture, setUserProfilePicture] = useState('');
-
+    const userId = JSON.parse(localStorage.getItem("userId"));
     useEffect(() => {
-        const userId = JSON.parse(localStorage.getItem("userId"));
+
         async function fetchUserData() {
             try {
                 const response = await fetch(`http://localhost:3000/${userId}/dashboard/name/picture`, {
@@ -27,7 +27,7 @@ function Appointments() {
             }
         }
         fetchUserData();
-    }, []);
+    }, [userId]);
 
     return (
         <div style={{height: '100vh'}}>

@@ -51,7 +51,6 @@ const DashboardHome = ({ }) => {
 
     const handlePatientClick = (patientId) => {
         setPatientId(patientId);
-        console.log(`Patient with ID ${patientId} was clicked`);
     };
 
     return (
