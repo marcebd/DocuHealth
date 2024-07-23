@@ -88,7 +88,7 @@ function TodaysAppointments() {
                 padding: '10px',
                 borderRadius: '5px'
             }}>
-                Today's Appointments
+                Your Appointments Today
             </h2>
             {loading && <p>Loading...</p>}
             {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
