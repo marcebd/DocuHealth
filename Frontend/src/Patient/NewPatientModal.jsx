@@ -17,9 +17,10 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   const userId = JSON.parse(localStorage.getItem("userId"));
   const [patientsInTabs, setPatientsInTabs] = useState([]);
   const [patientsData, setPatientsData] = useState([]);
+  const [fetchedPatients, setFetchedPatients] = useState([]);
   const [error, setError] = useState('');
   const [imgSrc, setImgSrc] = useState('');
-
+console.log(patientsData);
   useEffect(() => {
     const storedPatients = localStorage.getItem('patientTabs');
     if (storedPatients) {
@@ -40,6 +41,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
         }
         const data = await response.json();
         setPatientsData(data);
+        setFetchedPatients(data);
       } catch (error) {
         console.error('Error fetching patients:', error);
         setError('Error fetching patient data. Please try again later.');
@@ -65,7 +67,21 @@ const NewPatientModal = ({ onClose, onCreate }) => {
   };
 
   const handleSearch = (event) => {
-    // Handle search logic here
+    const searchQuery = event.target.value.trim().toLowerCase();
+
+    if (searchQuery === "") {
+      setPatientsData(fetchedPatients);
+    } else {
+      const filteredPatients = fetchedPatients.filter((patient) => {
+        return (
+          patient.firstName.toLowerCase().includes(searchQuery) ||
+          patient.middleName.toLowerCase().includes(searchQuery) ||
+          patient.lastName.toLowerCase().includes(searchQuery) ||
+          patient.email.toLowerCase().includes(searchQuery)
+        );
+      });
+      setPatientsData(filteredPatients); 
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -152,7 +168,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
           <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
             <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
               <div>
-                <SearchBarPatient placeholder="Search for a patient" onChange={handleSearch} />
+              <SearchBarPatient onChange={handleSearch}/>
               </div>
               <div style={{width: '20%'}} >
                 <FacialRecognitionSearchButton handlePatientClick={handlePatientClick}/>
