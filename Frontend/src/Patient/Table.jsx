@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ContentLoader from 'react-content-loader';
+import TableHeader from './TableHeader';
+import TableRow from './TableRow';
 
 const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange, style, loading }) => {
     const [sortedData, setSortedData] = useState([]);
@@ -41,46 +43,10 @@ const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange
                 <option value="desc">Descending</option>
             </select>
             <div style={{ display: 'flex', flexDirection: 'column', marginTop: '10px' }}>
-                <div style={{
-                    display: 'flex',
-                    backgroundColor: '#f2f2f2',
-                    padding: '8px',
-                    border: '1px solid #ddd',
-                    minWidth: '100%'
-                }}>
-                    {columns.map((column, index) => (
-                        <span key={column.key} style={{
-                            flex: 1,
-                            minWidth: '5%',
-                            borderRight: index !== columns.length - 1 ? '1px solid #f0f0f0' : 'none',
-                            textAlign: 'center'
-                        }}>
-                            {column.header}
-                        </span>
-                    ))}
-                </div>
+                <TableHeader columns={columns} />
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                     {loading ? <TableLoader /> : sortedData.map((item) => (
-                        <div key={item.id} onClick={() => onRowClick(item)} style={{
-                            display: 'flex',
-                            padding: '8px',
-                            border: '1px solid #ddd',
-                            minWidth: '100%'
-                        }}>
-                            {columns.map((column, index) => (
-                                <span key={column.key} style={{
-                                    flex: 1,
-                                    minWidth: '5%',
-                                    borderRight: index !== columns.length - 1 ? '1px solid #f0f0f0' : 'none',
-                                    textAlign: 'center',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    whiteSpace: 'nowrap'
-                                }}>
-                                    {item[column.key]}
-                                </span>
-                            ))}
-                        </div>
+                        <TableRow key={item.id} item={item} columns={columns} onRowClick={onRowClick} />
                     ))}
                 </div>
             </div>
