@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Dashboard from './Dashboard/Dashboard';
-import Home from './Home';
 import Login from './User-Authentication/Login';
 import Register from './User-Authentication/Register';
 import Profile from './User-Authentication/Profile';
 import Appointments from './Appointments/Appointments';
+import LandingPage from './LandingPage/LandingPage';
 
 function App() {
   const bodyStyle = {
@@ -23,7 +23,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<LandingPage />} />
           </Routes>
         </div>
       </Router>

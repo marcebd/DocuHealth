@@ -82,7 +82,7 @@ function Dashboard() {
         localStorage.removeItem('userId');
         localStorage.removeItem('patientTabs');
         localStorage.removeItem('viewingPatient');
-        navigate('/login');
+        navigate('/');
         window.location.reload();
       }
     } catch (error) {
