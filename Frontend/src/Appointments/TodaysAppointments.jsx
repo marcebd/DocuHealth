@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import Table from '../Patient/Table';
+import { useNavigate } from 'react-router-dom';
 
 function TodaysAppointments() {
     const [appointments, setAppointments] = useState([]);
@@ -11,6 +12,7 @@ function TodaysAppointments() {
     const [todaysAppointments, setTodaysAppointments] = useState([]);
     const [sortKey] = useState('time');
     const [sortDirection, setSortDirection] = useState('asc');
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchAppointments();
@@ -37,6 +39,7 @@ function TodaysAppointments() {
                     middleName: user.middleName || '',
                     lastName: user.lastName,
                     email: user.email,
+                    patientId: user.id,
                     time: moment(appointment.appointmentTime).format('hh:mm A')
                 }))
             );
@@ -57,8 +60,12 @@ function TodaysAppointments() {
         { key: 'email', header: 'Email' }
     ];
 
-    const handleRowClick = (item) => {
-        console.log('Row clicked:', item);
+    const handleRowClick = (patient) => {
+        localStorage.setItem('viewingPatient', patient.patientId);
+        const currentPatientTabs = JSON.parse(localStorage.getItem('patientTabs') || '[]');
+        const updatedPatientTabs = [...currentPatientTabs, parseInt(patient.patientId)];
+        localStorage.setItem('patientTabs', JSON.stringify(updatedPatientTabs));
+        navigate('/dashboard');
     };
 
     const handleSortChange = (event) => {

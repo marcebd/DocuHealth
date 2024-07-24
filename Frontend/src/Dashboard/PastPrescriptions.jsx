@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
+import ContentLoader from 'react-content-loader';
 
 const PastPrescriptions = () => {
   const [prescriptions, setPrescriptions] = useState([]);
@@ -7,11 +8,7 @@ const PastPrescriptions = () => {
   const [showModal, setShowModal] = useState(false);
   const [patientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
   const tableRef = useRef(null);
-  const [updatedPrescriptionName, setUpdatedPrescriptionName] = useState('');
-  const [updatedPrescriptionDose, setUpdatedPrescriptionDose] = useState('');
-  const [updatedPrescriptionInstructions, setUpdatedPrescriptionInstructions] = useState('');
-  const [updatedPrescriptionDateStart, setUpdatedPrescriptionDateStart] = useState('');
-  const [updatedPrescriptionDateEnd, setUpdatedPrescriptionDateEnd] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -32,11 +29,14 @@ const PastPrescriptions = () => {
         if (response.ok) {
           const data = await response.json();
           setPrescriptions(data);
+          setIsLoading(false);
         } else {
-          console.error('Failed to fetch prescriptions');
+          setError('Failed to fetch prescriptions');
+          setIsLoading(false);
         }
       } catch (error) {
-        console.error('Error fetching prescriptions:', error);
+        setError('Error fetching prescriptions:', error);
+        setIsLoading(false);
       }
     };
 
@@ -46,29 +46,19 @@ const PastPrescriptions = () => {
   const handleRowClick = (prescription) => {
     setSelectedPrescription(prescription);
     setShowModal(true);
-    setUpdatedPrescriptionName(prescription.name);
-    setUpdatedPrescriptionDose(prescription.dose);
-    setUpdatedPrescriptionInstructions(prescription.instructions);
-    setUpdatedPrescriptionDateStart(prescription.dateStart.slice(0, 10));
-    setUpdatedPrescriptionDateEnd(prescription.dateEnd.slice(0, 10));
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
   };
 
   const handleSubmit = async () => {
-    const updatedPrescription = {
-      name: updatedPrescriptionName ? updatedPrescriptionName : selectedPrescription.name,
-      dose: updatedPrescriptionDose ? updatedPrescriptionDose : selectedPrescription.dose,
-      instructions: updatedPrescriptionInstructions ? updatedPrescriptionInstructions : selectedPrescription.instructions,
-      dateStart: updatedPrescriptionDateStart ? updatedPrescriptionDateStart: selectedPrescription.dateStart,
-      dateEnd: updatedPrescriptionDateEnd ? updatedPrescriptionDateEnd: selectedPrescription.dateEnd
-    };
-
-    const prescription = {prescription: updatedPrescription};
-
     try {
+      const updatedPrescription = {
+        id: selectedPrescription.id,
+        name: selectedPrescription.name,
+        dose: selectedPrescription.dose,
+        instructions: selectedPrescription.instructions,
+        dateStart: new Date(selectedPrescription.dateStart),
+        dateEnd: new Date(selectedPrescription.dateEnd)
+      };
+      const prescription = {prescription: updatedPrescription};
       const response = await fetch(`http://localhost:3002/prescriptions/update/${selectedPrescription.id}`, {
         method: 'POST',
         headers: {
@@ -76,26 +66,37 @@ const PastPrescriptions = () => {
         },
         body: JSON.stringify(prescription)
       });
-
       if (!response.ok) {
         const responseData = await response.json();
-        console.error('Failed to update prescription:', responseData);
-        setError('Failed to save the updated prescription. Please try again.');
+        setError('Failed to save the updated prescription. Please try again.', responseData);
         return;
       }
+      setSelectedPrescription(null);
       setShowModal(false);
       window.location.reload();
     } catch (error) {
-      console.error("Error updating prescription:", error);
       setError(`An error occurred while saving the updated prescription: ${error}`);
     }
   };
 
-  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
+  const PrescriptionLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={700}
+      height={40}
+      viewBox="0 0 700 40"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <rect x="0" y="0" rx="3" ry="3" width="700" height="40" />
+    </ContentLoader>
+  );
 
   return (
-    <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
-      {prescriptions.length > 0 ? (
+    <div ref={tableRef} style={{ maxHeight: '80vh', overflowY: 'auto' }}>
+      {isLoading ? (
+        Array.from({ length: 5 }, (_, index) => <PrescriptionLoader key={index} />)
+      ) : prescriptions.length > 0 ? (
         <Table striped bordered hover>
           <thead>
             <tr>
@@ -116,29 +117,49 @@ const PastPrescriptions = () => {
         <p style={{ textAlign: 'center', marginTop: '20px' }}>This patient doesn't have any prescriptions.</p>
       )}
 
-      <Modal show={showModal} onHide={handleCloseModal}>
+<Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Prescription Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
           {selectedPrescription && (
             <>
-              <p><strong>Name:</strong> <input type="text" defaultValue={updatedPrescriptionName} onChange={(e) => setUpdatedPrescriptionName(e.target.value)} /></p>
-              <p><strong>Dose:</strong> <input type="text" defaultValue={updatedPrescriptionDose} onChange={(e) => setUpdatedPrescriptionDose(e.target.value)} /></p>
-              <p><strong>Instructions:</strong> <textarea defaultValue={updatedPrescriptionInstructions} onChange={(e) => setUpdatedPrescriptionInstructions(e.target.value)} style={{ width: '100%', height: '100px' }} /></p>
-              <p><strong>Start Date:</strong> <input type="date" defaultValue={updatedPrescriptionDateStart} onChange={(e) => setUpdatedPrescriptionDateStart(e.target.value)} /></p>
-              <p><strong>End Date:</strong> <input type="date" defaultValue={updatedPrescriptionDateEnd} onChange={(e) => setUpdatedPrescriptionDateEnd(e.target.value)} /></p>
+              <label>
+                Name:
+                <input type="text" value={selectedPrescription.name} onChange={(e) => setSelectedPrescription({ ...selectedPrescription, name: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Dose:
+                <input type="text" value={selectedPrescription.dose} onChange={(e) => setSelectedPrescription({ ...selectedPrescription, dose: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Instructions:
+                <textarea value={selectedPrescription.instructions} onChange={(e) => setSelectedPrescription({ ...selectedPrescription, instructions: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Date Start:
+                <input type="date" defaultValue={selectedPrescription.dateStart.slice(0, 10)}  onChange={(e) => setSelectedPrescription({ ...selectedPrescription, dateStart: e.target.value })} />
+              </label>
+              <br />
+              <label>
+                Date End:
+                <input type="date" defaultValue={selectedPrescription.dateEnd.slice(0, 10)}  onChange={(e) => setSelectedPrescription({ ...selectedPrescription, dateEnd: e.target.value })} />
+              </label>
             </>
-)}
-</Modal.Body>
-<Modal.Footer>
-<Button variant="primary" onClick={handleSubmit}>
-Save Changes
-</Button>
-</Modal.Footer>
-</Modal>
-</div>
-);
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleSubmit}>
+            Save Changes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
 };
+
 export default PastPrescriptions;

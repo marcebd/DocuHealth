@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import PastVisitNotes from './PastVisitNotes';
+import ContentLoader from 'react-content-loader';
 
 const Notepad = () => {
   const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
@@ -23,6 +24,8 @@ Assessment:
 Plan: `);
   const [visitDate, setVisitDate] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       const currentPatientId = localStorage.getItem('viewingPatient');
@@ -37,6 +40,7 @@ Plan: `);
   useEffect(() => {
     const currentDate = new Date();
     setVisitDate(currentDate.toISOString().split('T')[0]);
+    setIsLoading(false);
   }, []);
 
   const handleNoteChange = (event) => {
@@ -80,20 +84,38 @@ Plan: `);
     }
   };
 
+  const NoteLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={400}
+      height={400}
+      viewBox="0 0 400 400"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <rect x="0" y="0" rx="3" ry="3" width="400" height="20" />
+      <rect x="0" y="30" rx="3" ry="3" width="380" height="350" />
+    </ContentLoader>
+  );
+
   return (
     <div id='notes' style={{ width: '45%' }}>
       <h1>Today's Visit Note:</h1>
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <label style={{ alignSelf: 'flex-start', width: '100%' }}>
-          <span style={{ fontSize: '1.2em' }}>Visit Date:</span>
-          <input type="date" value={visitDate} onChange={(event) => { setVisitDate(event.target.value); setError(''); }} style={{ marginLeft: '10px' }} />
-        </label>
-        <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }}  />
-        <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
-          <button type="submit" style={{fontWeight:'bold'}} >Save Note</button>
-        </div>
-      </form>
+      {isLoading ? (
+        <NoteLoader />
+      ) : (
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <label style={{ alignSelf: 'flex-start', width: '100%' }}>
+            <span style={{ fontSize: '1.2em' }}>Visit Date:</span>
+            <input type="date" value={visitDate} onChange={(event) => { setVisitDate(event.target.value); setError(''); }} style={{ marginLeft: '10px' }} />
+          </label>
+          <textarea value={note} onChange={handleNoteChange} style={{ width: '95%', height: '60vh', marginTop: '10px' }}  />
+          <div style={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '10px' }}>
+            <button type="submit" style={{fontWeight:'bold'}} >Save Note</button>
+          </div>
+        </form>
+      )}
       <PastVisitNotes patientId={viewingPatientId} />
     </div>
   );

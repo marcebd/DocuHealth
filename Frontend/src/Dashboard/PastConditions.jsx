@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Table, Button, Modal } from 'react-bootstrap';
+import ContentLoader from 'react-content-loader';
 
 const PastConditions = ({ patientId }) => {
   let parsedPatientId = JSON.parse(patientId);
@@ -10,6 +11,7 @@ const PastConditions = ({ patientId }) => {
   const [updatedConditionName, setUpdatedConditionName] = useState('');
   const [updatedConditionDateStart, setUpdatedConditionDateStart] = useState('');
   const [updatedConditionDateEnd, setUpdatedConditionDateEnd] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -19,14 +21,16 @@ const PastConditions = ({ patientId }) => {
         if (response.ok) {
           const data = await response.json();
           setConditions(data);
+          setIsLoading(false);
         } else {
           console.error('Failed to fetch conditions');
+          setIsLoading(false);
         }
       } catch (error) {
         console.error('Error fetching conditions:', error);
+        setIsLoading(false);
       }
     };
-
     fetchConditions();
   }, [patientId]);
 
@@ -69,11 +73,26 @@ const PastConditions = ({ patientId }) => {
     }
   };
 
+  const ConditionLoader = () => (
+    <ContentLoader
+      speed={2}
+      width={700}
+      height={40}
+      viewBox="0 0 700 40"
+      backgroundColor="#f3f3f3"
+      foregroundColor="#ecebeb"
+    >
+      <rect x="0" y="0" rx="3" ry="3" width="700" height="40" />
+    </ContentLoader>
+  );
+
   const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
   return (
     <>
       <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
-        {conditions.length > 0 ? (
+      {isLoading ? (
+          Array.from({ length: 5 }, (_, index) => <ConditionLoader key={index} />)
+        ) : conditions.length > 0 ? (
           <Table striped bordered hover>
             <thead>
               <tr>
@@ -97,7 +116,7 @@ const PastConditions = ({ patientId }) => {
         )}
       </div>
 
-      <Modal show={showModal} onHide={handleCloseModal}>
+      <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton>
           <Modal.Title>Condition Details</Modal.Title>
         </Modal.Header>
