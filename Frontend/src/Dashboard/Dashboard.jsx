@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Helmet, HelmetProvider } from 'react-helmet-async';
 import PatientTabs from './PatientTabs';
 import ContentLoader from 'react-content-loader';
+import { useNavigate } from 'react-router-dom';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -19,6 +20,7 @@ function Dashboard() {
   let [userProfilePicture, setUserProfilePicture] = useState('');
   const [viewingPatientId] = useState(localStorage.getItem('viewingPatient'));
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -69,6 +71,25 @@ function Dashboard() {
     </ContentLoader>
   );
 
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('`http://localhost:3000/logout', {
+        method: 'GET'
+      });
+      if (!response.ok) {
+        console.error('Failed to log out:', response);
+      } else {
+        localStorage.removeItem('userId');
+        localStorage.removeItem('patientTabs');
+        localStorage.removeItem('viewingPatient');
+        navigate('/login');
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <div id="wholePage">
       <HelmetProvider>
@@ -97,7 +118,8 @@ function Dashboard() {
           }} />}
           <h1 style={{ margin: '0' }}>{isLoading ? <NameLoader /> : `Hello, ${userFirstName}`}</h1>
         </div>
-        <button aria-label="Logout from Dashboard" style={{
+        <button aria-label="Logout from Dashboard" onClick={handleLogout} style={{
+          cursor: 'pointer',
           padding: '10px 20px',
           display: 'flex',
           justifyContent: 'center',
