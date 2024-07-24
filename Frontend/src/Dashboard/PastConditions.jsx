@@ -7,6 +7,10 @@ const PastConditions = ({ patientId }) => {
   const [selectedCondition, setSelectedCondition] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const tableRef = useRef(null);
+  const [updatedConditionName, setUpdatedConditionName] = useState('');
+  const [updatedConditionDateStart, setUpdatedConditionDateStart] = useState('');
+  const [updatedConditionDateEnd, setUpdatedConditionDateEnd] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchConditions = async () => {
@@ -35,8 +39,37 @@ const PastConditions = ({ patientId }) => {
     setShowModal(false);
   };
 
-  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
+  const handleSubmit = async () => {
+    const updatedCondition = {
+      name: updatedConditionName ? updatedConditionName: selectedCondition.name,
+      dateStart: updatedConditionDateStart ? updatedConditionDateStart : selectedCondition.dateStart.slice(0, 10),
+      dateEnd: updatedConditionDateEnd ? updatedConditionDateEnd : selectedCondition.dateEnd.slice(0, 10)
+    };
+    const condition = {condition: updatedCondition};
 
+    try{
+      const response = await fetch(`http://localhost:3002/conditions/update/${selectedCondition.id}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(condition)
+      });
+      if (!response.ok) {
+        const responseData = await response.json();
+        console.error('Failed to update condition:', responseData);
+        setError('Failed to save the updated condition. Please try again.');
+        return;
+      }
+      setShowModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating condition:", error);
+      setError(`An error occurred while saving the updated condition: ${error}`);
+    }
+  };
+
+  const maxHeight = tableRef.current ? tableRef.current.parentElement.clientHeight * 0.8 : 'auto';
   return (
     <>
       <div ref={tableRef} style={{ maxHeight: maxHeight, overflowY: 'auto' }}>
@@ -45,7 +78,8 @@ const PastConditions = ({ patientId }) => {
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Date</th>
+                <th>Date Start</th>
+                <th>Date End</th>
               </tr>
             </thead>
             <tbody>
@@ -53,6 +87,7 @@ const PastConditions = ({ patientId }) => {
                 <tr key={condition.id} onClick={() => handleRowClick(condition)}>
                   <td>{condition.name}</td>
                   <td>{new Date(condition.dateStart).toLocaleDateString()}</td>
+                  <td>{new Date(condition.dateEnd).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>
@@ -67,16 +102,18 @@ const PastConditions = ({ patientId }) => {
           <Modal.Title>Condition Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {selectedCondition && (
-            <>
-              <p><strong>Name:</strong> {selectedCondition.name}</p>
-              <p><strong>Date:</strong> {new Date(selectedCondition.date).toLocaleDateString()}</p>
-            </>
-          )}
-        </Modal.Body>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        {selectedCondition && (
+          <>
+            <p><strong>Name:</strong> <input type="text" name="idNumber" defaultValue={selectedCondition.name} onChange={(e) => setUpdatedConditionName(e.target.value)}/></p>
+            <p><strong>Date Start:</strong> <input type="date" name="dateStart" defaultValue={selectedCondition.dateStart.slice(0, 10)} onChange={(e) => setUpdatedConditionDateStart(e.target.value)}/></p>
+            <p><strong>Date End:</strong> <input type="date" name="dateEnd" defaultValue={selectedCondition.dateEnd.slice(0, 10)} onChange={(e) => setUpdatedConditionDateEnd(e.target.value)}/></p>
+          </>
+        )}
+      </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModal}>
-            Close
+          <Button variant="secondary" onClick={handleSubmit}>
+            Submit
           </Button>
         </Modal.Footer>
       </Modal>

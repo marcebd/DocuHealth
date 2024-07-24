@@ -12,7 +12,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5174',
+    origin: 'http://localhost:5175',
     credentials: true,
 }));
 app.use(express.urlencoded({ extended: false }));
@@ -197,6 +197,97 @@ app.get('/conditions/:patientId', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.post('/visitNotes/update/:visitId', async (req, res) => {
+  const { visitId } = req.params;
+  const { notes } = req.body;
+  try {
+    const noteExists = await prisma.visitNote.findUnique({
+      where: { id: BigInt(visitId) }
+    });
+
+    if (!noteExists) {
+      console.log("Note not found");
+      return res.status(404).json({ message: "Visit Note not found" });
+    }
+
+    const updatedVisitNote = await prisma.visitNote.update({
+      where: { id: BigInt(visitId) },
+      data: { notes: notes }
+    });
+
+    const responseObj = {
+      ...updatedVisitNote,
+      id: updatedVisitNote.id.toString(),
+      patientId: updatedVisitNote.patientId.toString()
+    };
+    return res.json(responseObj);
+  } catch (error) {
+    return res.status(500).json({ message: 'Error updating note' });
+  }
+});
+
+app.post('/conditions/update/:conditionId', async (req, res) => {
+  const { conditionId } = req.params;
+  const { condition } = req.body;
+  try {
+    const conditionExisits = await prisma.condition.findUnique({
+      where: { id: BigInt(conditionId) }
+    });
+
+    if (!conditionExisits) {
+      return res.status(404).json({ message: "Condition not found" });
+    }
+
+    const updatedCondition = await prisma.condition.update({
+      where: { id: BigInt(conditionId) },
+      data: { name: condition.name, dateStart: new Date(condition.dateStart), dateEnd: new Date(condition.dateEnd) }
+    });
+
+    const responseObj = {
+      ...updatedCondition,
+      id: updatedCondition.id.toString(),
+      patientId: updatedCondition.patientId.toString()
+    };
+    return res.json(responseObj);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error: error.error});
+  }
+});
+
+app.post('/prescriptions/update/:prescriptionId', async (req, res) => {
+  const { prescriptionId } = req.params;
+  const { prescription } = req.body;
+  try {
+    const prescriptionExists = await prisma.prescription.findUnique({
+      where: { id: BigInt(prescriptionId) }
+    });
+
+    if (!prescriptionExists) {
+      return res.status(404).json({ message: "Prescription not found" });
+    }
+
+    const updatedPrescription = await prisma.prescription.update({
+      where: { id: BigInt(prescriptionId) },
+      data: {
+        name: prescription.name,
+        dose: prescription.dose,
+        instructions: prescription.instructions,
+        dateStart: new Date(prescription.dateStart),
+        dateEnd: new Date(prescription.dateEnd)
+      }
+    });
+
+    const responseObj = {
+      ...updatedPrescription,
+      id: updatedPrescription.id.toString(),
+      patientId: updatedPrescription.patientId.toString()
+    };
+    return res.json(responseObj);
+  } catch (error) {
+    return res.status(500).json({ message: error.message, error: error.error });
   }
 });
 

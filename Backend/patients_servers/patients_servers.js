@@ -20,7 +20,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5174',
+    origin: 'http://localhost:5175',
     credentials: true,
 }));
 app.use(express.urlencoded({ extended: false }));
@@ -221,6 +221,41 @@ app.get("/appointments/scheduled", async (req, res) => {
   try {
       const patients = await prisma.patient.findMany({
           where: { appointments: { some: {} } },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            appointments: {
+              select: {
+                  id: true,
+                  appointmentTime: true,
+                  timeZone: true,
+                  notificationSettings: {
+                    select: {
+                      number: true,
+                      frequency: true,
+                    }
+                  }
+              }
+            }
+          }
+      });
+      const serializedPatients = JSON.stringify(patients, replacer);
+      res.status(200).json(serializedPatients);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: error.message, error: error });
+  }
+});
+
+app.get("/appointments/scheduled/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  try {
+      const patients = await prisma.patient.findMany({
+          where: {
+            userId: userId,
+            appointments: { some: {} } },
           select: {
             id: true,
             firstName: true,
