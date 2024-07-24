@@ -107,12 +107,8 @@ app.get("/users/:userId/patients", async (req, res) => {
     if (!patientIds || patientIds.length === 0) {
       return res.status(400).json({ message: "No patient IDs provided" });
     }
-    const cleanedPatientIds = patientIds.map(id => {
-      const cleanedId = id.replace(/^"|"$/g, '');
-      return BigInt(cleanedId);
-    }).filter(id => id !== null);
     try {
-        const patientsData = await fetchPatientsData(cleanedPatientIds);
+        const patientsData = await fetchPatientsData(patientIds);
         res.status(200).json(patientsData);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch patient data" });
