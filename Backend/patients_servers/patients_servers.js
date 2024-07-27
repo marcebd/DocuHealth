@@ -275,3 +275,26 @@ app.get("/appointments/scheduled/:userId", async (req, res) => {
       res.status(500).json({ message: error.message, error: error });
   }
 });
+
+app.get("/dashboard/patient/information/:patientId", async (req, res) => {
+  const patientId = req.params.patientId;
+  try {
+      const patients = await prisma.patient.findUnique({
+          where: {id: patientId},
+          select: {
+            id: true,
+            firstName: true,
+            middleName: true,
+            lastName: true,
+            email: true,
+            idNumber: true,
+            birthDate: true,
+            picture: true,
+          }
+      });
+      const serializedPatients = JSON.stringify(patients, replacer);
+      res.status(200).json(serializedPatients);
+  } catch (error) {
+      res.status(500).json({ message: error.message, error: error });
+  }
+});
