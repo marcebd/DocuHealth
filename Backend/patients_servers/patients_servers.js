@@ -298,3 +298,40 @@ app.get("/dashboard/patient/information/:patientId", async (req, res) => {
       res.status(500).json({ message: error.message, error: error });
   }
 });
+
+app.post("/patients/:patientId", upload.single('imgSrc'), async (req, res) => {
+  try {
+    const birthDate = new Date(req.body.birthDate);
+    const prescriptions = JSON.parse(req.body.prescriptions).map(prescription => ({
+      ...prescription,
+      dateStart: new Date(prescription.dateStart),
+      dateEnd: new Date(prescription.dateEnd)
+    }));
+    const conditions = JSON.parse(req.body.conditions).map(condition => ({
+      ...condition,
+      dateStart: new Date(condition.dateStart),
+      dateEnd: new Date(condition.dateEnd)
+    }));
+
+    const patientId = req.params.patientId;
+    const updatedPatient = await prisma.patient.update({
+      where: { id: patientId },
+      data: {
+        userId: parseInt(req.body.userId),
+        firstName: req.body.firstName,
+        middleName: req.body.middleName,
+        lastName: req.body.lastName,
+        idNumber: req.body.idNumber,
+        email: req.body.email,
+        birthDate: birthDate,
+        picture: req.file ? req.file.buffer : null,
+        prescriptions: { create: prescriptions },
+        conditions: { create: conditions }
+      },
+    });
+    const serializedPatient = JSON.stringify(updatedPatient.id, replacer);
+    res.json(serializedPatient);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update patient", error: error.message });
+  }
+});

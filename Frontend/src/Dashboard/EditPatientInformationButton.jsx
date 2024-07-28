@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button} from 'react-bootstrap';
 import AddNewPrescriptionModal from './AddNewPrescriptionModal';
 import './AddNewPrescriptionButton.css'
+import EditPatientInformationModal from './EditPatientInformationModal';
 
 const EditPatientInformationButton = ({ styles, className }) => {
     const [viewingPatientId, setViewingPatientId] = useState(localStorage.getItem('viewingPatient'));
@@ -88,11 +89,11 @@ const EditPatientInformationButton = ({ styles, className }) => {
     return (
         <div style={{width: 'auto', height: 'auto', display:'flex', alignItems:'center'}}>
             <Button onClick={() => setShowModal(true)} style={{fontWeight:'bold'}} className={className} stye={styles}>
-                Prescribe Medication
+                Edit Patient Data
             </Button>
         {showModal && (
             <div>
-                <AddNewPrescriptionModal
+                <EditPatientInformationModal
                 showModal={showModal}
                 setShowModal={setShowModal}
                 prescriptions={prescriptions}
