@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import defaultImage from '../DocuImage/ProfilePicDefault.jpeg';
 
-function PatientIdentification () {
+function PatientIdentification() {
     const viewingPatientId = localStorage.getItem('viewingPatient');
     const [firstName, setFirstName] = useState('');
     const [middleName, setMiddleName] = useState('');
@@ -22,7 +22,7 @@ function PatientIdentification () {
                     console.error('Failed to fetch patient data in dashboard:', response);
                 } else {
                     let patientInformation = await response.json();
-                    patientInformation= JSON.parse(patientInformation);
+                    patientInformation = JSON.parse(patientInformation);
                     setFirstName(patientInformation.firstName);
                     setMiddleName(patientInformation.middleName);
                     setLastName(patientInformation.lastName);
@@ -36,6 +36,9 @@ function PatientIdentification () {
                         const base64String = btoa(String.fromCharCode(...new Uint8Array(buffer)));
                         setPicture(`data:image/jpeg;base64,${base64String}`);
                     }
+                    else{
+                        setPicture(defaultImage);
+                    }
                     setIsLoading(false);
                 }
             } catch (error) {
@@ -46,27 +49,27 @@ function PatientIdentification () {
     }, [viewingPatientId]);
 
     return (
-        <div className="identification-card" style={{display:'flex'}}>
+        <div className="identification-card" style={{ display: 'flex', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }}>
             {firstName !== "" ? (
-                <div style={{display: 'flex', flexDirection: 'row', width: 'auto', alignItems: 'center'}}>
-                    <div style={{width: '40%'}}>
-                        <img src={picture} style={{width: '100%'}} />
+                <div style={{ display: 'flex', flexDirection: 'row', width: '100%', alignItems: 'center' }}>
+                    <div style={{ width: '30%', padding: '10px' }}>
+                        <img src={picture} alt="Patient" style={{ width: '100%', height: 'auto', borderRadius: '10px' }} />
                     </div>
-                    <div style={{margin: '1%', width: '100%'}}>
-                        <h1>{`${firstName} ${middleName ? middleName + ' ' : ''}${lastName}`}</h1>
+                    <div style={{ margin: '1%', width: '70%' }}>
+                        <h1 style={{ color: 'black', fontSize: '24px', fontWeight: 'bold' }}>{`${firstName} ${middleName ? middleName + ' ' : ''}${lastName}`}</h1>
                         {birthDate !== "" && (
-                            <h4>Date of Birth: {birthDate}</h4>
+                            <h4 style={{ color: 'black', fontSize: '18px' }}>Date of Birth: {birthDate}</h4>
                         )}
                         {idNumber !== "" && (
-                            <h4>Personal Identification Number: {idNumber}</h4>
+                            <h4 style={{ color: 'black', fontSize: '18px' }}>Personal Identification Number: {idNumber}</h4>
                         )}
                         {email !== "" && (
-                            <h4>Email: {email}</h4>
+                            <h4 style={{ color: 'black', fontSize: '18px' }}>Email: {email}</h4>
                         )}
                     </div>
                 </div>
             ) : (
-                <h1>Loading...</h1>
+                <h1 style={{ color: '#e74c3c' }}>Loading...</h1>
             )}
         </div>
     )

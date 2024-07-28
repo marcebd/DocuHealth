@@ -22,7 +22,7 @@ const PatientSearchTable = ({ patientsData, handlePatientClick }) => {
             sortKey="firstName"
             sortDirection={sortDirection}
             onSortChange={handleSortChange}
-            style={{maxHeight: '80vh', overflowY: 'auto'}}
+            style={{maxHeight: '65vh', overflowY: 'auto'}}
         />
     );
 };

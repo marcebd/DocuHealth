@@ -104,6 +104,7 @@ app.get("/users/:userId/patients", async (req, res) => {
 
   app.post("/patients/names", async (req, res) => {
     const patientIds = req.body.map(id => parseInt(id));
+    console.log(patientIds);
     if (!patientIds || patientIds.length === 0) {
       return res.status(400).json({ message: "No patient IDs provided" });
     }

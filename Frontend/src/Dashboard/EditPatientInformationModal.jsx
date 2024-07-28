@@ -62,7 +62,7 @@ const EditPatientInformationModal = ({ patientId, setShowModal }) => {
 
     const onImageCapture = (image) => {
         const imageUrl = URL.createObjectURL(image);
-        setPicture(image);
+        setPicture(imageUrl);
         setImgSrc(image);
     };
 
@@ -108,6 +108,7 @@ const EditPatientInformationModal = ({ patientId, setShowModal }) => {
 
             setError('Patient Data Updated Correctly');
             setShowModal(false);
+            window.location.reload();
         } catch (error) {
             console.error(error);
             setError(error.message);

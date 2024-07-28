@@ -1,3 +1,7 @@
 .modal-content {
     align-items: center;
 }
+
+.modal-body {
+    height: 100vh;
+}

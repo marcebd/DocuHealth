@@ -123,7 +123,8 @@ const NewPatientModal = ({ onClose, onCreate }) => {
       if (!response.ok) {
         throw new Error('Failed to create patient');
       }
-      const responseData = await response.json();
+      let responseData = await response.json();
+      responseData = JSON.parse(responseData);
       const updatedPatientTabs = [...patientsInTabs, responseData];
       setPatientsInTabs(updatedPatientTabs);
       localStorage.setItem('viewingPatient', JSON.parse(responseData));
@@ -160,7 +161,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     setConditions(filteredConditions);
   };
   return (
-    <Modal show={true} onHide={onClose} centered style={{ display: 'flex', alignItems: 'center', width: '100vw' }}>
+    <Modal show={true} onHide={onClose} centered style={{ display: 'flex', alignItems: 'center', width: '100vw', height: '100%'}}>
       <Modal.Dialog style={{ margin: 0, width: '50vw', maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Modal.Header closeButton style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1%' }}>
           <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Find or Create a New Patient</Modal.Title>
@@ -188,7 +189,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               <FormGroup>
                 <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" required />
-              </FormGroup>p
+              </FormGroup>
               <FormGroup>
                 <FormLabel>Middle Name</FormLabel>
                 <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="form-control" />
