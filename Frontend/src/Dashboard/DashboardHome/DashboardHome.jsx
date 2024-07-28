@@ -59,11 +59,11 @@ const DashboardHome = ({ }) => {
     };
 
     return (
-        <div style={{width: '95%', display: 'flex'}}>
+        <div style={{width: '100%', display: 'flex', justifyContent: 'space-evenly'}}>
             <div style={{width: '45%'}}>
                 <TodaysAppointments />
             </div>
-            <div style={{display:'flex', flexDirection:'column', alignItems: 'center'}}>
+            <div style={{display:'flex', flexDirection:'column', alignItems: 'center', width: '45%'}}>
                 <SearchBarPatient onChange={handleSearch} value={searchQuery} />
                 {showPreview && <PatientPreview patients={patientsData} searchQuery={searchQuery} onClick={handlePatientClick} />}
                 <Scheduler patientId={patientId} />

@@ -4,6 +4,7 @@ import SearchBarPatient from './SearchBarPatient';
 import FacialRecognitionPatientButton from '../FacialRecognition/FacialRecognitionPacientButton';
 import FacialRecognitionSearchButton from '../FacialRecognition/FacialRecognitionSearchButton';
 import PatientSearchTable from './PatientSearchTable';
+import './NewPatientModal.css'
 
 const NewPatientModal = ({ onClose, onCreate }) => {
   const [firstName, setFirstName] = useState('');
