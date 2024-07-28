@@ -4,7 +4,7 @@
     align-items: center;
 }
 
-.modal-content{
-    height: 80%;
+.modal-content {
+    height: auto;
     width: 100%;
 }

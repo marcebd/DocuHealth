@@ -85,11 +85,11 @@ const Conditions = () => {
           Add New Condition
         </Button>
       </div>
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-        <Modal.Header closeButton>
+      <Modal show={showModal} onHide={() => setShowModal(false)} style={{width: '100%'}}>
+        <Modal.Header closeButton style={{width: '100%'}}>
           <Modal.Title>Add New Condition</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body style={{width: '100%', height: 'auto'}}>
           {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
           <Form onSubmit={handleSubmit}>
             {conditions.map((condition, index) => (
@@ -148,7 +148,7 @@ const Conditions = () => {
               </div>
           </Form>
         </Modal.Body>
-        <Modal.Footer>
+        <Modal.Footer style={{width: '100%'}}>
           <Button variant="secondary" onClick={() => setShowModal(false)}>
             Close
           </Button>

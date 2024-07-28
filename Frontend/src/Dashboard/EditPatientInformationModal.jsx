@@ -151,11 +151,11 @@ const EditPatientInformationModal = ({ patientId, setShowModal }) => {
                     <FacialRecognitionModal onClose={handleCloseModal} onImageCapture={onImageCapture} />
                 </div>
             )}
-            <Modal show={true} onHide={() => setShowModal(false)} style={{width: '100%', height: 'auto'}}>
+            <Modal show={true} onHide={() => setShowModal(false)} style={{width: '100%'}}>
                 <Modal.Header closeButton style={{width: '100%'}}>
                     <Modal.Title>Edit Patient Information</Modal.Title>
                 </Modal.Header>
-                <Modal.Body style={{width: '100%'}}>
+                <Modal.Body style={{width: '100%', height: 'auto'}}>
                     {error && <p style={{ color: 'red' }}>{error}</p>}
                     <Form onSubmit={handleSubmit}>
                         <Form.Group controlId="firstName">

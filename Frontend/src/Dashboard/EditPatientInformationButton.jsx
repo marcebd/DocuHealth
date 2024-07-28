@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-import AddNewPrescriptionModal from './AddNewPrescriptionModal';
-import './AddNewPrescriptionButton.css'
 import EditPatientInformationModal from './EditPatientInformationModal';
 
 const EditPatientInformationButton = ({ styles, className }) => {
@@ -23,7 +21,7 @@ const EditPatientInformationButton = ({ styles, className }) => {
     return (
     <div style={{width: 'auto', height: 'auto', display:'flex', alignItems:'center'}}>
         <Button onClick={() => setShowModal(true)} style={{fontWeight:'bold'}} className={className} stye={styles}>
-            Edit Patient Data
+            Edit Patient Profile
         </Button>
         {showModal && (
         <div>

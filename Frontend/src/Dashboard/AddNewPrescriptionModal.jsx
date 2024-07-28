@@ -8,7 +8,7 @@ function AddNewPrescriptionModal({ showModal, setShowModal, prescriptions, handl
             <Modal.Header closeButton style={{width: '100%'}}>
                 <Modal.Title>Add New Prescription</Modal.Title>
             </Modal.Header>
-            <Modal.Body style={{width: '100%'}}>
+            <Modal.Body style={{width: '100%', height: 'auto'}}>
                 {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
                 <Form onSubmit={handleSubmit}>
                 {prescriptions.map((prescription, index) => (

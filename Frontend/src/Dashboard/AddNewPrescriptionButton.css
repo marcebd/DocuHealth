@@ -42,3 +42,12 @@
     background-color: lightgrey;
     color: black;
 }
+
+.modal-body{
+    height: 50vh;
+}
+
+.modal-content {
+    height: 50%;
+    width: 100%;
+}
