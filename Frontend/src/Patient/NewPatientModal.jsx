@@ -188,7 +188,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               <FormGroup>
                 <FormLabel>First Name <span style={{color: 'red'}}>*</span></FormLabel>
                 <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} className="form-control" required />
-              </FormGroup>
+              </FormGroup>p
               <FormGroup>
                 <FormLabel>Middle Name</FormLabel>
                 <input type="text" value={middleName} onChange={(e) => setMiddleName(e.target.value)} className="form-control" />

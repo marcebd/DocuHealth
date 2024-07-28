@@ -45,10 +45,10 @@ const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
 
     return (
         <Modal show={true} onHide={onClose} centered size="lg">
-            <Modal.Header closeButton>
+            <Modal.Header closeButton style={{width: '100%'}}>
                 <Modal.Title>Stand in front of the camera and look forward</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body style={{width: '100%'}}>
                 {!imgSrc && (
                     <Webcam
                         audio={false}
@@ -71,7 +71,7 @@ const FacialRecognitionModal = ({ onClose, onImageCapture }) => {
                 )}
                 {error && <p style={{ color: error === "Image Taken Correctly, you can close the screen." ? 'green' : 'red' }}>{error}</p>}
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer style={{width: '100%'}}>
                 {!imgSrc && (
                     <Button variant="primary" onClick={capture}>
                         Take Picture
