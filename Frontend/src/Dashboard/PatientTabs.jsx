@@ -8,6 +8,7 @@ import './AddNewPrescriptionButton.css';
 import ContentLoader from 'react-content-loader';
 import DashboardHome from './DashboardHome/DashboardHome';
 import PatientIdentification from './PatientIdentification';
+import EditPatientInformationButton from './EditPatientInformationButton';
 
 const PatientTabs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -218,7 +219,8 @@ const PatientTabs = () => {
               <button onClick={() => navigate('/appointments')} className="addPrescriptionFolder">
                 Schedule Appointment
               </button>
-              <AddNewPrescriptionButton onClick={() => navigate('/prescriptions')} className="addPrescriptionFolder"/>
+              <AddNewPrescriptionButton className="addPrescriptionFolder"/>
+              <EditPatientInformationButton className="addPrescriptionFolder" />
           </div>
           <div id='notesPrescriptions' style={{
             display: 'flex',

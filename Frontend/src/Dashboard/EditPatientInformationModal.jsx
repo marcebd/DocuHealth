@@ -1,8 +1,6 @@
 import React from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
-import './AddNewPrescriptionButton.css'
-
-function AddNewPrescriptionModal({ showModal, setShowModal, prescriptions, handleInputChange, addPrescriptionForm, handleSubmit, error, isHovering, setIsHovering }) {
+function EditPatientInformationModal({ showModal, setShowModal, prescriptions, handleInputChange, addPrescriptionForm, handleSubmit, error, isHovering, setIsHovering }) {
     return (
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
             <Modal.Header closeButton style={{width: '100%'}}>
@@ -95,4 +93,4 @@ function AddNewPrescriptionModal({ showModal, setShowModal, prescriptions, handl
             </Modal>
     );
 }
-export default AddNewPrescriptionModal;
+export default EditPatientInformationModal;
