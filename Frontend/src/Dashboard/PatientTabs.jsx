@@ -216,7 +216,7 @@ const PatientTabs = () => {
           </div>
           <div style={{display:'flex', flexDirection: 'row', padding:'2%'}}>
               <button onClick={() => navigate('/appointments')} className="addPrescriptionFolder">
-                Schedule an Appointment
+                Schedule Appointment
               </button>
               <AddNewPrescriptionButton onClick={() => navigate('/prescriptions')} className="addPrescriptionFolder"/>
           </div>

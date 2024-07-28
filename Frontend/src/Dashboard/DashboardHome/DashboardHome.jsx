@@ -10,60 +10,65 @@ const DashboardHome = ({ }) => {
     const [fetchedPatients, setFetchedPatients] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [patientId, setPatientId] = useState('');
+    const [showPreview, setShowPreview] = useState(true);
 
     useEffect(() => {
-    async function fetchData() {
-        try {
-        const response = await fetch(`http://localhost:3001/users/${userId}/patients`, {
-            method: 'GET',
-        });
-        if (!response.ok) {
-            throw new Error('Failed to fetch patients');
+        async function fetchData() {
+            try {
+                const response = await fetch(`http://localhost:3001/users/${userId}/patients`, {
+                    method: 'GET',
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to fetch patients');
+                }
+                const data = await response.json();
+                setPatientsData(data);
+                setFetchedPatients(data);
+            } catch (error) {
+                console.error('Error fetching patients:', error);
+            }
         }
-        const data = await response.json();
-        setPatientsData(data);
-        setFetchedPatients(data);
-        } catch (error) {
-        console.error('Error fetching patients:', error);
-        }
-    }
-    fetchData();
+        fetchData();
     }, [userId]);
 
     const handleSearch = (event) => {
-    const searchQuery = event.target.value.trim().toLowerCase();
-    setSearchQuery(searchQuery);
+        setShowPreview(true);
+        const searchQuery = event.target.value.trim().toLowerCase();
+        setSearchQuery(searchQuery);
 
-    if (searchQuery === "") {
-        setPatientsData(fetchedPatients);
-    } else {
-        const filteredPatients = fetchedPatients.filter((patient) => {
-        return (
-            patient.firstName.toLowerCase().includes(searchQuery) ||
-            patient.middleName.toLowerCase().includes(searchQuery) ||
-            patient.lastName.toLowerCase().includes(searchQuery) ||
-            patient.email.toLowerCase().includes(searchQuery)
-        );
-        });
-        setPatientsData(filteredPatients);
-    }
+        if (searchQuery === "") {
+            setPatientsData(fetchedPatients);
+        } else {
+            const filteredPatients = fetchedPatients.filter((patient) => {
+            return (
+                (patient.firstName.toLowerCase() + ' ' + patient.middleName.toLowerCase() + ' ' + patient.lastName.toLowerCase()).includes(searchQuery) ||
+                patient.firstName.toLowerCase().includes(searchQuery) ||
+                patient.middleName.toLowerCase().includes(searchQuery) ||
+                patient.lastName.toLowerCase().includes(searchQuery) ||
+                patient.email.toLowerCase().includes(searchQuery)
+            );
+            });
+            setPatientsData(filteredPatients);
+        }
     };
 
-    const handlePatientClick = (patientId) => {
-        setPatientId(patientId);
+    const handlePatientClick = (patient) => {
+        setPatientId(patient.id);
+        setSearchQuery(`${patient.firstName} ${patient.middleName} ${patient.lastName}`);
+        setShowPreview(false);
     };
 
     return (
-    <div style={{width: '95%', display: 'flex'}}>
-        <div style={{width: '45%'}}>
-            <TodaysAppointments />
+        <div style={{width: '95%', display: 'flex'}}>
+            <div style={{width: '45%'}}>
+                <TodaysAppointments />
+            </div>
+            <div style={{display:'flex', flexDirection:'column', alignItems: 'center'}}>
+                <SearchBarPatient onChange={handleSearch} value={searchQuery} />
+                {showPreview && <PatientPreview patients={patientsData} searchQuery={searchQuery} onClick={handlePatientClick} />}
+                <Scheduler patientId={patientId} />
+            </div>
         </div>
-        <div style={{display:'flex', flexDirection:'column',}}>
-            <SearchBarPatient onChange={handleSearch} />
-            <PatientPreview patients={patientsData} searchQuery={searchQuery} onClick={handlePatientClick} />
-            <Scheduler patientId={patientId} />
-        </div>
-    </div>
     );
 };
 

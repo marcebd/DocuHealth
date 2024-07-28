@@ -87,7 +87,7 @@ const AddNewPrescriptionButton = ({ styles, className }) => {
     return (
         <div style={{width: 'auto', height: 'auto', display:'flex', alignItems:'center'}}>
             <Button onClick={() => setShowModal(true)} style={{fontWeight:'bold'}} className={className} stye={styles}>
-                Add New Prescription
+                Prescribe Medication
             </Button>
         {showModal && (
             <div>
