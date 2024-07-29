@@ -5,7 +5,6 @@ import TableRow from './TableRow';
 
 const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange, style, loading }) => {
     const [sortedData, setSortedData] = useState([]);
-
     useEffect(() => {
         sortData(sortDirection);
     }, [data, sortDirection]);

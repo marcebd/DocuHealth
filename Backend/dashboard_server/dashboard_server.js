@@ -7,6 +7,7 @@ import session from "express-session";
 import flash from "connect-flash";
 const prisma = new PrismaClient();
 import { config as dotenvConfig } from 'dotenv';
+import e from "connect-flash";
 dotenvConfig();
 const app = express();
 // Middleware
@@ -28,6 +29,14 @@ app.use(passport.session());
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the API" });
 });
+
+function replacer(key, value) {
+  if (typeof value === 'bigint') {
+      return value.toString();
+  } else {
+      return value;
+  }
+}
 
 app.get('/visitNotes/:patientId', async (req, res) => {
   const patientId = req.params.patientId.replace(/"/g, '');
@@ -132,6 +141,42 @@ app.get('/prescriptions/:patientId', async (req, res) => {
     return res.json(prescriptions);
   } catch (err) {
     res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.get('/appointments/:patientId', async (req, res) => {
+  const patientId = req.params.patientId.replace(/"/g, '');
+  try {
+    const appointments = await prisma.patient.findUnique({
+      where: { id: BigInt(patientId) },
+      select: {
+        appointments: {
+          select: {
+              id: true,
+              appointmentTime: true,
+              timeZone: true,
+              notificationSettings: {
+                select: {
+                  number: true,
+                  frequency: true,
+                }
+              },
+              type: true,
+              conditions: true,
+              prescriptions: true,
+              visitNotes: true,
+          }
+        }
+      }
+    });
+    if (!appointments) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+    const serializedAppointments = JSON.stringify(appointments, replacer);
+    res.status(200).json(serializedAppointments);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: err.message, error: err.eror });
   }
 });
 
@@ -283,6 +328,45 @@ app.post('/prescriptions/update/:prescriptionId', async (req, res) => {
     return res.json(responseObj);
   } catch (error) {
     return res.status(500).json({ message: error.message, error: error.error });
+  }
+});
+
+app.post('/appointment/severity/:patientId', async (req, res) => {
+  const { patientId } = req.params;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  try {
+    const existingAppointment = await prisma.appointment.findFirst({
+      where: {
+        patientId: BigInt(patientId),
+        appointmentTime: {
+          gte: today,
+          lt: new Date(today.getTime() + 24 * 60 * 60 * 1000)
+        }
+      }
+    });
+    console.log(existingAppointment.id);
+    if (existingAppointment) {
+      const updatedAppointment = await prisma.appointment.update({
+        where: { id: existingAppointment.id },
+        data: { type: req.body.selected.type }
+      });
+      const serializedAppointments = JSON.stringify(updatedAppointment, replacer);
+      console.log(serializedAppointments);
+      return res.json( serializedAppointments );
+    } else {
+      const newAppointment = await prisma.appointment.create({
+        data: {
+          patientId: BigInt(patientId),
+          appointmentTime: new Date(),
+          type: req.body.selected.type
+        }
+      });
+      const serializedAppointments = JSON.stringify(newAppointment, replacer);
+      return res.json(serializedAppointments);
+    }
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to process appointment', error: error.message });
   }
 });
 

@@ -48,6 +48,7 @@ model Patient {
   firstName            String
   middleName           String?
   lastName             String
+  gender               Gender?
   idNumber             String
   birthDate            DateTime
   email                String?
@@ -67,42 +68,60 @@ model Appointment {
   notificationSettings   NotificationSettings[]
   patientId              BigInt
   patient                Patient               @relation(fields: [patientId], references: [id])
+  type                   AppointmentType?
+  conditions             Condition[]
+  prescriptions          Prescription[]
+  visitNotes             VisitNote[]
 }
 
 model NotificationSettings {
-  id            BigInt        @id @default(autoincrement())
-  number        Int
-  frequency     String
-  appointment   Appointment?  @relation(fields: [appointmentID], references: [id])
-  appointmentID BigInt?        
+id BigInt @id @default(autoincrement())
+number Int
+frequency String
+appointment Appointment? @relation(fields: [appointmentID], references: [id])
+appointmentID BigInt?
+}
+
+enum AppointmentType {
+  Routine
+  CommonSickness
+  RoutineSickness
+  EmergencySickness
+  Emergency
 }
 
 model VisitNote {
-  id        BigInt   @id @default(autoincrement())
-  date      DateTime
-  notes     String
-  patientId BigInt
-  patient   Patient  @relation(fields: [patientId], references: [id])
+  id            BigInt       @id @default(autoincrement())
+  date          DateTime
+  notes         String
+  patientId     BigInt
+  patient       Patient      @relation(fields: [patientId], references: [id])
+  appointmentId BigInt?      @map("appointment_id")
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
 }
 
 model Prescription {
-  id           BigInt    @id @default(autoincrement())
-  name         String
-  dose         String
-  instructions String?
-  patientId    BigInt
-  dateEnd      DateTime?
-  dateStart    DateTime?
-  patient      Patient   @relation(fields: [patientId], references: [id])
+  id            BigInt       @id @default(autoincrement())
+  name          String
+  dose          String
+  instructions  String?
+  patientId     BigInt
+  dateEnd       DateTime?
+  dateStart     DateTime?
+  patient       Patient      @relation(fields: [patientId], references: [id])
+  appointmentId BigInt?      @map("appointment_id")
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
 }
 
 model Condition {
-  id        BigInt    @id @default(autoincrement())
-  name      String
-  patientId BigInt
-  dateEnd   DateTime?
-  dateStart DateTime?
-  patient   Patient   @relation(fields: [patientId], references: [id])
+  id            BigInt       @id @default(autoincrement())
+  name          String
+  patientId     BigInt
+  dateEnd       DateTime?
+  dateStart     DateTime?
+  patient       Patient      @relation(fields: [patientId], references: [id])
+  appointmentId BigInt?      @map("appointment_id")
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
 }
 
 enum Gender {

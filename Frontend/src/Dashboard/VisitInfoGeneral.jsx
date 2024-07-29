@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { FaRegCalendarAlt, FaRegEdit } from 'react-icons/fa'; // Import icons
+import { FaRegCalendarAlt, FaRegEdit } from 'react-icons/fa'; 
 import Notepad from "./Notepad";
 import PastVisitNotes from './PastVisitNotes';
 import VisitTable from './VisitTable';
 
 const VisitInfoGeneral = () => {
     const [viewingPatientId] = useState(localStorage.getItem('viewingPatient'));
-    const [showNotepad, setShowNotepad] = useState(false); // State to toggle between Notepad and VisitTable
+    const [showNotepad, setShowNotepad] = useState(false);
 
     const toggleView = () => {
         setShowNotepad(!showNotepad);
