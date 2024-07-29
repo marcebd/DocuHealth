@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import PastVisitNotes from './PastVisitNotes';
 import ContentLoader from 'react-content-loader';
 
 const Notepad = () => {
@@ -116,7 +115,6 @@ Plan: `);
           </div>
         </form>
       )}
-      <PastVisitNotes patientId={viewingPatientId} />
     </div>
   );
 };
