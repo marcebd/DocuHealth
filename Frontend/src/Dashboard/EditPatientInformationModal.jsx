@@ -153,7 +153,7 @@ const EditPatientInformationModal = ({ patientId, setShowModal }) => {
             )}
             <Modal show={true} onHide={() => setShowModal(false)} style={{width: '100%'}}>
                 <Modal.Header closeButton style={{width: '100%'}}>
-                    <Modal.Title>Edit Patient Information</Modal.Title>
+                    <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Edit Patient Information</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{width: '100%', height: 'auto'}}>
                     {error && <p style={{ color: 'red' }}>{error}</p>}

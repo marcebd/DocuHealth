@@ -161,13 +161,12 @@ const NewPatientModal = ({ onClose, onCreate }) => {
     setConditions(filteredConditions);
   };
   return (
-    <Modal show={true} onHide={onClose} centered style={{ display: 'flex', alignItems: 'center', width: '100vw', height: '100%'}}>
-      <Modal.Dialog style={{ margin: 0, width: '50vw', maxWidth: '50vw', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <Modal.Header closeButton style={{ width: '100%', padding: '0 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '1%' }}>
+    <Modal show={true} onHide={onClose} centered style={{}}>
+        <Modal.Header closeButton style={{ width: '100%'}}>
           <Modal.Title style={{ flex: 1, textAlign: 'center', padding: '2%' }}>Find or Create a New Patient</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '100%', padding: '0', justifyContent: 'space-evenly' }}>
-          <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
+        <Modal.Body style={{ display: 'flex', flexDirection: 'row', width: '90vw', padding: '0', justifyContent: 'space-evenly', height: 'auto' }}>
+          <div style={{ width: '45vw', maxHeight: '100%', overflowY: 'auto', padding: '2%' }}>
             <div style={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
               <div>
               <SearchBarPatient onChange={handleSearch}/>
@@ -182,7 +181,7 @@ const NewPatientModal = ({ onClose, onCreate }) => {
               <p>No patients found</p>
             )}
           </div>
-          <div style={{ width: '45%', maxHeight: '100%', overflowY: 'auto' }}>
+          <div style={{ width: '45vw', maxHeight: '80vh', overflowY: 'auto', padding: '2%' }}>
             {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             <Form onSubmit={handleSubmit}>
               <h3>Patient Data</h3>
@@ -255,11 +254,15 @@ const NewPatientModal = ({ onClose, onCreate }) => {
                 ))}
                 <button type="button" onClick={addCondition} className="btn btn-primary">Add Condition</button>
               </FormGroup>
-              <Button type="submit" className="btn btn-success">Save Patient</Button>
+              <Button type="submit" className="btn btn-success" style={{background: 'red'}}>Save Patient</Button>
             </Form>
           </div>
         </Modal.Body>
-      </Modal.Dialog>
+        <Modal.Footer style={{width: '100%'}}>
+            <Button variant="secondary" onClick={() => onClose()} >
+                Close
+            </Button>
+        </Modal.Footer>
     </Modal>
   );
 };

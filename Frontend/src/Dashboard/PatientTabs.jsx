@@ -30,7 +30,6 @@ const PatientTabs = () => {
   }, [isModalOpen]);
 
   const fetchData = async (patientsIds) => {
-    console.log(patientsIds);
     try {
       const response = await fetch(`http://localhost:3001/patients/names`, {
         method: 'POST',
