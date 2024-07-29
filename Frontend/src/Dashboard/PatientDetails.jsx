@@ -4,7 +4,7 @@ import Conditions from './Conditions';
 
 const PatientDetails = () => {
     return (
-        <div id='patientDetails' style={{ width: '50%', height: '100%' }}>
+        <div id='patientDetails' style={{ width: '100%', height: '100%' }}>
             <Conditions />
             <Prescriptions />
         </div>

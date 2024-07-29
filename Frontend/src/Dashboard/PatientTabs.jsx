@@ -9,6 +9,7 @@ import ContentLoader from 'react-content-loader';
 import DashboardHome from './DashboardHome/DashboardHome';
 import PatientIdentification from './PatientIdentification';
 import EditPatientInformationButton from './EditPatientInformationButton';
+import VisitInfoGeneral from './VisitInfoGeneral';
 
 const PatientTabs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -235,8 +236,12 @@ const PatientTabs = () => {
             width:'100%',
             height: '150vh'
           }}>
-            <Notepad />
+            <div style={{width: '50%'}}>
+            <VisitInfoGeneral/>
+            </div>
+            <div style={{width: '50%'}}>
             <PatientDetails />
+            </div>
           </div>
         </div>
       )}

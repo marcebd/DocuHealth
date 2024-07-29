@@ -99,7 +99,7 @@ Plan: `);
   );
 
   return (
-    <div id='notes' style={{ width: '45%' }}>
+    <div id='notes' style={{ width: '100%' }}>
       <h1>Today's Visit Note:</h1>
       {error && <div style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
       {isLoading ? (
