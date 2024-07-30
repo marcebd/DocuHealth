@@ -10,7 +10,7 @@ const dockItems = {
         { icon: <FaTrashAlt />, name: 'Delete Patient', color: '#85C1E9' }
         ],
         MedicalRecords: [
-        { icon: <FaEdit />, name: 'Add Visit Note', color: '#58D68D' },
+        { icon: <FaEdit />, name: 'Add Note', color: '#58D68D',  key: 'addNote' },
         { icon: <FaFilePrescription />, name: 'Add Prescription', color: '#58D68D' },
         { icon: <FaNotesMedical />, name: 'Add Diagnosis', color: '#58D68D' }
         ],

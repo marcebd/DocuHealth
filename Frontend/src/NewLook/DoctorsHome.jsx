@@ -4,13 +4,15 @@ import Dock from './Dock';
 import MonthlyCalendar from './Calendar/MonthlyCalendar';
 import PatientInformation from './PatientInformation/PatientInformation';
 import AddPatient from './AddPatient/AddPatient';
+import AddNote from './VisitNote.jsx/AddNote';
 
 
 function DoctorsHome() {
     const [components, setComponents] = useState({
         calendar: { component: <MonthlyCalendar />, isVisible: false },
         patientInformation: {component: <PatientInformation />, isVisible: false},
-        addPatient: {component: <AddPatient />, isVisible: false}
+        addPatient: {component: <AddPatient />, isVisible: false},
+        addNote: {component: <AddNote />, isVisible: false}
         // Add more components as needed
     });
 
