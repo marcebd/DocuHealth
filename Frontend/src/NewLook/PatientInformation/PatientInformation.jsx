@@ -10,7 +10,7 @@ const PatientInformation = () => {
     const handlePatientSelect = (patient) => {
         setSelectedPatient(patient);
         setShowTable(false);
-        setSearchQuery(`${patient.firstName} ${patient.middleName} ${patient.lastName}`.trim());  // Set the search query to the patient's name
+        setSearchQuery(`${patient.firstName} ${patient.middleName} ${patient.lastName}`.trim());
     };
 
     const handleSearchChange = (query) => {
