@@ -1,0 +1,65 @@
+/* General text color in the calendar for days and numbers */
+.fc .fc-media-screen,
+.fc .fc-daygrid-day-number,
+.fc .fc-col-header-cell-cushion { /* This targets the day names like Mon, Tue, etc. */
+    color: #000; /* Black text */
+}
+
+/* Header button and title colors */
+.fc .fc-toolbar-title {
+    color: #000; /* Black */
+}
+
+.fc .fc-button-primary {
+    background-color: #4285F4; /* Blue */
+    border-color: #4285F4; /* Blue */
+    color: #fff; /* White text */
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #3173c4; /* Darker blue */
+    border-color: #3173c4; /* Darker blue */
+}
+
+/* Event colors */
+.fc .fc-event {
+    background-color: #4285F4; /* Blue */
+    border-color: #4285F4; /* Blue */
+    color: #fff; /* White text */
+}
+
+.fc .fc-event:hover {
+    background-color: #3173c4; /* Darker blue */
+    border-color: #3173c4; /* Darker blue */
+}
+
+/* Today's date background and related elements */
+.fc .fc-day-today,
+.fc .fc-button-today {
+    background-color: #DB4437; /* Red */
+    color: #fff; /* White text */
+    opacity: 1;
+}
+
+/* Weekend background color */
+.fc .fc-day-sat,
+.fc .fc-day-sun {
+    background-color: #E0E0E0; /* Grey */
+    opacity: 0.3;
+}
+
+/* Active day background */
+.fc .fc-day-active {
+    background-color: #87CEEB; /* Sky Blue */
+    opacity: 0.5;
+}
+
+/* Styles for the 'Today' button */
+.fc .fc-today-button {
+    font-size: 16px; /* Larger font size for better readability */
+    border-radius: 5px;
+}
+
+.fc .fc-today-button:hover {
+    background-color: #E60000;
+}

@@ -1,0 +1,22 @@
+.component-grid-container {
+    display: flex;
+    width: 100%;
+    height: 90vh;
+}
+
+.component-grid {
+    flex: 1;
+    display: grid;
+    grid-gap: 10px;
+    padding: 5px;
+}
+
+.grid-one, .grid-two, .grid-three, .grid-four {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+}
+
+.grid-more-than-four {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+}
