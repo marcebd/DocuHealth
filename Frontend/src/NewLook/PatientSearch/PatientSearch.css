@@ -1,0 +1,27 @@
+.patient-search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 95%;
+}
+
+.search-bar-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.patient-search-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.patient-search-table th, .patient-search-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+}
+
+.patient-search-table th {
+    background-color: #f8f8f8;
+}

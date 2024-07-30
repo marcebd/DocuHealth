@@ -53,7 +53,7 @@ function MonthlyCalendar() {
     };
 
     return (
-        <div className="calendar-container">
+        <div className="calendar-container" >
             <FullCalendar
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView={view}

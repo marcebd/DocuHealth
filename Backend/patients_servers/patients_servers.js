@@ -290,6 +290,7 @@ app.get("/dashboard/patient/information/:patientId", async (req, res) => {
             idNumber: true,
             birthDate: true,
             picture: true,
+            gender: true
           }
       });
       const serializedPatients = JSON.stringify(patients, replacer);
@@ -318,6 +319,7 @@ app.post("/patients/:patientId", upload.single('picture'), async (req, res) => {
               middleName: req.body.middleName,
               lastName: req.body.lastName,
               idNumber: req.body.idNumber,
+              gender: req.body.gender,
               email: req.body.email,
               birthDate: birthDate,
               picture: pictureData

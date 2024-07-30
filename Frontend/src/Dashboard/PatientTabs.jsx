@@ -10,7 +10,8 @@ import DashboardHome from './DashboardHome/DashboardHome';
 import PatientIdentification from './PatientIdentification';
 import EditPatientInformationButton from './EditPatientInformationButton';
 import VisitInfoGeneral from './VisitInfoGeneral';
-import DoctorsHome from './NewLook/DoctorsHome';
+import DoctorsHome from '../NewLook/DoctorsHome';
+
 
 const PatientTabs = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

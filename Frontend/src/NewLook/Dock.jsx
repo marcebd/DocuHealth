@@ -5,7 +5,7 @@ import './Dock.css';
 
 const dockItems = {
     PatientManagement: [
-        { icon: <FaUserMd />, name: 'Patient Info', color: '#85C1E9' },
+        { icon: <FaUserMd />, name: 'Patient Info', color: '#85C1E9', key: 'patientInformation' },
         { icon: <FaPlusSquare />, name: 'Add Patient', color: '#85C1E9' },
         { icon: <FaEdit />, name: 'Edit Patient', color: '#85C1E9' },
         { icon: <FaTrashAlt />, name: 'Delete Patient', color: '#85C1E9' }
