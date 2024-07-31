@@ -5,6 +5,7 @@ import MonthlyCalendar from './Calendar/MonthlyCalendar';
 import PatientInformation from './PatientInformation/PatientInformation';
 import AddPatient from './AddPatient/AddPatient';
 import Note from './VisitNote.jsx/Note';
+import Prescription from './Prescription/Prescription'
 
 
 function DoctorsHome() {
@@ -12,7 +13,8 @@ function DoctorsHome() {
         calendar: { component: <MonthlyCalendar />, isVisible: false },
         patientInformation: {component: <PatientInformation />, isVisible: false},
         addPatient: {component: <AddPatient />, isVisible: false},
-        addNote: {component: <Note />, isVisible: false}
+        addNote: {component: <Note />, isVisible: false},
+        addPrescription: {component: <Prescription />, isVisible: false}
         // Add more components as needed
     });
 

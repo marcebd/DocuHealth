@@ -62,10 +62,9 @@ Plan:`);
             noteTime,
             patientId
         };
-        handleSubmit(noteData); // Call the passed handleSubmit function with the note data
+        handleSubmit(noteData); 
     };
 
-    // Construct the patient's full name
     const patientName = patient ? `${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}` : 'Patient';
 
     return (
