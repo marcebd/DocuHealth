@@ -186,7 +186,6 @@ app.listen(3002, () => {
 
 app.post('/conditions', async (req, res) => {
   const conditions = req.body.conditions;
-
   if (!Array.isArray(conditions) || conditions.length === 0) {
     return res.status(400).json({ message: "No conditions provided or incorrect format" });
   }

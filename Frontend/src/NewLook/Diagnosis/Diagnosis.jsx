@@ -3,12 +3,12 @@ import { FaFilePrescription } from 'react-icons/fa';
 import PatientSearch from "../PatientSearch/PatientSearch";
 import { Snackbar, Typography, Box, Button } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import AddPrescription from "./AddPrescription";
-import PrescriptionTable from "./PrescriptionTable";
+import AddDiagnosis from "./AddDiagnosis";
+import DiagnosisTable from "./DiagnosisTable";
 
-const Prescription = () => {
+const Diagnosis = () => {
     const [selectedPatient, setSelectedPatient] = useState(null);
-    const [prescriptions, setPrescriptions] = useState([]);
+    const [diagnoses, setDiagnoses] = useState([]);
     const [showTable, setShowTable] = useState(true);
     const [searchQuery, setSearchQuery] = useState("");
     const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -34,45 +34,43 @@ const Prescription = () => {
 
     const handleSearchChange = (query) => {
         setSearchQuery(query);
-        if (query !== `${selectedPatient?.firstName} ${selectedPatient?.middleName} ${selectedPatient?.lastName}`.trim()) {
+        if (query !== fullName) {
             setShowTable(true);
             setSelectedPatient(null);
         }
     };
 
     useEffect(() => {
-        const fetchPrescriptions = async () => {
+        const fetchDiagnoses = async () => {
             if (selectedPatient && selectedPatient.id) {
                 setIsLoading(true);
                 try {
-                    const response = await fetch(`http://localhost:3002/prescriptions/${selectedPatient.id}`);
+                    const response = await fetch(`http://localhost:3002/conditions/${selectedPatient.id}`);
                     if (response.ok) {
                         let data = await response.json();
-                        data = data.map(prescription => ({
-                            ...prescription,
-                            dateStart: new Date(prescription.dateStart).toLocaleDateString('en-US'), // Adjust the locale as needed
-                            dateEnd: prescription.dateEnd ? new Date(prescription.dateEnd).toLocaleDateString('en-US') : null
+                        data = data.map(diagnosis => ({
+                            ...diagnosis,
+                            dateStart: new Date(diagnosis.dateStart).toLocaleDateString('en-US'),
+                            dateEnd: diagnosis.dateEnd ? new Date(diagnosis.dateEnd).toLocaleDateString('en-US') : null
                         }));
-                        setPrescriptions(data);
+                        setDiagnoses(data);
                     } else {
-                        setError('Failed to fetch prescriptions');
+                        setError('Failed to fetch diagnoses');
                     }
                 } catch (error) {
-                    setError(`Error fetching prescriptions: ${error}`);
+                    setError(`Error fetching diagnoses: ${error}`);
                 } finally {
                     setIsLoading(false);
                 }
             }
         };
 
-        fetchPrescriptions();
+        fetchDiagnoses();
     }, [selectedPatient, reFetch]);
 
-    const handlePrescriptionSubmit = async (prescriptionData) => {
-        const isValid = prescriptionData.name.trim() !== '' &&
-                        prescriptionData.dose.trim() !== '' &&
-                        prescriptionData.instructions.trim() !== '' &&
-                        prescriptionData.dateStart.trim() !== '';
+    const handleDiagnosisSubmit = async (diagnosisData) => {
+        const isValid = diagnosisData.name.trim() !== '' &&
+                        diagnosisData.dateStart.trim() !== '';
 
         if (!isValid) {
             setError('All fields are required. Please fill in all data.');
@@ -80,29 +78,29 @@ const Prescription = () => {
         }
 
         try {
-            const response = await fetch(`http://localhost:3002/prescriptions`, {
+            const response = await fetch(`http://localhost:3002/conditions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ prescriptions: [{ ...prescriptionData, patientId: selectedPatient.id }] })
+                body: JSON.stringify({ conditions: [{ ...diagnosisData, patientId: selectedPatient.id }] })
             });
 
             if (response.ok) {
-                setSnackbarMessage('Prescription saved successfully');
+                setSnackbarMessage('Diagnosis saved successfully');
                 setOpenSnackbar(true);
                 setFetch(true);
                 setShowAddButton(true);
             } else {
                 const errorResponse = await response.json();
-                setError(`Failed to add prescription: ${errorResponse.message}`);
+                setError(`Failed to add diagnosis: ${errorResponse.message}`);
             }
         } catch (error) {
-            setError(`Error adding prescription: ${error}`);
+            setError(`Error adding diagnosis: ${error}`);
         }
     };
 
-    const handleAddAnotherPrescription = () => {
+    const handleAddAnotherDiagnosis = () => {
         setResetForm(true);
         setTimeout(() => setResetForm(false), 10);
     };
@@ -112,23 +110,18 @@ const Prescription = () => {
             <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', marginBottom: '2%' }}>
                 <FaFilePrescription style={{ color: 'white', marginRight: 8, fontSize: '24px' }} />
                 <Typography variant="h5" style={{ color: 'white' }}>
-                    Add Prescription
+                    Add Diagnosis
                 </Typography>
             </Box>
-            {prescriptions.length > 0 && <PrescriptionTable prescriptions={prescriptions} patientName={fullName} />}
-            <PatientSearch
-                onPatientSelect={handlePatientSelect}
-                showTable={showTable}
-                searchQuery={searchQuery}
-                onSearchChange={handleSearchChange}
-            />
-            {selectedPatient && <AddPrescription patient={selectedPatient} handleSubmit={handlePrescriptionSubmit} resetFormTrigger={resetForm} />}
+            {diagnoses.length > 0 && <DiagnosisTable diagnoses={diagnoses} patientName={fullName} />}
+            <PatientSearch onPatientSelect={handlePatientSelect} showTable={showTable} searchQuery={searchQuery} onSearchChange={handleSearchChange} />
+            {selectedPatient && <AddDiagnosis patient={selectedPatient} handleSubmit={handleDiagnosisSubmit} resetFormTrigger={resetForm} />}
             {showAddButton && (
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                    <Button variant="contained" color="error" onClick={handleAddAnotherPrescription}>
-                        Add Another Prescription
-                    </Button>
-                </Box>
+            <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+                <Button variant="contained" color="primary" onClick={handleAddAnotherDiagnosis}>
+                    Add Another Diagnosis
+                </Button>
+            </Box>
             )}
             {error && <Typography color="error" style={{ marginTop: '20px' }}>{error}</Typography>}
             <Snackbar
@@ -149,4 +142,4 @@ const Prescription = () => {
         </div>
     );
 }
-export default Prescription;
+export default Diagnosis;
