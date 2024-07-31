@@ -16,7 +16,7 @@ const dockItems = {
         ],
         Scheduling: [
         { icon: <FaCalendarAlt />, name: 'Calendar', color: '#F4D03F', key: 'calendar' },
-        { icon: <RiCalendarScheduleFill />, name: 'Schedule Appointment', color: '#F4D03F' }
+        { icon: <RiCalendarScheduleFill />, name: 'Schedule Appointment', color: '#F4D03F', key: 'addAppointment' }
         ],
         ProfileSettings: [
         { icon: <FaUserEdit />, name: 'Edit Profile', color: '#BB8FCE' },

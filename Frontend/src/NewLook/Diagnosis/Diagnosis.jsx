@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaFilePrescription } from 'react-icons/fa';
+import { FaNotesMedical } from 'react-icons/fa';
 import PatientSearch from "../PatientSearch/PatientSearch";
 import { Snackbar, Typography, Box, Button } from '@mui/material';
 import Alert from '@mui/material/Alert';
@@ -108,17 +108,17 @@ const Diagnosis = () => {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
             <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', marginBottom: '2%' }}>
-                <FaFilePrescription style={{ color: 'white', marginRight: 8, fontSize: '24px' }} />
+                <FaNotesMedical style={{ color: 'white', marginRight: 8, fontSize: '24px' }} />
                 <Typography variant="h5" style={{ color: 'white' }}>
                     Add Diagnosis
                 </Typography>
             </Box>
-            {diagnoses.length > 0 && <DiagnosisTable diagnoses={diagnoses} patientName={fullName} />}
             <PatientSearch onPatientSelect={handlePatientSelect} showTable={showTable} searchQuery={searchQuery} onSearchChange={handleSearchChange} />
+            {diagnoses.length > 0 && selectedPatient && <DiagnosisTable diagnoses={diagnoses} patientName={fullName} />}
             {selectedPatient && <AddDiagnosis patient={selectedPatient} handleSubmit={handleDiagnosisSubmit} resetFormTrigger={resetForm} />}
             {showAddButton && (
             <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-                <Button variant="contained" color="primary" onClick={handleAddAnotherDiagnosis}>
+                <Button variant="contained" color="error" onClick={handleAddAnotherDiagnosis}>
                     Add Another Diagnosis
                 </Button>
             </Box>

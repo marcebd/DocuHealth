@@ -7,6 +7,7 @@ import AddPatient from './AddPatient/AddPatient';
 import Note from './VisitNote.jsx/Note';
 import Prescription from './Prescription/Prescription'
 import Diagnosis from './Diagnosis/Diagnosis';
+import ScheduleAppointment from './Appointment/ScheduleAppointment';
 
 
 function DoctorsHome() {
@@ -17,6 +18,7 @@ function DoctorsHome() {
         addNote: {component: <Note />, isVisible: false},
         addPrescription: {component: <Prescription />, isVisible: false},
         addDiagnosis: {component: <Diagnosis />, isVisible: false},
+        addAppointment: {component: <ScheduleAppointment />, isVisible: false},
         // Add more components as needed
     });
 
