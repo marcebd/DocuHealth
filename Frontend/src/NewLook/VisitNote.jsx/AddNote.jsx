@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { TextField, Button, Select, MenuItem, FormControl, InputLabel, Typography, Box, InputAdornment } from '@mui/material';
 import { LocalizationProvider, DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Ensure this icon is imported
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
-const AddNote = () => {
+const AddNote = ({ patient, handleSubmit }) => {
     const [noteType, setNoteType] = useState('visit');
+    const [patientId] = patient.id;
     const [noteContent, setNoteContent] = useState(`Weight:
 Temperature:
 Heart Rate:
@@ -51,18 +53,28 @@ Plan:`);
         setNoteContent(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const localHandleSubmit = (event) => {
         event.preventDefault();
-        console.log('Submitting Note:', noteType, noteContent, noteDate, noteTime);
+        const noteData = {
+            noteType,
+            noteContent,
+            noteDate,
+            noteTime,
+            patientId
+        };
+        handleSubmit(noteData); // Call the passed handleSubmit function with the note data
     };
+
+    // Construct the patient's full name
+    const patientName = patient ? `${patient.firstName} ${patient.middleName ? patient.middleName + ' ' : ''}${patient.lastName}` : 'Patient';
 
     return (
         <LocalizationProvider dateAdapter={AdapterDateFns}>
             <Box sx={{ width: '100%', padding: 3 }}>
                 <Typography variant="h4" gutterBottom>
-                    Add a Note
+                    Add a Note for {patientName}
                 </Typography>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={localHandleSubmit}>
                     <FormControl fullWidth margin="normal">
                         <InputLabel>
                             <Typography variant="h6">Note Type</Typography>
@@ -77,36 +89,48 @@ Plan:`);
                             <MenuItem value="other">Other</MenuItem>
                         </Select>
                     </FormControl>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2, mt: 2, width: '60%', ml: 'auto' }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 2 }}>
                         <DatePicker
-                            label="Note Date"
                             value={noteDate}
                             onChange={setNoteDate}
-                            textField={(params) => <TextField {...params} sx={{ width: 220, outline: 'none' }} InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <CalendarTodayIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
-                                    </InputAdornment>
-                                ),
-                            }} />}
+                            textField={(params) => (
+                                <TextField {...params} sx={{ width: 220 }} InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <CalendarTodayIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
+                                        </InputAdornment>
+                                    ),
+                                }} />
+                            )}
                         />
                         <TimePicker
-                            label="Note Time"
                             value={noteTime}
                             onChange={setNoteTime}
-                            textField={(params) => <TextField {...params} sx={{ width: 220, outline: 'none' }} />}
+                            textField={(params) => (
+                                <TextField {...params} sx={{ width: 220 }} InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <AccessTimeIcon sx={{ color: 'action.active', mr: 1, my: 0.5 }} />
+                                        </InputAdornment>
+                                    ),
+                                }} />
+                            )}
                         />
                     </Box>
                     <Box sx={{ mt: 2 }}>
                         <TextField
                             label={noteType.charAt(0).toUpperCase() + noteType.slice(1) + " Note"}
                             multiline
-                            rows={10}
+                            rows={4}
                             fullWidth
                             value={noteContent}
                             onChange={handleNoteContentChange}
                             placeholder={templates[noteType]}
                             variant="outlined"
+                            sx={{
+                                maxHeight: '70vh',
+                                overflow: 'auto' // Ensures content can be scrolled if it exceeds the visible area
+                            }}
                         />
                     </Box>
                     <Button type="submit" variant="contained" color="primary" sx={{ mt: 3 }}>
@@ -116,6 +140,5 @@ Plan:`);
             </Box>
         </LocalizationProvider>
     );
-};
-
-export default AddNote;
+    };
+    export default AddNote;

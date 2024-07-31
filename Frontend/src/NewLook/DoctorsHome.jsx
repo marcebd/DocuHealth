@@ -4,7 +4,7 @@ import Dock from './Dock';
 import MonthlyCalendar from './Calendar/MonthlyCalendar';
 import PatientInformation from './PatientInformation/PatientInformation';
 import AddPatient from './AddPatient/AddPatient';
-import AddNote from './VisitNote.jsx/AddNote';
+import Note from './VisitNote.jsx/Note';
 
 
 function DoctorsHome() {
@@ -12,7 +12,7 @@ function DoctorsHome() {
         calendar: { component: <MonthlyCalendar />, isVisible: false },
         patientInformation: {component: <PatientInformation />, isVisible: false},
         addPatient: {component: <AddPatient />, isVisible: false},
-        addNote: {component: <AddNote />, isVisible: false}
+        addNote: {component: <Note />, isVisible: false}
         // Add more components as needed
     });
 

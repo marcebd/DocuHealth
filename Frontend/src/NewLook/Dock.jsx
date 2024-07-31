@@ -11,7 +11,7 @@ const dockItems = {
         ],
         MedicalRecords: [
         { icon: <FaEdit />, name: 'Add Note', color: '#58D68D',  key: 'addNote' },
-        { icon: <FaFilePrescription />, name: 'Add Prescription', color: '#58D68D' },
+        { icon: <FaFilePrescription />, name: 'Add Prescription', color: '#58D68D', key: 'addPrescription' },
         { icon: <FaNotesMedical />, name: 'Add Diagnosis', color: '#58D68D' }
         ],
         Scheduling: [
