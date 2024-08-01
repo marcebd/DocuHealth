@@ -3,6 +3,7 @@ import { Helmet, HelmetProvider } from 'react-helmet-async';
 import PatientTabs from './PatientTabs';
 import ContentLoader from 'react-content-loader';
 import { useNavigate } from 'react-router-dom';
+import DoctorsHome from '../NewLook/DoctorsHome';
 
 const CustomHelmet = () => (
   <Helmet>
@@ -133,7 +134,7 @@ function Dashboard() {
         }}>Logout</button>
       </header>
       <main style={{ paddingTop: '2%', marginTop: '80px' }}>
-        <PatientTabs viewingPatientId={viewingPatientId} />
+        <DoctorsHome />
       </main>
     </div>
   );

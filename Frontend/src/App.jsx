@@ -6,6 +6,7 @@ import Register from './User-Authentication/Register';
 import Profile from './User-Authentication/Profile';
 import Appointments from './Appointments/Appointments';
 import LandingPage from './LandingPage/LandingPage';
+import DoctorsHome from './NewLook/DoctorsHome';
 
 function App() {
   const bodyStyle = {
@@ -18,8 +19,7 @@ function App() {
       <Router>
         <div id='app' style={bodyStyle}>
           <Routes>
-          <Route path="/appointments" element={<Appointments />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<DoctorsHome />} />
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<Register />} />
