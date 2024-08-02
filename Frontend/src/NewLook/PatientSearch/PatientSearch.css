@@ -1,27 +1,70 @@
 .patient-search-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 95%;
+    height: auto;
+    min-height: 100px;
+    width: 100%;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    transition: height 0.3s ease-in-out;
 }
 
 .search-bar-container {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
+    align-items: center;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.search-bar-container select {
+    margin-left: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .patient-search-table {
-    width: 100%;
-    border-collapse: collapse;
+    flex-grow: 1;
+    overflow: auto;
 }
 
-.patient-search-table th, .patient-search-table td {
-    border: 1px solid #ccc;
+
+.table-header {
+    display: flex;
+    background-color: #e1e1e1;
     padding: 8px;
-    text-align: left;
+    border-bottom: 1px solid #ccc;
 }
 
-.patient-search-table th {
-    background-color: #f8f8f8;
+.table-row {
+    display: flex;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.table-row:hover {
+    background-color: #f0f0f0;
+}
+
+.table-row span {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 5px;
+}
+
+.table-row img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
 }

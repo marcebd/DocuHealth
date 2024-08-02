@@ -33,7 +33,7 @@ const Dock = ({ onToggleComponent }) => {
             {Object.keys(dockItems).map(category => (
                 <div key={category} className="dock-category">
                     {dockItems[category].map(item => (
-                        <button key={item.name} style={{ backgroundColor: item.color }} className="dock-button" onClick={() => item.key && onToggleComponent(item.key)}>
+                        <button key={item.name} style={{ backgroundColor: item.color }} className="dock-button" onClick={() => item.key && onToggleComponent(item.key, item.icon, item.color)}>
                             {item.icon}
                             <span>{item.name}</span>
                         </button>

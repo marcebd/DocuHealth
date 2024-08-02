@@ -109,12 +109,6 @@ const Prescription = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
-            <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', marginBottom: '2%' }}>
-                <FaFilePrescription style={{ color: 'white', marginRight: 8, fontSize: '24px' }} />
-                <Typography variant="h5" style={{ color: 'white' }}>
-                    Add Prescription
-                </Typography>
-            </Box>
             {prescriptions.length > 0 && <PrescriptionTable prescriptions={prescriptions} patientName={fullName} />}
             <PatientSearch
                 onPatientSelect={handlePatientSelect}
@@ -141,11 +135,6 @@ const Prescription = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-            <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2%' }}>
-                <Typography variant="body1" style={{ color: 'white' }}>
-                    Ensure all details are correct before submitting.
-                </Typography>
-            </Box>
         </div>
     );
 }

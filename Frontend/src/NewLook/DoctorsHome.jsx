@@ -19,6 +19,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 function DoctorsHome() {
     const [layouts, setLayouts] = useState({ lg: [] });
     const [visibility, setVisibility] = useState({});
+    const [headerInfo, setHeaderInfo] = useState({});
     const [zIndexes, setZIndexes] = useState({});
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(0);
@@ -40,19 +41,20 @@ function DoctorsHome() {
         searchRecords: <PatientManager />,
     };
 
-    const toggleComponent = useCallback((componentKey) => {
+    const toggleComponent = useCallback((componentKey, icon, color) => {
         setVisibility(prev => ({ ...prev, [componentKey]: !prev[componentKey] }));
+        setHeaderInfo(prev => ({ ...prev, [componentKey]: { icon, color } }));
         setLayouts(prev => {
             const existing = prev.lg.find(l => l.i === componentKey);
             if (existing) {
                 return { lg: prev.lg.filter(l => l.i !== componentKey) };
             } else {
-                const cols = 12; // Total number of columns in the grid
-                const componentWidth = 15; // Default width
-                const componentHeight = 30; // Default height
+                const cols = 12;
+                const componentWidth = 15;
+                const componentHeight = 30;
                 const xPosition = Math.floor((cols - componentWidth) / 2);
-                const minW = Math.max(1, Math.round(cols * 0.3)); // Minimum width as 10% of total columns
-                const minH = Math.max(1, Math.round(30 * 0.3)); // Minimum height as 10% of total rows (assuming 30 rows)
+                const minW = Math.max(1, Math.round(cols * 0.3));
+                const minH = Math.max(1, Math.round(30 * 0.3));
                 return { lg: [...prev.lg, { i: componentKey, x: xPosition, y: 0, w: componentWidth, h: componentHeight, minW, minH }] };
             }
         });
@@ -67,7 +69,7 @@ function DoctorsHome() {
 
     return (
         <div ref={containerRef} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-            <PatientBar onToggleComponent={toggleComponent}/>
+            <PatientBar onToggleComponent={(key, icon, color) => toggleComponent(key, icon, color)} />
             <div style={{ width: 'calc(100% - 200px)', height: '100%', overflow: 'auto' }}>
             <ResponsiveGridLayout
                 className="layout"
@@ -80,7 +82,7 @@ function DoctorsHome() {
                 isResizable={true}
                 onLayoutChange={(newLayout, layouts) => setLayouts(layouts)}
                 draggableHandle=".drag-handle"
-                resizeHandles={['se', 'ne', 'sw', 'nw']} // Allow resizing from all corners
+                resizeHandles={['se', 'ne', 'sw', 'nw']}
                 compactType={null}
                 preventCollision={false}
                 style={{ height: '100%', width: '100%' }}
@@ -88,8 +90,10 @@ function DoctorsHome() {
                 {Object.keys(components).map(key => (
                     visibility[key] && (
                         <div key={key} className="window-frame" data-grid={layouts.lg.find(l => l.i === key)} onClick={() => bringToFront(key)}>
-                            <div className="window-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                                <div className="drag-handle" style={{ flexGrow: 1, cursor: 'move' }}></div>
+                            <div className="window-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', backgroundColor: headerInfo[key]?.color }}>
+                                <div className="drag-handle" style={{ display: 'flex', alignItems: 'center', flexGrow: 1, cursor: 'move',  backgroundColor: headerInfo[key]?.color }}>
+                                    {headerInfo[key]?.icon}
+                                </div>
                                 <FaTimes style={{ cursor: 'pointer' }} onClick={() => toggleComponent(key)} />
                             </div>
                             <div className="window-content">
@@ -99,7 +103,7 @@ function DoctorsHome() {
                     )
                 ))}
             </ResponsiveGridLayout>
-                <Dock onToggleComponent={toggleComponent} components={components} />
+            <Dock onToggleComponent={(key, icon, color) => toggleComponent(key, icon, color)} />
             </div>
         </div>
     );

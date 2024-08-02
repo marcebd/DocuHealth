@@ -76,17 +76,6 @@ const Note = () => {
 
     return (
         <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%'}}>
-            <div style={{
-                width: '100%',
-                height: '40px',
-                backgroundColor: '#58D68D',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: '2%'
-            }}>
-                <FaEdit style={{ color: 'white', fontSize: '24px' }} />
-            </div>
             <PatientSearch
                 onPatientSelect={handlePatientSelect}
                 showTable={showTable}
@@ -94,16 +83,6 @@ const Note = () => {
                 onSearchChange={handleSearchChange}
             />
             {selectedPatient && <AddNote patient={selectedPatient} handleSubmit={handleSubmit}/>}
-            <div style={{
-                width: '100%',
-                height: '40px',
-                backgroundColor: '#58D68D',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: '2%'
-            }}>
-            </div>
             <Snackbar
                 open={openSnackbar}
                 autoHideDuration={6000}

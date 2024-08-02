@@ -93,12 +93,6 @@ const ScheduleAppointment = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
-            <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', marginBottom: '2%' }}>
-                <FaCalendarAlt style={{ color: 'white', marginRight: 8, fontSize: '24px' }} />
-                <Typography variant="h5" style={{ color: 'white' }}>
-                    Schedule Appointment
-                </Typography>
-            </Box>
             <PatientSearch onPatientSelect={handlePatientSelect} showTable={showTable} searchQuery={searchQuery} onSearchChange={handleSearchChange} />
             {appointments.length > 0 && selectedPatient && <AppointmentTable appointments={appointments} patientName={fullName} />}
             {selectedPatient && <AddAppointment patient={selectedPatient} handleSubmit={handleAppointmentSubmit} resetFormTrigger={resetForm} />}
@@ -120,11 +114,6 @@ const ScheduleAppointment = () => {
                 {snackbarMessage}
             </Alert>
         </Snackbar>
-        <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2%' }}>
-            <Typography variant="body1" style={{ color: 'white' }}>
-                Ensure all details are correct before submitting.
-            </Typography>
-        </Box>
     </div>
 );
 };

@@ -1,6 +1,7 @@
-const TableRow = ({ item, columns, onRowClick }) => {
+import '../NewLook/PatientSearch/PatientSearch.css';
+const TableRow = ({ item, columns, onRowClick, viewMode }) => {
     return (
-        <div onClick={() => onRowClick(item)} style={{
+        <div className="table-row" onClick={() => onRowClick(item)} style={{
             display: 'flex',
             padding: '8px',
             border: '1px solid #ddd',
@@ -16,7 +17,7 @@ const TableRow = ({ item, columns, onRowClick }) => {
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap'
                 }}>
-                    {item[column.key]}
+                    {column.render ? column.render(item) : item[column.key]}
                 </span>
             ))}
         </div>

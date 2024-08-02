@@ -107,12 +107,6 @@ const Diagnosis = () => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
-            <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', marginBottom: '2%' }}>
-                <FaNotesMedical style={{ color: 'white', marginRight: 8, fontSize: '24px' }} />
-                <Typography variant="h5" style={{ color: 'white' }}>
-                    Add Diagnosis
-                </Typography>
-            </Box>
             <PatientSearch onPatientSelect={handlePatientSelect} showTable={showTable} searchQuery={searchQuery} onSearchChange={handleSearchChange} />
             {diagnoses.length > 0 && selectedPatient && <DiagnosisTable diagnoses={diagnoses} patientName={fullName} />}
             {selectedPatient && <AddDiagnosis patient={selectedPatient} handleSubmit={handleDiagnosisSubmit} resetFormTrigger={resetForm} />}
@@ -134,11 +128,6 @@ const Diagnosis = () => {
                     {snackbarMessage}
                 </Alert>
             </Snackbar>
-            <Box sx={{ width: '100%', bgcolor: '#58D68D', p: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2%' }}>
-                <Typography variant="body1" style={{ color: 'white' }}>
-                    Ensure all details are correct before submitting.
-                </Typography>
-            </Box>
         </div>
     );
 }

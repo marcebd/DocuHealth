@@ -1,6 +1,7 @@
+import '../NewLook/PatientSearch/PatientSearch.css';
 const TableHeader = ({ columns }) => {
     return (
-        <div style={{
+        <div className="table-header" style={{
             display: 'flex',
             backgroundColor: '#f2f2f2',
             padding: '8px',
