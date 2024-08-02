@@ -1,5 +1,5 @@
 .patient-bar {
-    width: 200px; /* Full width when expanded */
+    width: 200px; /* Initial width when collapsed */
     background-color: #ffffff;
     color: black; /* Adjusted for better visibility on white background */
     display: flex;
@@ -9,18 +9,73 @@
     box-shadow: 2px 0 5px rgba(0,0,0,0.5);
     transition: width 0.3s ease-in-out;
     flex-shrink: 0; /* Prevent the bar from shrinking */
+    overflow-y: auto; /* Add auto y-scroll */
+    position: fixed; /* Fixed position to keep it visible */
+    left: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 1000; /* High z-index to ensure it's above other content */
 }
 
 .patient-bar.visible,
 .patient-bar:hover {
-    width: 200px; /* Ensure full width on hover */
+    width: 300px; /* Expand to full width on hover or when visible */
 }
 
-.patient-bar .pin-button {
-    position: absolute;
-    top: 10px;
-    right: -40px; /* Adjusted to be visible on the edge */
-    background-color: #ffffff;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+.button-container {
+    display: flex;
+    justify-content: space-around; /* Adjust as needed for your design */
+    width: 100%;
+    padding: 10px 0;
+}
+
+.patient-bar-button {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    padding: 8px;
+    border: none;
+    border-radius: 10px;
+    background-color: #76D7C4;
+    color: white;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 40px;
+    transition: width 0.3s ease-out;
+}
+
+.patient-bar-button:hover {
+    width: 150px;
+    background-color: #76D7C4;
+}
+
+.home-button {
+    background-color: #FF0000;
+}
+
+.home-button:hover {
+    background-color: #E60000;
+}
+
+.patient-bar-button span {
+    display: none;
+    margin-left: 8px;
+}
+
+.patient-bar-button:hover span {
+    display: inline;
+    transition: opacity 0.2s ease-in;
+}
+
+@media (max-width: 600px) {
+    .patient-bar-button {
+        width: 30px;
+    }
+
+    .patient-bar-button:hover {
+        width: 100px;
+    }
 }

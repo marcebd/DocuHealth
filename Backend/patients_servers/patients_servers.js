@@ -128,7 +128,8 @@ async function fetchPatientsData(patientIds) {
             id: patient.id.toString(),
             firstName: patient.firstName,
             middleName: patient.middleName,
-            lastName: patient.lastName
+            lastName: patient.lastName,
+            imgSrc: patient.picture,
         };
     }));
     return patients.filter(patient => patient !== null);
