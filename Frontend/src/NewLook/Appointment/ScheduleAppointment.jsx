@@ -24,6 +24,45 @@ const ScheduleAppointment = () => {
         setOpenSnackbar(false);
     };
 
+    useEffect(() => {
+        const viewingPatientId = localStorage.getItem('viewingPatientId');
+        if (viewingPatientId) {
+            fetchPatientById(viewingPatientId);
+        }
+
+        const handleStorageChange = (event) => {
+            if (event.key === 'viewingPatientId') {
+                fetchPatientById(event.newValue);
+            }
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+        };
+    }, []);
+
+    const fetchPatientById = async (patientId) => {
+
+        try {
+            const response = await fetch(`http://localhost:3001/dashboard/patient/information/${patientId}`, {
+                method: 'GET'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch patient data');
+            }
+            let patientInformation = await response.json();
+            patientInformation = JSON.parse(patientInformation);
+            handlePatientSelect(patientInformation);
+            setShowTable(false);
+        } catch (error) {
+            console.error(error);
+            setError('Failed to load patient data: ' + error.message);
+        }
+    };
+
     const handlePatientSelect = (patient) => {
         setSelectedPatient(patient);
         setShowTable(false);
