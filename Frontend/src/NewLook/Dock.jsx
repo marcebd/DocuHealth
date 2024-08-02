@@ -1,7 +1,9 @@
 import React from 'react';
 import { FaUserMd, FaPlusSquare, FaTrashAlt, FaEdit, FaUserEdit, FaCog, FaFilePrescription, FaNotesMedical, FaCalendarAlt, FaSearch, FaHome } from 'react-icons/fa';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import './Dock.css';
+import { useNavigate } from 'react-router-dom';
 
 const dockItems = {
     PatientManagement: [
@@ -28,8 +30,28 @@ const dockItems = {
 };
 
 const Dock = ({ onToggleComponent }) => {
+    const navigate = useNavigate();
     const handleHomeClick = () => {
         localStorage.removeItem('viewingPatientId');
+    };
+
+    const handleLogOutClick  = async () => {
+        try {
+            const response = await fetch('`http://localhost:3000/logout', {
+                method: 'GET'
+            });
+            if (!response.ok) {
+                console.error('Failed to log out:', response);
+            } else {
+                localStorage.removeItem('userId');
+                localStorage.removeItem('patientTabs');
+                localStorage.removeItem('viewingPatient');
+                navigate('/');
+                window.location.reload();
+            }
+            } catch (error) {
+            console.error('Error logging out:', error);
+            }
     };
 
     return (
@@ -47,6 +69,10 @@ const Dock = ({ onToggleComponent }) => {
             <button className="dock-button" style={{ backgroundColor: 'red' }} onClick={handleHomeClick}>
                 <FaHome style={{ color: 'white' }} />
                 <span>Home</span>
+            </button>
+            <button className="dock-button" style={{ backgroundColor: 'red' }} onClick={handleLogOutClick}>
+                <LogoutIcon style={{ color: 'white' }} />
+                <span>Log Out</span>
             </button>
         </div>
     );
