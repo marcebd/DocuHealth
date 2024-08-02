@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserMd, FaPlusSquare, FaTrashAlt, FaEdit, FaUserEdit, FaCog, FaFilePrescription, FaNotesMedical, FaCalendarAlt, FaSearch } from 'react-icons/fa';
+import { FaUserMd, FaPlusSquare, FaTrashAlt, FaEdit, FaUserEdit, FaCog, FaFilePrescription, FaNotesMedical, FaCalendarAlt, FaSearch, FaHome } from 'react-icons/fa';
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import './Dock.css';
 
@@ -28,6 +28,10 @@ const dockItems = {
 };
 
 const Dock = ({ onToggleComponent }) => {
+    const handleHomeClick = () => {
+        localStorage.removeItem('viewingPatientId');
+    };
+
     return (
         <div className="dock-container">
             {Object.keys(dockItems).map(category => (
@@ -40,6 +44,10 @@ const Dock = ({ onToggleComponent }) => {
                     ))}
                 </div>
             ))}
+            <button className="dock-button" style={{ backgroundColor: 'red' }} onClick={handleHomeClick}>
+                <FaHome style={{ color: 'white' }} />
+                <span>Home</span>
+            </button>
         </div>
     );
 };

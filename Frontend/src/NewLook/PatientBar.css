@@ -1,5 +1,5 @@
 .patient-bar {
-    width: 200px; /* Initial width when collapsed */
+    width: 150px; /* Initial width when collapsed */
     background-color: #ffffff;
     color: black; /* Adjusted for better visibility on white background */
     display: flex;
@@ -19,7 +19,7 @@
 
 .patient-bar.visible,
 .patient-bar:hover {
-    width: 300px; /* Expand to full width on hover or when visible */
+    width: 400px; /* Expand to full width on hover or when visible */
 }
 
 .button-container {
@@ -62,7 +62,7 @@
 
 .patient-bar-button span {
     display: none;
-    margin-left: 8px;
+
 }
 
 .patient-bar-button:hover span {

@@ -21,9 +21,13 @@ const PatientManager = ({ onPatientSelect, selectedPatients, setSelectedPatients
     };
 
     const handlePatientSelect = (patientId) => {
-        if (!selectedPatients.includes(patientId)) {
-            setSelectedPatients([...selectedPatients, patientId]);
-            onPatientSelect(patientId); // Assuming this is a prop function to handle selected patient
+        const patientSet = new Set(selectedPatients);
+        if (patientSet.has(patientId)) {
+            localStorage.setItem('viewingPatientId', patientId);
+        } else {
+            patientSet.add(patientId);
+            setSelectedPatients([...patientSet]);
+            onPatientSelect(patientId); 
         }
     };
 

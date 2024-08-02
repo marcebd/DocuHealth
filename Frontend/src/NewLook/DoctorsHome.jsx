@@ -16,7 +16,6 @@ import PatientManager from './PatientManager';
 import { FaTimes } from 'react-icons/fa';
 import defaultImage from '../DocuImage/ProfilePicDefault.jpeg';
 const ResponsiveGridLayout = WidthProvider(Responsive);
-
 function DoctorsHome() {
     const [layouts, setLayouts] = useState({ lg: [] });
     const [visibility, setVisibility] = useState({});
@@ -24,18 +23,17 @@ function DoctorsHome() {
     const [zIndexes, setZIndexes] = useState({});
     const containerRef = useRef(null);
     const [containerWidth, setContainerWidth] = useState(0);
-    const [selectedPatients, setSelectedPatients] = useState(JSON.parse(localStorage.getItem('selectedPatients')) || []);
+    const [selectedPatients, setSelectedPatients] = useState([...new Set(JSON.parse(localStorage.getItem('selectedPatients')) || [])]);
     const [selectedPatientObjects, setSelectedPatientObjects] = useState([]);
-
+    const [reFetch, setFetch] = useState(false);
     useEffect(() => {
         if (containerRef.current) {
             setContainerWidth(containerRef.current.clientWidth);
         }
     }, []);
-
     useEffect(() => {
         const fetchPatientData = async () => {
-            const patientIds = JSON.parse(localStorage.getItem('selectedPatients')) || [];
+            const patientIds = [...new Set(JSON.parse(localStorage.getItem('selectedPatients')) || [])];
             if (patientIds.length > 0) {
                 try {
                     const response = await fetch('http://localhost:3001/patients/names', {
@@ -47,13 +45,12 @@ function DoctorsHome() {
                     });
                     if (response.ok) {
                         let patients = await response.json();
-                        // Process image data for each patient
                         patients = patients.map(patient => {
                             if (patient.imgSrc && patient.imgSrc.data) {
                                 const base64String = btoa(String.fromCharCode(...new Uint8Array(patient.imgSrc.data)));
                                 patient.imgSrc = `data:image/jpeg;base64,${base64String}`;
                             } else {
-                                patient.imgSrc = defaultImage; // Use default image if no image data
+                                patient.imgSrc = defaultImage;
                             }
                             return patient;
                         });
@@ -64,17 +61,21 @@ function DoctorsHome() {
                 } catch (error) {
                     console.error('Error fetching patient data:', error);
                 }
+            } else {
+                setSelectedPatientObjects([]);
             }
         };
-
         fetchPatientData();
-    }, [selectedPatients]);
-
+    }, [selectedPatients, reFetch]);
     const handlePatientSelect = useCallback((patient) => {
-        const existingPatients = JSON.parse(localStorage.getItem('selectedPatients')) || [];
-        const newPatients = [...existingPatients, patient.id];
-        localStorage.setItem('selectedPatients', JSON.stringify(newPatients));
-        setSelectedPatients(newPatients);
+        const existingPatients = new Set(JSON.parse(localStorage.getItem('selectedPatients')) || []);
+        if (existingPatients.has(patient.id)) {
+            localStorage.setItem('viewingPatientId', patient.id);
+        } else {
+            existingPatients.add(patient.id);
+            localStorage.setItem('selectedPatients', JSON.stringify([...existingPatients]));
+            setSelectedPatients([...existingPatients]);
+        }
     }, []);
 
     const components = {
@@ -140,10 +141,11 @@ function DoctorsHome() {
                                     ) : null
                                 ))}
                             </ResponsiveGridLayout>
-                            <PatientBar onToggleComponent={toggleComponent} selectedPatients={selectedPatientObjects} />
+                            {selectedPatientObjects.length > 0 && (
+                                <PatientBar onToggleComponent={toggleComponent} selectedPatients={selectedPatientObjects} setSelectedPatients={setSelectedPatients} setFetch={setFetch} />
+                            )}
                         </div>
-
                     </div>
-                );
+    );
 }
 export default DoctorsHome;
