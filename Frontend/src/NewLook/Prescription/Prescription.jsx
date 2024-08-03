@@ -147,7 +147,7 @@ const Prescription = () => {
     };
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 'auto', height: 'auto' }}>
             {prescriptions.length > 0 && <PrescriptionTable prescriptions={prescriptions} patientName={fullName} />}
             <PatientSearch
                 onPatientSelect={handlePatientSelect}

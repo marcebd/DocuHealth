@@ -29,7 +29,8 @@ const FacialRecognitionSearchButton = ({ handlePatientClick }) => {
     marginTop: '1%',
     backgroundColor: hoveredButton ? 'lightgrey' : 'white',
     textOverflow: 'ellipsis',
-    marginLeft: '7%'
+    marginLeft: '7%',
+    color: 'black'
     };
 
     const modalStyle = {
