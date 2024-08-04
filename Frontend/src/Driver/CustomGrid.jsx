@@ -22,9 +22,13 @@ const CustomGrid = ({
             key={key}
             default={{
               x: (layouts[key] && layouts[key].x) || 0,
-              y: (layouts[key] && layouts[key].y) || 0,
-              width: (layouts[key] && layouts[key].w) || 1100,
-              height: (layouts[key] && layouts[key].h) || 1100,
+              y: (layouts[key] && layouts[key].y) || (
+                Object.keys(visibility)
+                  .filter((k) => visibility[k] && k < key)
+                  .reduce((acc, k) => acc + (layouts[k] && layouts[k].h) + 50, 0)
+              ),
+              width: (layouts[key] && layouts[key].w) || (containerWidth * 0.9),
+              height: (layouts[key] && layouts[key].h) || (window.innerHeight * 0.9),
             }}
             minWidth={200}
             minHeight={100}

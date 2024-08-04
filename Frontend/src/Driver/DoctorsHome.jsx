@@ -86,56 +86,46 @@ function DoctorsHome() {
         searchRecords: <PatientManager onPatientSelect={handlePatientSelect} selectedPatients={selectedPatients} setSelectedPatients={setSelectedPatients} />,
     };
 
+    const bringToFront = useCallback((componentKey) => {
+        setZIndexes((prevZIndexes) => {
+            const maxZIndex = Object.values(prevZIndexes).reduce((max, current) => Math.max(max, current), 0) + 1;
+            return { ...prevZIndexes, [componentKey]: maxZIndex };
+        });
+    }, []);
     const toggleComponent = useCallback((componentKey, icon, color) => {
-        setVisibility(prev => ({ ...prev, [componentKey]: !prev[componentKey] }));
-        setHeaderInfo(prev => ({ ...prev, [componentKey]: { icon, color } }));
-        setLayouts(prev => {
-            const existing = prev.lg.find(l => l.i === componentKey);
-            if (existing) {
-                return { lg: prev.lg.filter(l => l.i !== componentKey) };
-            } else {
-                const cols = 12;
-                const componentWidth = Math.max(1, Math.round(cols)); // 25% of the container's width
-                const componentHeight = Math.max(1, Math.round(100)); //
-                const xPosition = Math.floor((cols - componentWidth) / 2);
-                const minW = Math.max(1, Math.round(cols));
-                const minH = Math.max(1, Math.round(30));
-                return { lg: [...prev.lg, { i: componentKey,x: xPosition, y: 0, w: componentWidth, h: componentHeight, minW, minH }] };
-            }
-            });
-            }, []);
-            const bringToFront = useCallback((componentKey) => {
-                setZIndexes(prevZIndexes => {
-                    const maxZIndex = Object.values(prevZIndexes).reduce((max, current) => Math.max(max, current), 0) + 1;
-                    return { ...prevZIndexes, [componentKey]: maxZIndex };
-                });
-            }, []);
-            return (
-                <div ref={containerRef} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden' }}>
-                    <div style={{ width: '200px', zIndex: 2 }}> {/* Fixed width for Dock */}
-                        <Dock onToggleComponent={toggleComponent} />
-                    </div>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                        <PatientBar
-                            selectedPatients={selectedPatientObjects}
-                            setSelectedPatients={setSelectedPatients}
-                            setFetch={setFetch}
-                        />
-                        <div style={{ flex: 1, overflow: 'auto' }}> {/* Ensure this container has flex: 1 */}
-                            <CustomGrid
-                                components={components}
-                                visibility={visibility}
-                                headerInfo={headerInfo}
-                                zIndexes={zIndexes}
-                                bringToFront={bringToFront}
-                                toggleComponent={toggleComponent}
-                                layouts={layouts}
-                                setLayouts={setLayouts}
-                                containerWidth={containerWidth}
-                            />
-                        </div>
-                    </div>
-                </div>
-            );
-        }
-        export default DoctorsHome;
+        setVisibility((prev) => ({ ...prev, [componentKey]: !prev[componentKey] }));
+        setHeaderInfo((prev) => ({ ...prev, [componentKey]: { icon, color } }));
+        bringToFront(componentKey); // Bring the newly opened application to the front
+    }, [bringToFront]);
+
+    return (
+        <div ref={containerRef} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+            {selectedPatients.length > 0 && (
+              <PatientBar
+                selectedPatients={selectedPatientObjects}
+                setSelectedPatients={setSelectedPatients}
+                setFetch={setFetch}
+              />
+            )}
+            <div style={{ flex: 1, overflow: 'auto' }}> 
+              <CustomGrid
+                components={components}
+                visibility={visibility}
+                headerInfo={headerInfo}
+                zIndexes={zIndexes}
+                bringToFront={bringToFront}
+                toggleComponent={toggleComponent}
+                layouts={layouts}
+                setLayouts={setLayouts}
+                containerWidth={containerWidth}
+              />
+            </div>
+          </div>
+          <div style={{ width: '100%', height: '50px', backgroundColor: '#f0f0f0' }}>
+            <Dock onToggleComponent={toggleComponent} />
+          </div>
+        </div>
+      );
+}
+export default DoctorsHome;
