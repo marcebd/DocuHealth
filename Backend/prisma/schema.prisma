@@ -52,6 +52,7 @@ model Patient {
   idNumber             String
   birthDate            DateTime
   email                String?
+  phone_number    String?
   picture              Bytes?
   userId               BigInt
   conditions           Condition[]

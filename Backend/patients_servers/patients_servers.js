@@ -221,6 +221,7 @@ app.get("/appointments/scheduled", async (req, res) => {
             firstName: true,
             lastName: true,
             email: true,
+            phone_number: true,
             appointments: {
               select: {
                   id: true,
