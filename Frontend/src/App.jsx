@@ -1,12 +1,10 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Dashboard from './Dashboard/Dashboard';
 import Login from './User-Authentication/Login';
 import Register from './User-Authentication/Register';
 import Profile from './User-Authentication/Profile';
-import Appointments from './Appointments/Appointments';
 import LandingPage from './LandingPage/LandingPage';
-import DoctorsHome from './NewLook/DoctorsHome';
+import DoctorsHome from './Driver/DoctorsHome';
 
 function App() {
   const bodyStyle = {

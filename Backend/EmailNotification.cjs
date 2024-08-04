@@ -101,6 +101,6 @@ async function handleScheduleEmails() {
     }
 }
 
-setInterval(() => {
-    handleScheduleEmails();
-}, 600);  // Run the scheduling check every minute
+// setInterval(() => {
+//     handleScheduleEmails();
+// }, 600);  // Run the scheduling check every minute

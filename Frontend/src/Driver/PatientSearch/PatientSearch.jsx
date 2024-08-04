@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import './PatientSearch.css';
-import FacialRecognitionSearchButton from '../../FacialRecognition/FacialRecognitionSearchButton';
-import SearchBarPatient from '../../Patient/SearchBarPatient';
-import PatientSearchTable from '../../Patient/PatientSearchTable';
+import FacialRecognitionSearchButton from './FacialRecognitionSearchButton';
+import SearchBarPatient from './SearchBarPatient';
+import PatientSearchTable from './PatientSearchTable';
 
 const PatientSearch = ({ onPatientSelect, showTable, searchQuery, onSearchChange }) => {
     const [patientsData, setPatientsData] = useState([]);

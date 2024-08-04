@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FacialRecognitionModal from '../../FacialRecognition/FacialRecognitionModal';
+import FacialRecognitionModal from '../PatientInformation/FacialRecognitionSearchModal';
 import defaultImage from '../../DocuImage/ProfilePicDefault.jpeg';
 import { Box, Grid, TextField, Button, Typography, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 

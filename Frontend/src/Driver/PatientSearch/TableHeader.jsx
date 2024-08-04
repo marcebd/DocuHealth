@@ -1,8 +1,9 @@
-import '../NewLook/PatientSearch/PatientSearch.css';
-const TableRow = ({ item, columns, onRowClick, viewMode }) => {
+import './PatientSearch.css';
+const TableHeader = ({ columns }) => {
     return (
-        <div className="table-row" onClick={() => onRowClick(item)} style={{
+        <div className="table-header" style={{
             display: 'flex',
+            backgroundColor: '#f2f2f2',
             padding: '8px',
             border: '1px solid #ddd',
             minWidth: '100%'
@@ -12,16 +13,13 @@ const TableRow = ({ item, columns, onRowClick, viewMode }) => {
                     flex: 1,
                     minWidth: '5%',
                     borderRight: index !== columns.length - 1 ? '1px solid #f0f0f0' : 'none',
-                    textAlign: 'center',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap'
+                    textAlign: 'center'
                 }}>
-                    {column.render ? column.render(item) : item[column.key]}
+                    {column.header}
                 </span>
             ))}
         </div>
     );
 };
 
-export default TableRow;
+export default TableHeader;

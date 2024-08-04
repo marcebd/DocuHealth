@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ContentLoader from 'react-content-loader';
 import TableHeader from './TableHeader';
 import TableRow from './TableRow';
-import '../NewLook/PatientSearch/PatientSearch.css';
+import './PatientSearch.css';
 
 const Table = ({ data, columns, onRowClick, sortKey, sortDirection, onSortChange, style, viewMode }) => {
     const [sortedData, setSortedData] = useState([]);

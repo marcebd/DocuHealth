@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './PatientProfile.css';
-import FacialRecognitionModal from '../../FacialRecognition/FacialRecognitionModal';
+import FacialRecognitionModal from './FacialRecognitionSearchModal';
 
 const PatientProfile = ({ patient, onUpdate }) => {
     const [patientData, setPatientData] = useState({ ...patient });

@@ -1,30 +1,36 @@
 import React, { useState } from 'react';
-import FacialRecognitionModal from './FacialRecognitionModal';
+import FacialRecognitionSearchModal from '../PatientInformation/FacialRecognitionSearchModal';
 
-const FacialRecognitionPatientButton = ({ onImageCapture }) => {
+
+
+const FacialRecognitionSearchButton = ({ handlePatientClick }) => {
     const [hoveredButton, setHoveredButton] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const handleCreate = () => {
-    setIsModalOpen(true);
+        setIsModalOpen(true);
     };
 
     const handleCloseModal = () => {
-    setIsModalOpen(false);
+        setIsModalOpen(false);
     };
+
+
 
     const buttonStyle = {
     padding: '10px 20px',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    width: 'auto',
+    width: '100%',
     height: '40px',
     background: 'transparent',
     border: '1px solid #ccc',
     borderRadius: '5px',
     marginTop: '1%',
     backgroundColor: hoveredButton ? 'lightgrey' : 'white',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
+    marginLeft: '7%',
+    color: 'black'
     };
 
     const modalStyle = {
@@ -44,22 +50,20 @@ const FacialRecognitionPatientButton = ({ onImageCapture }) => {
     <div style={{ display: 'flex', justifyContent: 'space-around' }}>
         {isModalOpen && (
         <div style={modalStyle}>
-            <FacialRecognitionModal onClose={handleCloseModal} onImageCapture={(imgSrc) => {
-            onImageCapture(imgSrc);
-            }} />
+            <FacialRecognitionSearchModal onClose={handleCloseModal} handlePatientClick={(handlePatientClick)}/>
         </div>
         )}
         <button
-        aria-label="Add Face Recognition to this Patient"
-        style={buttonStyle}
-        onMouseEnter={() => setHoveredButton(true)}
-        onMouseLeave={() => setHoveredButton(false)}
-        onClick={handleCreate}
-        >
-        Add Face Recognition to this Patient
+            aria-label="Facial Recognition Search"
+            style={buttonStyle}
+            onMouseEnter={() => setHoveredButton(true)}
+            onMouseLeave={() => setHoveredButton(false)}
+            onClick={handleCreate}
+            >
+            Face
         </button>
     </div>
     );
 };
 
-export default FacialRecognitionPatientButton;
+export default FacialRecognitionSearchButton;

@@ -113,6 +113,7 @@ app.post("/login", (req, res, next) => {
   }
   passport.authenticate("local", { session: true }, (err, user, info) => {
     if (err) {
+      console.log(err);
       return res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
     if (!user) {
@@ -120,6 +121,7 @@ app.post("/login", (req, res, next) => {
     }
     req.login(user, err => {
       if (err) {
+        console.log(err);
         return res.status(500).json({ message: "Error logging in", error: err.message });
       }
       return res.json({ userId: user.id });

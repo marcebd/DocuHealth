@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Table from './Table';
-import defaultImage from '../DocuImage/ProfilePicDefault.jpeg';
+import defaultImage from '../../DocuImage/ProfilePicDefault.jpeg';
 
 const PatientSearchTable = ({ patientsData, handlePatientClick, viewMode }) => {
     const [sortDirection, setSortDirection] = useState('asc');

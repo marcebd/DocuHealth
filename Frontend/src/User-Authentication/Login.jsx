@@ -24,6 +24,7 @@ function Login() {
       });
       const jsonData = await response.json();
       if (!response.ok) {
+        console.log(jsonData);
         setError(jsonData.message || 'Failed to login'); 
       } else {
         localStorage.setItem('userId', JSON.stringify(jsonData.userId));
