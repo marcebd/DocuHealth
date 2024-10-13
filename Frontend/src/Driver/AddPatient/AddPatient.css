@@ -1,67 +1,74 @@
-.patient-profile {
-    width: 95%;
+.add-patient-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-patient-header {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    margin: auto;
-}
-
-.header {
+    margin-bottom: 20px;
+  }
+  
+  .add-patient-header h4 {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .add-patient-header button {
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-patient-form {
     display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.profile-picture-section {
-    margin-right: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 40%;
-}
-.name-details {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: auto;
-}
-.input-field {
-    width: auto; /* Adjust width as necessary or keep it flexible */
-    margin-bottom: 10px; /* Adds spacing between inputs */
-}
-.profile-picture-container {
-    width: 15vw;
-    height: 15vw;
-    border-radius: 50%;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.profile-picture {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .add-patient-form > div {
+    width: 48%;
+    margin-bottom: 20px;
+  }
+  
+  .add-patient-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .add-patient-form input, .add-patient-form select, .add-patient-form textarea {
     width: 100%;
-    height: auto;
-}
-
-.image-controls {
-    text-align: center;
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.input-file {
-    width: 7vw;
-}
-
-.input-field {
-    width: 50vw;
-}
-
-.save-button {
-    margin-top: 20px;
-    align-self: center;
-}
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+  }
+  
+  .add-patient-form button[type="submit"] {
+    background-color: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .add-patient-form button[type="submit"]:hover {
+    background-color: #1565c0;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .add-patient-form > div {
+      width: 100%;
+    }
+  }

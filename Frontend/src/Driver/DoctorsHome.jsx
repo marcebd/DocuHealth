@@ -26,7 +26,7 @@ function DoctorsHome() {
 
     useEffect(() => {
         if (containerRef.current) {
-            setContainerWidth(containerRef.current.clientWidth - 200); // Subtract the width of the Dock
+            setContainerWidth(containerRef.current.clientWidth - 200); 
         }
     }, []);
 
@@ -95,37 +95,37 @@ function DoctorsHome() {
     const toggleComponent = useCallback((componentKey, icon, color) => {
         setVisibility((prev) => ({ ...prev, [componentKey]: !prev[componentKey] }));
         setHeaderInfo((prev) => ({ ...prev, [componentKey]: { icon, color } }));
-        bringToFront(componentKey); // Bring the newly opened application to the front
+        bringToFront(componentKey); 
     }, [bringToFront]);
 
     return (
         <div ref={containerRef} style={{ display: 'flex', height: '100vh', width: '100vw', overflow: 'hidden', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', height: '100%', width: '100%' }}>
+            <div style={{ display: 'flex', height: '100%', width: '100%' }}>
             {selectedPatients.length > 0 && (
-              <PatientBar
+                <PatientBar
                 selectedPatients={selectedPatientObjects}
                 setSelectedPatients={setSelectedPatients}
                 setFetch={setFetch}
-              />
+            />
             )}
-            <div style={{ flex: 1, overflow: 'auto' }}> 
-              <CustomGrid
-                components={components}
-                visibility={visibility}
-                headerInfo={headerInfo}
-                zIndexes={zIndexes}
-                bringToFront={bringToFront}
-                toggleComponent={toggleComponent}
-                layouts={layouts}
-                setLayouts={setLayouts}
-                containerWidth={containerWidth}
-              />
+            <div style={{ flex: 1, overflow: 'auto', marginLeft: '1%' }} > 
+                <CustomGrid
+                    components={components}
+                    visibility={visibility}
+                    headerInfo={headerInfo}
+                    zIndexes={zIndexes}
+                    bringToFront={bringToFront}
+                    toggleComponent={toggleComponent}
+                    layouts={layouts}
+                    setLayouts={setLayouts}
+                    containerWidth={containerWidth - 1} 
+                />
             </div>
-          </div>
-          <div style={{ width: '100%', height: '50px', backgroundColor: '#f0f0f0' }}>
-            <Dock onToggleComponent={toggleComponent} />
-          </div>
+            </div>
+            <div style={{ width: '100%', height: '50px', backgroundColor: '#f0f0f0' }}>
+                <Dock onToggleComponent={toggleComponent} />
+            </div>
         </div>
-      );
+    );
 }
 export default DoctorsHome;

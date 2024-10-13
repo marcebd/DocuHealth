@@ -1,5 +1,5 @@
 .patient-bar {
-    width: 150px; /* Initial width when collapsed */
+    width: 1%; /* Initial width when collapsed */
     background-color: #ffffff;
     color: black; /* Adjusted for better visibility on white background */
     display: flex;

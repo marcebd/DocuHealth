@@ -52,14 +52,32 @@ model Patient {
   idNumber             String
   birthDate            DateTime
   email                String?
-  phone_number    String?
+  phone_number         String?
   picture              Bytes?
   userId               BigInt
-  conditions           Condition[]
-  user                 User                  @relation(fields: [userId], references: [id])
-  prescriptions        Prescription[]
-  visitNotes           VisitNote[]
-  appointments         Appointment[]
+  address              String
+  city                 String
+  state                String
+  zipCode              String
+  emergencyContactName String
+  emergencyContactRelationship String
+  emergencyContactPhoneNumber String
+  primaryCarePhysicianName String
+  primaryCarePhysicianPhoneNumber String
+  medicalHistory        String[]
+  familyMedicalHistory  String[]
+  insuranceProvider     String
+  policyNumber          String
+  groupNumber           String
+  billingAddress        String
+  preferredCommunicationMethod String
+  languagePreference    String
+  ethnicity             String
+  user                  User                  @relation(fields: [userId], references: [id])
+  conditions            Condition[]
+  prescriptions         Prescription[]
+  visitNotes            VisitNote[]
+  appointments          Appointment[]
 }
 
 model Appointment {

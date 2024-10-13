@@ -48,10 +48,6 @@ function MonthlyCalendar() {
     setDate(new Date(arg.dateStr));
   };
 
-  const handleViewChange = (newView) => {
-    setView(newView);
-  };
-
   return (
     <div className="calendar-container">
       <FullCalendar
