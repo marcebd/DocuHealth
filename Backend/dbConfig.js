@@ -6,10 +6,8 @@ const { Pool } = pg;
 
 const isProduction = process.env.NODE_ENV === "production";
 
-const connectionString = `postgresql://postgres:Blue&Rufus&111103@localhost:5432/DocuHealth?schema=public`;
-
 const pool = new Pool({
-  connectionString: isProduction ? process.env.DATABASE_URL : connectionString,
+  connectionString: process.env.DATABASE_URL,
   ssl: isProduction ? { rejectUnauthorized: false } : false
 });
 

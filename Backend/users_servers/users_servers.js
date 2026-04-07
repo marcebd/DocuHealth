@@ -20,10 +20,6 @@ const prisma = new PrismaClient();
 
 const app = express();
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
-});
-
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -59,8 +55,8 @@ app.get("/logout", (req, res) => {
 
 app.get("/:userId/dashboard/name/picture", async(req, res) => {
     try {
-      const userId = req.params.userId;
-      const userData = await prisma.user_data.findUnique({ where: { id: userId } });
+      const userId = BigInt(req.params.userId);
+      const userData = await prisma.user_data.findUnique({ where: { user_id: userId } });
       res.json({
         first_name: userData.first_name,
         profile_picture: userData.profile_picture,
@@ -137,13 +133,14 @@ function replacer(key, value) {
 
 app.post("/profile", upload.single('profilePicture'), async (req, res) => {
   try {
+    const userId = BigInt(req.body.userId);
     const existingProfile = await prisma.user_data.findUnique({
-      where: { user_id: req.body.userId },
+      where: { user_id: userId },
     });
 
     if (existingProfile) {
       const updatedProfile = await prisma.user_data.update({
-        where: { user_id: req.body.userId },
+        where: { user_id: userId },
         data: {
           first_name: req.body.firstName,
           middle_name: req.body.middleName,
@@ -166,7 +163,7 @@ app.post("/profile", upload.single('profilePicture'), async (req, res) => {
       // Create a new profile
       const newProfile = await prisma.user_data.create({
         data: {
-          user_id: req.body.userId,
+          user_id: userId,
           first_name: req.body.firstName,
           middle_name: req.body.middleName,
           last_name: req.body.lastName,
@@ -218,6 +215,10 @@ app.delete('/users/:userId', async (req, res) => {
     console.error('Error deleting user:', error);
     res.status(500).json({ message: "Failed to delete user", error: error.message });
   }
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
 });
 
 // Helper Functions

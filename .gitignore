@@ -1,5 +1,25 @@
-node_modules
-public/images/*
+# Dependencies
+node_modules/
+
+# Environment variables
 .env
-# Keep environment variables out of version control
-Backend/.env
+.env.local
+.env.production
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.idx/
+.vscode/
+.idea/
+
+# Build output
+Frontend/dist/
+
+# Images uploads
+public/images/*
+
+# Claude Code
+.claude/

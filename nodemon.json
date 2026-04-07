@@ -1,5 +1,0 @@
-{
-    "watch": ["src"],
-    "ext": "ts",
-    "exec": "/Users/marcebd/Desktop/DocuHealth/Backend/server.js"
-  }
