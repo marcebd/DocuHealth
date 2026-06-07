@@ -2,8 +2,6 @@
 
 A full-stack healthcare patient management system designed to digitize medical records in Guatemalan public hospitals. DocuHealth replaces paper-based patient files with a centralized digital platform where doctors can manage patient records, write visit notes, prescribe medications, track conditions, and schedule appointments — with facial recognition for fast patient identification.
 
-Built during the **Meta University Engineering Internship** (Summer 2024).
-
 ## Demo
 
 https://www.loom.com/share/e82636f1031540a0902c422036cd4ecf?sid=30f6bd22-4554-4066-9510-fbc43625936f
