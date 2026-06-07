@@ -135,14 +135,6 @@ The app will be available at **http://localhost:5175**.
 5. **Manage records** — click on a patient tab to write visit notes, add prescriptions, and track conditions
 6. **Schedule appointments** from the appointments view with the calendar interface
 
-## Internship Context
-
-This project was built as part of the **Meta University (MetaU) Engineering Internship** program at Meta.
-
-- **Intern:** Marcela Billingslea Durini
-- **Intern Manager:** Vidushi Seth
-- **Intern Director:** Carl Taylor (AR Experiences)
-
 ## License
 
-This project was created for educational purposes as part of the Meta University internship program.
+This project was created for educational purposes as part of an internship program.
